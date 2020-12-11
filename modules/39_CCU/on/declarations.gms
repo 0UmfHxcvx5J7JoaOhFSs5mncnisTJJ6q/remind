@@ -9,7 +9,7 @@
 Parameters
   p39_co2_dem(ttot,all_regi,all_enty,all_enty,all_te)   "CO2 demand of CCU technologies, unit: tC/TWa(output)"
 $ifthen.shSynTrans "%c39_shSynTrans%" == "parameter"   !! c39_shSynTrans
-  p39_shSynTrans(t)                                     "Share of synthetic liquids in all fossil liquids.  Value between 0 and 1."
+  p39_shSynTrans(tall)                                  "Share of synthetic liquids in all fossil liquids.  Value between 0 and 1."
 $endif.shSynTrans
 ;
 
