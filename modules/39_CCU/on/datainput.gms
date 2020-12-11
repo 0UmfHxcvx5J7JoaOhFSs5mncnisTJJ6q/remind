@@ -10,4 +10,12 @@
 p39_co2_dem(t,regi,"seh2","segafos","h22ch4") = pm_emifac(t,regi,"pegas","segafos","gastr","co2") / fm_dataglob("eta","gastr");
 p39_co2_dem(t,regi,"seh2","seliqfos","MeOH") = pm_emifac(t,regi,"peoil","seliqfos","refliq","co2") / fm_dataglob("eta","refliq"); 
 
+$ifthen.shSynTrans "%c39_shSynTrans%" == "parameter"   !! c39_shSynTrans
+p39_shSynTrans(t)$( t.val lt 2025 ) = 0;
+p39_shSynTrans(t)$( t.val eq 2025 ) = cm_shSynTrans / 4;
+p39_shSynTrans(t)$( t.val eq 2030 ) = cm_shSynTrans / 2;
+p39_shSynTrans(t)$( t.val gt 2030 ) = cm_shSynTrans;
+$endif.shSynTrans
+
 *** EOF ./modules/39_CCU/on/datainput.gms
+

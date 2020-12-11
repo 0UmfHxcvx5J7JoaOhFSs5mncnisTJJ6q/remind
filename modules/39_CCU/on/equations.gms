@@ -11,7 +11,7 @@
 *** calculate CCU emissions (= CO2 demand of CCU technologies)
 *** ---------------------------------------------------------
 
-q39_emiCCU(t,regi,te)$(te_ccu39(te)).. 
+q39_emiCCU(t,regi,te_ccu39(te)) .. 
   sum(teCCU2rlf(te,rlf),
     vm_co2CCUshort(t,regi,"cco2","ccuco2short",te,rlf)
   )
@@ -24,14 +24,33 @@ q39_emiCCU(t,regi,te)$(te_ccu39(te))..
 
 *' Adjust the shares of synfuels in transport liquids.
 *' This equation is only effective when CCU is switched on.
-q39_shSynTrans(t,regi)..
-    (
-	sum(pe2se(entyPe,entySe,te)$seAgg2se("all_seliq",entySe), vm_prodSe(t,regi,entyPe,entySe,te))
-	+ sum(se2se(entySe,entySe2,te)$seAgg2se("all_seliq",entySe2), vm_prodSe(t,regi,entySe,entySe2,te))
-    ) * v39_shSynTrans(t,regi)
-    =e=
-    vm_prodSe(t,regi,"seh2","seliqfos","MeOH")
+$ifthen.shSynTrans "%c39_shSynTrans%" == "variable"   !! c39_shSynTrans
+q39_shSynTrans(t,regi) ..
+    ( sum(pe2se(entyPe,entySe,te)$( seAgg2se("all_seliq",entySe) ), 
+        vm_prodSe(t,regi,entyPe,entySe,te)
+      )
+    + sum(se2se(entySe,entySe2,te)$( seAgg2se("all_seliq",entySe2) ), 
+        vm_prodSe(t,regi,entySe,entySe2,te)
+      )
+    )
+  * v39_shSynTrans(t,regi)
+  =e=
+  vm_prodSe(t,regi,"seh2","seliqfos","MeOH")
 ;
-
+$elseif.shSynTrans "%c39_shSynTrans%" == "parameter"   !! c39_shSynTrans
+q39_shSynTrans(t,regi)$( t.val ge 2025 ) ..
+    ( sum(pe2se(entyPe,entySe,te)$( seAgg2se("all_seliq",entySe) ), 
+        vm_prodSe(t,regi,entyPe,entySe,te)
+      )
+    + sum(se2se(entySe,entySe2,te)$( seAgg2se("all_seliq",entySe2) ), 
+        vm_prodSe(t,regi,entySe,entySe2,te)
+      )
+    )
+  * p3_shSynTrans(t)
+  =l=
+  vm_prodSE(t,regi,"seh2","seliqfos","MeOH")
+;
+$endif.shSynTrans
 
 *** EOF ./modules/39_CCU/on/equations.gms
+
