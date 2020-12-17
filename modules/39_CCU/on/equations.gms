@@ -37,7 +37,7 @@ q39_shSynTrans(t,regi) ..
   =e=
   vm_prodSe(t,regi,"seh2","seliqfos","MeOH")
 ;
-$elseif.shSynTrans "%c39_shSynTrans%" == "parameter"   !! c39_shSynTrans
+$elseif.shSynTrans "%c39_shSynTrans%" == "parameter"
 q39_shSynTrans(t,regi)$( t.val ge 2025 ) ..
     ( sum(pe2se(entyPe,entySe,te)$( seAgg2se("all_seliq",entySe) ), 
         vm_prodSe(t,regi,entyPe,entySe,te)
@@ -46,7 +46,7 @@ q39_shSynTrans(t,regi)$( t.val ge 2025 ) ..
         vm_prodSe(t,regi,entySe,entySe2,te)
       )
     )
-  * p3_shSynTrans(t)
+  * p39_shSynTrans(t)
   =l=
   vm_prodSE(t,regi,"seh2","seliqfos","MeOH")
 ;
