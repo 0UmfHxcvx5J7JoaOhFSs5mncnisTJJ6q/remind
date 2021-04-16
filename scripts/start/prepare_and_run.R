@@ -7,6 +7,7 @@
 library(lucode, quietly = TRUE,warn.conflicts =FALSE)
 library(dplyr, quietly = TRUE,warn.conflicts =FALSE)
 require(gdx)
+madrat::setConfig(hash="md5")
 
 ################################################################################################## 
 #                             function: getReportData                                            #
@@ -380,7 +381,7 @@ prepare <- function() {
   update_info(regionscode(cfg$regionmapping),cfg$revision)
   # update_sets, which is updating the region-depending sets in core/sets.gms
   #-- load new mapping information
-  map <- read.csv(cfg$regionmapping,sep=";")  
+  map <- read.csv(cfg$regionmapping,sep=";", stringsAsFactors = TRUE) 
   update_sets(map)
   
   ########################################################
