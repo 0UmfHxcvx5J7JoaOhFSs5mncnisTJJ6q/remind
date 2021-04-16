@@ -148,7 +148,6 @@ Parameter
     feh2_chemicals    . fega_chemicals       1e-5
     feh2_steel        . fega_steel           1e-5
     feh2_otherInd     . fega_otherInd        1e-5
-    feelhth_chemicals . feelwlth_chemicals   1e-5
     feelhth_otherInd  . feelwlth_otherInd    1e-5
   /
 ;
@@ -159,7 +158,6 @@ Parameter
 $ontext saved for when gms::codeCheck() can handle tables properly
 Table pm_calibrate_eff_scale(all_in,all_in,eff_scale_par)   "parameters for scaling efficiencies in CES calibration"
                                          level   midperiod   width
-    feelhth_chemicals . fega_chemicals   1.5     2030        15
     feelhth_otherInd  . fega_otherInd    1.5     2030        15
 
     feh2_cement       . fega_cement      1.1     2050        22
@@ -169,9 +167,6 @@ Table pm_calibrate_eff_scale(all_in,all_in,eff_scale_par)   "parameters for scal
 ;
 $offtext
 
-pm_calibrate_eff_scale("feelhth_chemicals","fega_chemicals","level")     = 1.5;
-pm_calibrate_eff_scale("feelhth_chemicals","fega_chemicals","midperiod") = 2030;
-pm_calibrate_eff_scale("feelhth_chemicals","fega_chemicals","width")     = 15;
 pm_calibrate_eff_scale("feelhth_otherInd","fega_otherInd","level")       = 1.5;
 pm_calibrate_eff_scale("feelhth_otherInd","fega_otherInd","midperiod")   = 2030;
 pm_calibrate_eff_scale("feelhth_otherInd","fega_otherInd","width")       = 15;

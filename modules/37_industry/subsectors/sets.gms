@@ -70,7 +70,6 @@ Sets
     feli_chemicals       "liquids energy use of chemicals production"
     fega_chemicals       "gases energy use of chemicals production"
     feh2_chemicals       "hydrogen energy use of chemicals production"
-    feelhth_chemicals    "electric energy for high temperature heat in chemicals production"
     feelwlth_chemicals   "electric energy for mechanical work and low temperature heat in chemicals production"
 
     ue_steel               "useful energy of steel production"
@@ -113,7 +112,7 @@ Sets
    ue_chemicals             . (en_chemicals, kap_chemicals)
    en_chemicals             . (en_chemicals_fhth, feelwlth_chemicals)
    en_chemicals_fhth        . (feso_chemicals, feli_chemicals, fega_chemicals,
-                               feh2_chemicals, feelhth_chemicals)
+                               feh2_chemicals)
 
    ue_steel                 . (ue_steel_primary, ue_steel_secondary)
    ue_steel_secondary       . (feel_steel_secondary, kap_steel_secondary)
@@ -133,7 +132,7 @@ Sets
                  feel_cement)
 
     ue_chemicals . (feso_chemicals, feli_chemicals, fega_chemicals, 
-                    feh2_chemicals, feelhth_chemicals, feelwlth_chemicals)
+                    feh2_chemicals, feelwlth_chemicals)
 
     ue_steel_primary . (feso_steel, feli_steel, fega_steel, feh2_steel, 
                         feel_steel_primary)
@@ -166,7 +165,7 @@ Sets
   /
     feso_cement, feli_cement, fega_cement, feh2_cement, feel_cement,
     feso_chemicals, feli_chemicals, fega_chemicals, feh2_chemicals, 
-    feelhth_chemicals, feelwlth_chemicals,
+    feelwlth_chemicals,
     feso_steel, feli_steel, fega_steel, feh2_steel, feel_steel_primary, 
     feel_steel_secondary,
     feso_otherInd, feli_otherInd, fega_otherInd, feh2_otherInd, fehe_otherInd,
@@ -184,7 +183,6 @@ Sets
     feh2_steel     . fega_steel
     feh2_otherInd  . fega_otherInd
 
-    feelhth_chemicals . feelwlth_chemicals
     feelhth_otherInd  . feelwlth_otherInd
   /
 
@@ -196,7 +194,7 @@ Sets
 
     chemicals . (ue_chemicals, en_chemicals, kap_chemicals, en_chemicals_fhth,
                  feso_chemicals, feli_chemicals, fega_chemicals, feh2_chemicals,
-                 feelhth_chemicals, feelwlth_chemicals)
+                 feelwlth_chemicals)
 
     steel . (ue_steel, ue_steel_primary, ue_steel_secondary, en_steel_primary,
              kap_steel_primary, en_steel_furnace, feso_steel, feli_steel, 
@@ -223,7 +221,7 @@ Sets
     fegas . (fega_cement, fega_chemicals, fega_steel, fega_otherInd)
     feh2s . (feh2_cement, feh2_chemicals, feh2_steel, feh2_otherInd)
     fehes . fehe_otherInd
-    feels . (feel_cement, feelhth_chemicals, feelwlth_chemicals, 
+    feels . (feel_cement, feelwlth_chemicals, 
              feel_steel_primary, feel_steel_secondary, feelhth_otherInd,
              feelwlth_otherInd)
   /
@@ -236,7 +234,7 @@ Sets
     fegai . (fega_cement, fega_chemicals, fega_steel, fega_otherInd)
     feh2i . (feh2_cement, feh2_chemicals, feh2_steel, feh2_otherInd)
     fehei . fehe_otherInd
-    feeli . (feel_cement, feelhth_chemicals, feelwlth_chemicals, 
+    feeli . (feel_cement, feelwlth_chemicals, 
              feel_steel_primary, feel_steel_secondary, feelhth_otherInd,
              feelwlth_otherInd)
   /

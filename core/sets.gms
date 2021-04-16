@@ -566,7 +566,6 @@ all_in   "all inputs and outputs of the CES function"
   feli_chemicals          "liquids energy use of chemicals production"
   fega_chemicals          "gases energy use of chemicals production"
   feh2_chemicals          "hydrogen energy use of chemicals production"
-  feelhth_chemicals       "high temperature heat electricity energy use of chemicals production"
   feelwlth_chemicals      "work and low temperature heat electricity energy use of chemicals production"
 
   ue_steel                "useful energy of steel production"
