@@ -99,5 +99,15 @@ q37_IndCCSCost(ttot,regi,emiInd37)$( ttot.val ge cm_startyear ) ..
     )
 ;
 
+*' Limit the share of H2 in Chemicals FE use to preserve share of feedstocks
+q37_limit_feh2_chemicals_share(ttot,regi) ..
+  vm_cesIO(ttot,regi,"feh2_chemicals")
+  =l=
+    sum(cesOut2cesIn("en_chemicals_fhth",in),
+      vm_cesIO(ttot,regi,in)
+    )
+  * 0.32   !! share of coal + oil + gas in CHEMICALS + NECHEM in 2015
+;
+
 *** EOF ./modules/37_industry/subsectors/equations.gms
 
