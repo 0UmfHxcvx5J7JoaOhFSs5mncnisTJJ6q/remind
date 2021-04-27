@@ -37,6 +37,7 @@ Equations
   q37_IndCCS(ttot,all_regi,emiInd37)                      "limit industry emissions abatement"
   q37_cementCCS(ttot,all_regi)                            "link cement fuel and process abatement"
   q37_IndCCSCost                                          "Calculate industry CCS costs"
+  q37_limit_feh2_chemicals_share(ttot,all_regi)           "limit share of H2 in chemicals FE"
 ;
 
 *** EOF ./modules/37_industry/subsectors/declarations.gms
