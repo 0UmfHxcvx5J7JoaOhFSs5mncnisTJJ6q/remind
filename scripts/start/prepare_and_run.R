@@ -7,7 +7,6 @@
 library(lucode, quietly = TRUE,warn.conflicts =FALSE)
 library(dplyr, quietly = TRUE,warn.conflicts =FALSE)
 require(gdx)
-madrat::setConfig(hash="md5")
 
 ################################################################################################## 
 #                             function: getReportData                                            #
