@@ -96,6 +96,10 @@ option limcol = 70;
 option limrow = 70;
 
 *** solve statement
+if (execError > 0,
+  execute_unload "abort.gdx";
+  abort "at least one execution error occured, possibly in the loop";
+);
 solve initialcap2 using cns;
 
 display v05_INIdemEn0.l, v05_INIcap0.l;
