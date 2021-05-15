@@ -460,6 +460,8 @@ $setglobal c_CES_calibration_iteration        1    !!  def  =  1
 $setglobal c_CES_calibration_write_prices  0    !!  def  =  0
 $setglobal cm_CES_calibration_default_prices  0.1  !!  def  =  0
 
+$ife (%c_CES_calibration_iteration%>1) $setglobal cm_nash_mode debug
+
 $setglobal c_testOneRegi_region  EUR   !! def = EUR
 
 $setglobal cm_cooling_shares  static    !! def = static
