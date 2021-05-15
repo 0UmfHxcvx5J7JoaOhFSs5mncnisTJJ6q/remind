@@ -45,13 +45,40 @@ p80_etaLT_correct(trade,iteration) =
          sum(ttot2$(ttot2.val ge cm_startyear), pm_pvp(ttot2,trade) * pm_ts(ttot2) * p80_surplus(ttot2,trade,iteration) )
         / p80_normalizeLT(trade);
 
-p80_etaST_correct(ttot,trade,iteration)$(ttot.val ge 2005) = 
-           p80_etaST(trade)    
-         * ( (  (1-sm_fadeoutPriceAnticip) + sm_fadeoutPriceAnticip * sqrt(pm_pvp(ttot,"good")/pm_pvp("2100","good"))  )$(sameas(trade,"perm")) + 1$(NOT sameas(trade,"perm")) )    
-      * ((sm_fadeoutPriceAnticip + (1-sm_fadeoutPriceAnticip) * (pm_pvp(ttot,"good")/pm_pvp('2040',"good")) )$(sameas(trade,"perm")) + 1$(NOT sameas(trade,"perm")) )
-      * ((sm_fadeoutPriceAnticip + (1-sm_fadeoutPriceAnticip) * (pm_pvp(ttot,trade)/pm_pvp('2050',trade)) )$(tradePe(trade)) + 1$(NOT tradePe(trade)) )
-         * p80_surplus(ttot,trade,iteration)
-         / max(sm_eps , sum(regi, p80_normalize0(ttot,regi,trade)));
+p80_etaST_correct(ttot,trade,iteration)$( ttot.val ge 2005 )
+  = p80_etaST(trade)    
+  * ( ( (1 - sm_fadeoutPriceAnticip)
+      + sm_fadeoutPriceAnticip
+      * sqrt(pm_pvp(ttot,"good") / pm_pvp("2100","good"))
+      )$( sameas(trade,"perm") )
+    + 1$( NOT sameas(trade,"perm") )
+    )    
+  * ( ( sm_fadeoutPriceAnticip
+      + (1 - sm_fadeoutPriceAnticip)
+      * (pm_pvp(ttot,"good") / pm_pvp('2040',"good"))
+      )$( sameas(trade,"perm") )
+    + 1$( NOT sameas(trade,"perm") )
+    )
+  * ( ( sm_fadeoutPriceAnticip
+      + (1 - sm_fadeoutPriceAnticip)
+      * (pm_pvp(ttot,trade) / pm_pvp('2050',trade))
+      )$( tradePe(trade) )
+    + 1$( NOT tradePe(trade) )
+    )
+  * p80_surplus(ttot,trade,iteration)
+  / max(sm_eps, sum(regi, p80_normalize0(ttot,regi,trade)));
+
+put logfile, ">>> DEBUG <<<" /;
+loop ((ttot,trade)$( ttot.val eq 2150 AND sameas(trade,"peur") ),
+  put p80_etaST_correct.tn(ttot,trade,iteration),       @60 p80_etaST_correct(ttot,trade,iteration) /;
+  put "sm_fadeoutPriceAnticip",                         @60 sm_fadeoutPriceAnticip /;
+  put pm_pvp.tn(ttot,trade),                            @60 pm_pvp(ttot,trade) /;
+  put pm_pvp.tn("2050",trade),                          @60 pm_pvp("2050",trade) /;
+  put p80_surplus.tn(ttot,trade,iteration),             @60 p80_surplus(ttot,trade,iteration) /;
+  put "sum(regi, p80_normalize0('2150',regi,'peur'))",  @60 sum(regi, p80_normalize0(ttot,regi,trade)) /;
+);
+
+putclose logfile, " " /;
 
 *RP* add a stronger push to the price adjustment if convergence doesn't happen for an extended amount of iterations:
 p80_etaST_correct_safecopy(ttot,trade,iteration) = p80_etaST_correct(ttot,trade,iteration); !! first make a copy of the initial adjustment values
