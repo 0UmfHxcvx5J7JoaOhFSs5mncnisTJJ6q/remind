@@ -286,18 +286,21 @@ prepare <- function() {
 
 
   # Calculate CES configuration string
-  cfg$gms$cm_CES_configuration <- paste0("stat_",cfg$gms$stationary,"-",
-                                         "indu_",cfg$gms$industry,"-",
-                                         "buil_",cfg$gms$buildings,"-",
-                                         "tran_",cfg$gms$transport,"-",
-                                         "POP_", cfg$gms$cm_POPscen, "-",
-                                         "GDP_", cfg$gms$cm_GDPscen, "-",
-                                         "Kap_", cfg$gms$capitalMarket, "-",
-                                         ifelse(cfg$gms$transport == "edge_esm", paste0( "demTrsp_", demTrsp, "-"), ""),
-                                         if(cfg$gms$cm_demTcomplex == "fromEDGET") "EDGET-" else "",
-                                         if(cfg$gms$cm_calibration_string == "off") "" else paste0(cfg$gms$cm_calibration_string, "-"),
-                                         if(cfg$gms$buildings == "services_putty") paste0("Esub_",cfg$gms$cm_esubGrowth, "-") else "" ,
-                                         "Reg_", regionscode(cfg$regionmapping))
+  cfg$gms$cm_CES_configuration <- paste0(
+    "stat_",cfg$gms$stationary,"-",
+    "indu_",cfg$gms$industry,"-",
+    "buil_",cfg$gms$buildings,"-",
+    "tran_",cfg$gms$transport,"-",
+    "POP_", cfg$gms$cm_POPscen, "-",
+    "GDP_", cfg$gms$cm_GDPscen, "-",
+    ifelse("off" == cfg$gms$c29_SHAPE_industry_demand, '', 
+	   paste0('Sid_', cfg$gms$c29_SHAPE_industry_demand, '-')),
+    "Kap_", cfg$gms$capitalMarket, "-",
+    ifelse(cfg$gms$transport == "edge_esm", paste0( "demTrsp_", demTrsp, "-"), ""),
+    if(cfg$gms$cm_demTcomplex == "fromEDGET") "EDGET-" else "",
+    if(cfg$gms$cm_calibration_string == "off") "" else paste0(cfg$gms$cm_calibration_string, "-"),
+    if(cfg$gms$buildings == "services_putty") paste0("Esub_",cfg$gms$cm_esubGrowth, "-") else "" ,
+    "Reg_", regionscode(cfg$regionmapping))
 
   # write name of corresponding CES file to datainput.gms
   replace_in_file(file    = "./modules/29_CES_parameters/load/datainput.gms",

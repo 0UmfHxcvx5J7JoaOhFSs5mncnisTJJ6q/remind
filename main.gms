@@ -567,6 +567,9 @@ $setglobal cm_cooling_shares  static    !! def = static
 $setglobal cm_techcosts  REG       !! def = REG
 $setglobal cm_regNetNegCO2  on       !! def = on
 
+*** SHAPE switches
+$setglobal c29_SHAPE_industry_demand   off   !! def = off
+
 *** INNOPATHS switches
 $setglobal cm_calibration_FE  off      !! def = off
 

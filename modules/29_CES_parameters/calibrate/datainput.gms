@@ -290,6 +290,13 @@ $ifthen.indst_H2_penetration "%industry%" == "fixed_shares"
 pm_fedemand(t,regi,"%cm_GDPscen%","feh2i")$(t.val ge 2010) = 0.01*pm_fedemand(t,regi,"%cm_GDPscen%","fegai");
 $endif.indst_H2_penetration
 
+*** SHAPE industry demand trajectories
+$ifthen NOT "%c29_SHAPE_industry_demand%" == "off"   !! c29_SHAPE_industry_demand
+pm_fedemand(t,regi,"%cm_GDPscen%",in_industry_dyn37(in))$( 
+                                         pm_fedemand(t,regi,"%cm_GDPscen%",in) )
+  = pm_fedemand(t,regi,"%c29_SHAPE_industry_demand%",in);
+$endif
+
 display pm_fedemand;
 
 
