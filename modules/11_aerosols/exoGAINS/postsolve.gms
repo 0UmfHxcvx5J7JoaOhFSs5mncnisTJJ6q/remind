@@ -21,6 +21,10 @@ if((o_modelstat gt 2),
 *** Calcualte AP emissions
 Execute "Rscript exoGAINSAirpollutants.R";
 
+if (errorLevel > 1,
+    abort "exoGAINSAirpollutants.R failed";
+);
+
 *** Read input ref results for tall with following dimensions: pm_emiAPexsolve(tall,all_regi,all_sectorEmi,emiRCP)
 if((cm_startyear gt 2005),
 Execute_Loadpoint 'input_ref' p11_emiAPexsolveGDX =  pm_emiAPexsolve;
