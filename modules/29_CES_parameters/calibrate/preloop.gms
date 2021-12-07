@@ -1169,14 +1169,14 @@ loop ((t_29hist_last(t2),cesOut2cesIn(out,in))$(    ue_fe_kap_29(out) ),
 );
 
 
-*** Apply efficiency improvements assumptions to industrial final energy and capital inputs
-loop ((t_29hist_last(t2),cesOut2cesIn_below(out,in))$(
-                                            industry_ue_calibration_target_dyn37(out) 
-                                            AND ppf_beyondcalib_29(in)),
-  pm_cesdata(t_29,regi_dyn29(regi),in, "effGr")$( NOT t_29hist(t_29) )
-  = pm_cesdata(t2,regi,in, "effGr")
-  * ((1 + pm_ue_eff_target(out)) ** (t_29.val - pm_ttot_val(t2)))
-  ;
+*** Apply efficiency improvements assumptions to industrial final energy and
+*** capital inputs
+loop (cesOut2cesIn_below(industry_ue_calibration_target_dyn37(out),
+                         ppf_beyondcalib_29(in)),
+  pm_cesdta(t,regi_dyn29(regi),in,"effGr")$( NOT t_29hist(t) )
+  = pm_cesdata(t-1,regi,in,"effGr")
+  * (pm_cesdata(t,regi,in,"price") / pm_cesdata(t-1,regi,in,"price"))
+  * ((1 + pm_ue_eff_target(out)) ** (pm_ttot_val(t) - pm_ttot_val(t-1)));
 );
 
 !! - adjust efficiency parameters for feelhth_X and feh2_X
