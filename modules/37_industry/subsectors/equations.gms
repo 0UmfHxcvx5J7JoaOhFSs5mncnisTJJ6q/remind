@@ -115,11 +115,60 @@ q37_IndCCSCost(ttot,regi,emiInd37)$( ttot.val ge cm_startyear ) ..
 ***---------------------------------------------------------------------------
 *'  CES markup cost to represent sector-specific demand-side transformation cost in industry
 ***---------------------------------------------------------------------------
-q37_costCESmarkup(t,regi,in)$(ppfen_CESMkup_dyn37(in))..
+q37_costCESmarkup(t,regi,in)$(ppfen_CESMkup_dyn37(in)) ..
   vm_costCESMkup(t,regi,in)
   =e=
     p37_CESMkup(t,regi,in) 
   * (vm_cesIO(t,regi,in) + pm_cesdata(t,regi,in,"offset_quantity"))
+;
+
+*' Calculate sector-specific additional t&d cost (here only cost of hydrogen t&d
+*' at low hydrogen penetration levels when grid is not yet developed)
+q37_costAddTeInv(t,regi,te)$( sameas(te,"tdh2s") ) ..
+  vm_costAddTeInv(t,regi,te,"indst")
+  =e=
+  v37_costAddTeInvH2(t,regi,te)
+;
+
+*'  Additional hydrogen phase-in cost at low H2 penetration levels 
+q37_costAddH2PhaseIn(t,regi) ..
+  v37_costAddTeInvH2(t,regi,"tdh2s")
+  =e=
+    (1 / (1 + (3 ** v37_costExponent(t,regi)))) 
+  * ( s37_costAddH2Inv 
+    * sm_TWa_2_kWh 
+    / sm_trillion_2_non
+    * sum(emiMkt, vm_demFeSector(t,regi,"seh2","feh2s","indst",emiMkt))
+    )
+  + (v37_expSlack(t,regi) * 1e-8)
+;
+
+*' Logistic function exponent for additional hydrogen low penetration cost
+*' equation
+q37_auxCostAddTeInv(t,regi) ..
+  v37_costExponent(t,regi)
+  =e=
+    ( (10 / (s37_costDecayEnd - s37_costDecayStart)) 
+    * ( (v37_H2share(t,regi) + 1e-7)
+      - ( (s37_costDecayEnd + s37_costDecayStart)
+	/ 2
+	)
+      )
+    )
+  - v37_expSlack(t,regi)
+;
+
+*' Hydrogen fe share in industry gases use (natural gas + hydrogen)
+q37_H2Share(t,regi) ..
+    v37_H2share(t,regi) 
+  * sum((emiMkt,se2fe(entySe,entyFe,te))$(   sameas(entyFe,"feh2s")
+                                          OR sameas(entyFe,"fegas") ),   
+      vm_demFeSector(t,regi,entySe,entyFe,"indst",emiMkt)
+    )
+  =e=
+  sum((emiMkt,se2fe(entySe,entyFe,te))$( sameas(entyFe,"feh2s") ),   
+    vm_demFeSector(t,regi,entySe,entyFe,"indst",emiMkt)
+  )
 ;
 
 *** EOF ./modules/37_industry/subsectors/equations.gms

@@ -198,9 +198,10 @@ $endIf.CESMkup
 
 display p37_CESMkup;
 
-
-
-
+*** additional H2 cost parameters
+s37_costAddH2Inv   = cm_indst_H2costAddH2Inv;
+s37_costDecayStart = cm_indst_costDecayStart;
+s37_costDecayEnd   = cm_indst_H2costDecayEnd;
 
 *** EOF ./modules/37_industry/subsectors/datainput.gms
 
