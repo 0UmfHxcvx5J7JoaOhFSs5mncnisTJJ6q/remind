@@ -60,6 +60,12 @@ $ENDIF.debug
 
   regi(all_regi) = no;
   p80_handle(all_regi) = hybrid.handle;
+
+* set o_modelstat to model status of the last run region
+$ifthen.debug NOT "%cm_nash_mode%" == "parallel"   !! cm_nash_mode
+  o_modelstat 
+  = p80_repy(all_regi,"modelstat")$( p80_repy(all_regi,"modelstat") ne 7 );
+$endif.debug
 );  !! close regi loop
 
 $IFTHEN.debug %cm_nash_mode% == "parallel"
@@ -91,8 +97,12 @@ if((p80_repy(regi,'modelstat') eq 2) or (p80_repy(regi,'modelstat') eq 7),
 if((p80_repy(regi,'modelstat') eq 7), p80_SolNonOpt(regi)= 1);
 );
 
-***set o_modelstat to the highest value across all regions, ignoring status 7 
-o_modelstat = smax(regi, p80_repy(regi,'modelstat')$(p80_repy(regi,'modelstat') ne 7) );
+$ifthen.parallel "%cm_nash_mode%" == "parallel"   !! cm_nash_mode
+* set o_modelstat to the highest value across all regions, ignoring
+* model status 7
+o_modelstat 
+= smax(regi, p80_repy(regi,'modelstat')$( p80_repy(regi,'modelstat') ne 7) );
+$endif.parallel
 
 *** in cm_nash_mode=debug mode, enable solprint for next sol_itr when last iteration was non-optimal:
 $ifthen.solprint %cm_nash_mode% == "debug" 
