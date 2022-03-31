@@ -78,6 +78,9 @@ capcost4W = inputdata$capcost4W
 loadFactor = inputdata$loadFactor
 price_nonmot = inputdata$price_nonmot
 pref_data = inputdata$pref_data
+preftab4W = inputdata$ptab4W
+
+setnames(preftab4W, old = "ptab4W", new = "value")
 
 ## Moinput produces all combinations of iso-vehicle types and attributes a 0. These ghost entries have to be cleared.
 int_dat = int_dat[EJ_Mpkm_final>0]
@@ -190,6 +193,7 @@ logit_data <- calculate_logit_inconv_endog(
   logit_params = logit_params,
   intensity_data = int_dat,
   price_nonmot = price_nonmot,
+  ptab4W = preftab4W,
   totveh = if (!is.null(totveh)) totveh,
   tech_scen = tech_scen)
 
