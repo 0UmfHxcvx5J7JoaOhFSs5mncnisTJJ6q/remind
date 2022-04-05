@@ -78,7 +78,7 @@ capcost4W = inputdata$capcost4W
 loadFactor = inputdata$loadFactor
 price_nonmot = inputdata$price_nonmot
 pref_data = inputdata$pref_data
-preftab4W = inputdata$ptab4W
+preftab4W = inputdata$preftab4W
 
 setnames(preftab4W, old = "ptab4W", new = "value")
 
