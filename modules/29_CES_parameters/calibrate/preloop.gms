@@ -175,11 +175,12 @@ if (smin((t,regi_dyn29(regi),ppf_29(in)), pm_cesdata(t,regi,in,"price")) le 0,
 if (%c_CES_calibration_iteration% eq 1, !! first CES calibration iteration
   put file_CES_calibration;
 
-  loop ((t,regi_dyn29(regi),in)$(    ppf_29(in) 
-                                  OR sameas(in,"inco") 
-                                  OR ppf_beyondcalib_29(in) 
-                                  OR sameas(in,"enhb")
-                                  OR sameas(in,"enhgab")       ),
+  loop ((t,regi_dyn29(regi),cesLevel2cesIO(counter,in))$(
+                                                       ppf_29(in) 
+                                                    OR sameas(in,"inco") 
+                                                    OR ppf_beyondcalib_29(in) 
+                                                    OR sameas(in,"enhb")
+                                                    OR sameas(in,"enhgab")    ),
     if (NOT in_putty(in) AND (ppf_29(in) OR sameas(in,"inco")),
       put "%c_expname%", "origin", t.tl, regi.tl, "quantity",   in.tl;
       put p29_cesIO_load(t,regi,in) /;
@@ -489,11 +490,12 @@ pm_cesdata(t_29,regi_dyn29(regi),in,"quantity") $ putty_compute_in(in)
 if (%c_CES_calibration_iteration% eq 1, !! first CES calibration iteration
   put file_CES_calibration;
 
-  loop ((t,regi_dyn29(regi),in)$(    ppf_29(in) 
-                                  OR sameas(in,"inco") 
-                                  OR ppf_beyondcalib_29(in) 
-                                  OR sameas(in,"enhb")
-                                  OR sameas(in,"enhgab")       ),
+  loop ((t,regi_dyn29(regi),cesLevel2cesIO(counter,in))$(
+                                                       ppf_29(in) 
+                                                    OR sameas(in,"inco") 
+                                                    OR ppf_beyondcalib_29(in) 
+                                                    OR sameas(in,"enhb")
+                                                    OR sameas(in,"enhgab")    ),
     if (NOT in_putty(in) AND (ppf_29(in) OR sameas(in,"inco")),
       put "%c_expname%", "target", t.tl, regi.tl, "quantity",   in.tl;
       put pm_cesdata(t,regi,in,"quantity") /;
@@ -505,15 +507,17 @@ if (%c_CES_calibration_iteration% eq 1, !! first CES calibration iteration
     );
   );
 
-  loop ((t_29hist(t),regi_dyn29(regi),ppf_beyondcalib_29(in)),
+  loop ((t_29hist(t),regi_dyn29(regi),
+         cesLevel2cesIO(counter,ppf_beyondcalib_29(in))),
     put "%c_expname%", "target", t.tl, regi.tl, "quantity", in.tl;
     put pm_cesdata(t,regi,in,"quantity") /;
   );
 
 $ifthen.subsectors "%industry%" == "subsectors"
 $ifthen.industry_FE_target "%c_CES_calibration_industry_FE_target%" == "1"
-  loop((t_29scen(t),regi_dyn29(regi),in)$(   ppfen_industry_dyn37(in)
-                                          OR ppfKap_industry_dyn37(in) ),
+  loop((t_29scen(t),regi_dyn29(regi),cesLevel2cesIO(counter,in))$(   
+                                                    ppfen_industry_dyn37(in)
+                                                 OR ppfKap_industry_dyn37(in) ),
     put "%c_expname%", "target", t.tl, regi.tl, "quantity", in.tl;
     put pm_cesdata(t,regi,in,"quantity") /;
   );
@@ -1615,7 +1619,8 @@ putclose logfile;
 if (%c_CES_calibration_iteration% eq 1, !! first CES calibration iteration
   put file_CES_calibration;
 
-  loop ((t,regi_dyn29(regi),in)$(( NOT ppf_29(in)) AND ppf_putty(in)),
+  loop ((t,regi_dyn29(regi),cesLevel2cesIO(counter,in))$(
+                                           (NOT ppf_29(in)) AND ppf_putty(in) ),
 
     put "%c_expname%", "target", t.tl, regi.tl, "quantity_putty",   in.tl;
     put pm_cesdata_putty(t,regi,in,"quantity") /;
