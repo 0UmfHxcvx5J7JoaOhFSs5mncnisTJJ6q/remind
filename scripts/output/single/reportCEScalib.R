@@ -153,7 +153,7 @@ iter.max = max(itr_num)
 #------------------------      PLOTS     ----------------------------------
 #---------------------------------------------------------------------------
 
-pdf(file.path(outputdir,paste0("CES calibration report_",scenario,".pdf")),
+pdf(file.path(outputdir,paste0("CES_calibration_report_",scenario,".pdf")),
     width = 42 / 2.54, height = 29.7 / 2.54, title = "CES calibration report")
 
 

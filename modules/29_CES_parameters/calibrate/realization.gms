@@ -19,7 +19,7 @@
 *'1. the energy demand pathways will be selected automatically in input/pm_fe_demand.cs4r according to the modules selected and the SSP scenario chosen. If you wish to modify the pathways, refer to the mrremind library, which provides the pm_fe_demand.cs4r file.
 *'2. Select/Add the scenarios of interest in `scenario_config_calibrateSSPs.csv` and copy it to `scenario_config.csv`.
 *'3. Rscript start_bundle.R or similar command
-*'4.	After the runs are finished, look at `CES calibration report_RunName.pdf` in the output folder
+*'4.	After the runs are finished, look at `CES_calibration_report_RunName.pdf` in the output folder
 *'  * If there is nothing on the first two pages, it should be OK
 *'  *	If there are a couple of rows in the table, look at the variables mentioned
 *'  *	If you see more than 10 lines, there is a high chance that the calibration ran into problems
@@ -219,7 +219,7 @@
 *'The calibration will store the `full.lst`, `full.log` and `input.gdx` files for all calibration iterations (i.e., `input_00.gdx`, `input_01.gdx`, ...) for analysis and debugging.
 *'The most important numbers (quantities, prices and efficiencies) are also written to the file `CES_calibration.csv` for easy analysis.
 *'The file to be stored in `/load/datainput/` are produced after each iteration. Which iteration to take remains to be decided.
-*'The calibration produces a PDF-file based on the data in `CES_calibration.csv` called `CES calibration report_RunName.pdf`. See at the "How to calibrate Remind" section to see how to interpret it.
+*'The calibration produces a PDF-file based on the data in `CES_calibration.csv` called `CES_calibration_report_RunName.pdf`. See at the "How to calibrate Remind" section to see how to interpret it.
 *'The input files gathering all the efficiency parameters take the name `indu_fixed_shares-buil_services_putty-tran_complex-POP_pop_SSP2-GDP_gdp_SSP2-Kap_perfect-Reg_690d3718e1_ITERATION_ITERATIONnumber.inc`. The file corresponding to the best iteration should be copied to `../../modules/29_CES_parameters/load/input/` removing the `_ITERATIONnumber` part
 
 
