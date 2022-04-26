@@ -439,16 +439,23 @@ loop ((t,regi),
 );
 $endif.build_H2_offset
 
+* Erase all old fixings
+pm_cesdata(t,regi,in,"fx")$( pm_cesdata(t,regi,in,"fx") ) = 0;
+
 *** Add an epsilon to the values which are 0 so that they can fit in the CES 
 *** function. And withdraw this epsilon when going to the ESM side
-loop((t,regi,in)$(    (ppf(in) OR ppf_29(in)) 
-                  AND pm_cesdata(t,regi,in,"quantity") lt 1e-5 
-                  AND NOT ppfen_industry_dyn37(in)
-                  AND NOT ppfkap_industry_dyn37(in)  
-                  AND NOT SAMEAS(in,"feh2i")  
-                  AND NOT SAMEAS(in,"feh2b")        ),
-  pm_cesdata(t,regi,in,"offset_quantity")  = pm_cesdata(t,regi,in,"quantity")  - 1e-5;
+loop ((t,regi,in)$(    (ppf(in) OR ppf_29(in)) 
+                   AND pm_cesdata(t,regi,in,"quantity") lt 1e-5 
+                   AND NOT ppfen_industry_dyn37(in)
+                   AND NOT ppfkap_industry_dyn37(in)  
+                   AND NOT SAMEAS(in,"feh2i")  
+                   AND NOT SAMEAS(in,"feh2b")        ),
+  pm_cesdata(t,regi,in,"offset_quantity")
+  = pm_cesdata(t,regi,in,"quantity")  
+  - 1e-5;
+
   pm_cesdata(t,regi,in,"quantity") = 1e-5;
+  pm_cesdata(t,regi,in,"fx")       = 1e-5;
 );
 
 *** Capital price assumption

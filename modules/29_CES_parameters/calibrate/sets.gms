@@ -18,6 +18,7 @@ cesParameter   "parameters of the CES functions and for calibration"
   xi                "baseyear income share of CES function input/output"
   offset_quantity   "quantity offset for the CES tree if the quantity is null"
   compl_coef        "coefficients for the perfectly complementary factors"
+  fx                "fixing quantity for ppf"
 /
 
 regi_dyn29(all_regi)   "dynamic region set for compatibility with testOneRegi"

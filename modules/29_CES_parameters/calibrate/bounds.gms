@@ -38,5 +38,11 @@ if (smax((t,regi_dyn29(regi),in)$(    t.val gt 2005
   putclose logfile, " " /;
 );
 
+* Apply fixings from offset quantities
+vm_cesIO.fx(t,regi,in)$(
+                pm_cesdata(t,regi,in,"fx") ne 0
+            AND pm_cesdata(t,regi,in,"fx") eq pm_cesdata(t,regi,in,"quantity") )
+  = pm_cesdata(t,regi,in,"fx");
+
 *** EOF ./modules/29_CES_parameters/calibrate/bounds.gms
 
