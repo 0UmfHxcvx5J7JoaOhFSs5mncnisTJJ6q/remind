@@ -2261,7 +2261,7 @@ period1234(tall)   "period 1,2,3,and 4"
 
 sol_itr       "iterator for inner solution process within one Negishi iteration"
 /
-      1*10
+  1 * 100
 /
 
 iteration     "iterator for main (Negishi/Nash) iterations"

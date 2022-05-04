@@ -37,6 +37,7 @@ q37_limit_secondary_steel_share(ttot,regi)$( ttot.val ge cm_startyear ) ..
     + vm_cesIO(ttot,regi,"ue_steel_secondary")
     )
   * p37_steel_secondary_max_share(ttot,regi)
+  + sm_eps  !! add 1e-9 slack because of bad madrat rounding
 ;
 
 *' Compute gross industry emissions before CCS by multiplying sub-sector energy
