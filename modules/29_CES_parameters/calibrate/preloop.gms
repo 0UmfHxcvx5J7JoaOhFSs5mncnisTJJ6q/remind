@@ -375,20 +375,6 @@ loop ((t_29,cesOut2cesIn_below(out,in))$( ppfIO_putty(out) ),
 
 display "after price smoothing",  cesOut2cesIn_below, pm_cesdata;
 
-* relax industry fixing over the calibration iterations
-sm_tmp = 5;  !! last iteration with bounds on industry
-loop (pf_industry_relaxed_bounds_dyn37(in),
-  vm_cesIO.lo(t_29(t),regi_dyn29(regi),in)
-  = pm_cesdata(t,regi,in,"quantity")
-  * max(1e-12, 1 + min(0, (1 - %c_CES_calibration_iteration%) / sm_tmp));
-
-  vm_cesIO.up(t,regi_dyn29(regi),in)
-  = ( pm_cesdata(t,regi,in,"quantity")
-    * (1 + max(0, (%c_CES_calibration_iteration% - 1) / sm_tmp))
-    )$( %c_CES_calibration_iteration% le sm_tmp )
-  + INF$( %c_CES_calibration_iteration% gt sm_tmp );
-);
-
 *** Finalize calibration by ensuring the consistency of pm_cesdata ***
 
 display "start consistency", pm_cesdata;
