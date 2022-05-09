@@ -64,5 +64,8 @@ $endif.first_iteration
 $endif.FE_target
 $endif.calibration
 $offtext
+vm_cesIO.lo(t,regi_dyn29(regi),in_industry_dyn37(in))$( 
+                                                  0 eq vm_cesIO.lo(t,regi,in) )
+  = sm_eps;
 
 *** EOF ./modules/37_industry/subsectors/bounds.gms
