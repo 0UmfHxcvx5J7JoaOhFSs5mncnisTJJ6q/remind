@@ -1177,20 +1177,35 @@ $ifthen.subsectors "%industry%" == "subsectors"
 $ifthen.industry_FE_target "%c_CES_calibration_industry_FE_target%" == "1"
 *** scale industry input prices as a slack variable to make the Euler identity
 *** hold
+put logfile, ">>> Industry IPF Price Rescaling <<<" /;
 loop ((t,regi_dyn29(regi),ue_industry_dyn37(out)),
   sm_tmp
-  = pm_cesdata(t,regi,out,"quantity")
-  / sum(ue_industry_2_pf(out,ppf_industry_dyn37(in)),
-      pm_cesdata(t,regi,in,"price")
-    * pm_cesdata(t,regi,in,"quantity")
+  = ( pm_cesdata(t,regi,out,"quantity")
+    - sum(ue_industry_2_pf(out,ppfkap(in)),
+        pm_cesdata(t,regi,in,"quantity")
+      * pm_cesdata(t,regi,in,"price")
+      )
+    )
+  / sum(ue_industry_2_pf(out,ppfen(in)),
+      pm_cesdata(t,regi,in,"quantity")
+    * pm_cesdata(t,regi,in,"price")
     );
 
-  loop (ue_industry_2_pf(out,ppf_industry_dyn37(in)),
-    pm_cesdata(t,regi,in,"price")
-    = pm_cesdata(t,regi,in,"price")
-    * sm_tmp;
+  if (sm_tmp ne 1,
+    loop (cesOut2cesIn(out,ipf(in)),
+      put pm_cesdata.tn(t,regi,in,"price"),
+          @60 pm_cesdata(t,regi,in,"price"), " * ",
+	  sm_tmp;
+
+      pm_cesdata(t,regi,in,"price")
+      = pm_cesdata(t,regi,in,"price")
+      * sm_tmp;
+
+      put pm_cesdata(t,regi,in,"price") /;
+    );
   );
 );
+putclose logfile, " " /;
 
 *** recompute all ipf from Euler equation
 loop (cesRev2cesIO(counter,ipf_industry_dyn37(out))$( 
