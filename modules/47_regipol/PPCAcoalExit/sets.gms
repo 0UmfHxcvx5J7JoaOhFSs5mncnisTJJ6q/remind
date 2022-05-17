@@ -17,6 +17,7 @@ pecoal.seel.igcc
 cov_coal "COVID coal sector recovery scenario"
 /
 BAU
+Neutral
 Green
 Brown
 Norm

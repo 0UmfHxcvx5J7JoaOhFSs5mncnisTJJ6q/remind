@@ -7,9 +7,11 @@
 *** SOF ./modules/47_regipol/PPCAcoalExit/postsolve.gms
 
 display vm_cap.l, vm_prodFe.l, vm_emiTeDetail.l;
-* $ifthen.cov_coal not %cm_COVID_coal_scen% == "none"
-* display p47_coalCapCOVID, q47_CovidCoalCap.l;
-* $endif.cov_coal
+$ifthen.cov_coal not %cm_COVID_coal_scen% == "none"
+$ifthen.ppcapol %cm_PPCA_pol% == "none"
+display p47_coalCapCOVID, q47_CovidCoalCap.l, q47_CovidCoalFloor.l;
+$endif.ppcapol
+$endif.cov_coal
 
 $ifthen.policy %cm_PPCA_pol% == "power"
 $if %cm_PPCA_OECD% == "on" display p47_max_coal_el_share_oecd, q47_PPCA_OECD_power_phaseOut.l, q47_PPCA_OECD_power_phaseOut.m;

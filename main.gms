@@ -84,7 +84,7 @@
 * 
 * Input data revision: 5.979
 * 
-* Last modification (input data): Tue May 25 21:32:18 2021
+* Last modification (input data): Mon Dec  6 01:31:28 2021
 * 
 *###################### R SECTION END (VERSION INFO) ###########################
 
@@ -139,7 +139,7 @@ option profile = 0;
 
 
 ***---------------------    Run name    -----------------------------------------
-$setGlobal c_expname  PPCA_demand-nonOECD-2pCHA-cfCHA52_4e4_distMean-BAU
+$setGlobal c_expname  PPCA-nonOECD-3p-pubfinex-pledged
 
 ***------------------------------------------------------------------------------
 ***                           MODULES
@@ -469,11 +469,13 @@ $setglobal cm_cooling_shares  dynamic    !! def = static
 $setglobal cm_techcosts  REG       !! def = REG
 $setglobal cm_regNetNegCO2  on       !! def = on
 
-$setglobal cm_PPCA_pol  demand !! def = power
-$setglobal cm_PPCA_size  2p     !! def = current
-$setglobal cm_COVID_coal_scen  BAU  !! def = none
+$setglobal cm_PPCA_pol  power !! def = power
+$setglobal cm_PPCA_size  3p     !! def = current
+$setglobal cm_COVID_coal_scen  Neutral  !! def = none
 $setglobal cm_PPCA_OECD  on    !! def = off
 $setglobal cm_PPCA_nonOECD  on    !! def = off
+
+$setglobal cm_pubfinex_pol  pledged !! def = none
 
 $setglobal cm_coalExitRegi  none   !! def = none
 

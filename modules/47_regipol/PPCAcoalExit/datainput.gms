@@ -6,14 +6,40 @@
 *** |  Contact: remind@pik-potsdam.de
 *** SOF ./modules/47_regipol/PPCAcoalExit/datainput.gms
 
+$ifthen.finex %cm_pubfinex_pol% == "none"
 parameter p47_coalCapCOVID(tall,all_regi,COV_coal) "2025 coal capacity scenarios based on COVID recovery scenarios"
 /
 $ondelim
 $include "./modules/47_regipol/PPCAcoalExit/input/p47_coalCapCOVID_mar10.cs4r"
-* $include "./modules/47_regipol/PPCAcoalExit/input/p47_coalCapCOVID.cs4r"
 $offdelim
 /
 ;
+
+$else.finex
+parameter p47_coalCapCOVID(tall,all_regi,COV_coal) "2025-2030 coal capacity scenarios based on COVID recovery scenarios and public overseas finance exit pledges"
+/
+$ondelim
+$include "./modules/47_regipol/PPCAcoalExit/input/p47_coalCapCOVID_pubfinex_nov29.cs4r"
+$offdelim
+/
+;
+$endif.finex
+
+* $if.REsub %cm_pubfinex_pol% == "RE_sub"
+parameter p47_deltaCap_REsub(tall,all_regi) "2025-2030 overseas financed RE capacity, equal to public overseas coal finance exit pledges"
+/
+$ondelim
+$include "./modules/47_regipol/PPCAcoalExit/input/p47_pubfinex_capREsub.cs4r"
+$offdelim
+/
+;
+* $endif.REsub
+
+* $ifthen.size %cm_PPCA_size% == "current"
+$ifthen.REsub %cm_pubfinex_pol% == "RE_sub"
+Execute_Loadpoint 'input_ref' p47_deltaCap = vm_deltaCap.l;
+$endif.REsub
+* $endif.size
 
 * *** PPCA coal exit scenario cascade should all have the same C price but includes runs with different startyears
 * $ifthen.ppca %cm_PPCA_nonOECD% == "on"
@@ -51,7 +77,7 @@ $offdelim
 $endif.coalition
 $endif.recovery1
 
-$ifthen.recovery %cm_COVID_coal_scen% == "BAU"
+$ifthen.recovery %cm_COVID_coal_scen% == "Neutral"
 $ifthen.coalition1 %cm_PPCA_size% == "current"
 $ondelim
 $include "./modules/47_regipol/PPCAcoalExit/input/f47_OECD_BAU_power_current.cs4r"
@@ -132,7 +158,7 @@ $elseif.polscen %cm_PPCA_pol% == "demand"
 *** 2030 OECD PPCA phase-out
 parameter p47_max_coal_dem_share_oecd(all_regi,dem_sector)    "Maximum share of met coal emissions from total coal emissions after the OECD phases out steel sector coal demand"
 /
-$ifthen.recovery7 %cm_COVID_coal_scen% == "BAU"
+$ifthen.recovery7 %cm_COVID_coal_scen% == "Neutral"
 $ifthen.coalition7 %cm_PPCA_size% == "current"
 $ondelim
 $include "./modules/47_regipol/PPCAcoalExit/input/f47_OECD_BAU_demand_current.cs4r"
@@ -260,7 +286,7 @@ $offdelim
 $endif.coalition
 $endif.recovery1
 
-$ifthen.recovery4 %cm_COVID_coal_scen% == "BAU"
+$ifthen.recovery4 %cm_COVID_coal_scen% == "Neutral"
 $ifthen.coalition4 %cm_PPCA_size% == "current"
 $ondelim
 $include "./modules/47_regipol/PPCAcoalExit/input/f47_nonOECD_BAU_power_current.cs4r"
@@ -341,7 +367,7 @@ $elseif.polscen2 %cm_PPCA_pol% == "demand"
 *** Non-OECD 2050 coal demand phase-out ***
 parameter p47_max_coal_dem_share_nonoecd(all_regi,dem_sector)     "Maximum regional coal share from 2050 on as a result of non-OECD PPCA countries phasing out coal"
 /
-$ifthen.recovery10 %cm_COVID_coal_scen% == "BAU"
+$ifthen.recovery10 %cm_COVID_coal_scen% == "Neutral"
 $ifthen.coalition10 %cm_PPCA_size% == "current"
 $ondelim
 $include "./modules/47_regipol/PPCAcoalExit/input/f47_nonOECD_BAU_demand_current.cs4r"

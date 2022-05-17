@@ -403,7 +403,7 @@ pm_cf(ttot,regi,"elh2VRE") = 0.6;
 table p_earlyreti_adjRate(all_regi,all_te)  "extra retirement rate for technologies in countries with relatively old fleet"
 $ondelim
 * $include "./core/input/p_earlyRetirementAdjFactor.cs3r"
-$include "./core/input/p_earlyRetirementAdjFactor_PPCA.cs3r"
+$include "./core/input/p_earlyRetirementAdjFactor.cs3r"
 $offdelim
 ;
 
