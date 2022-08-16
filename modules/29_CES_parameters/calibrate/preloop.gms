@@ -1175,6 +1175,39 @@ loop ((t_29hist_last(t2),cesOut2cesIn(out,in))$(    ue_fe_kap_29(out) ),
 
 $ifthen.subsectors "%industry%" == "subsectors"
 $ifthen.industry_FE_target "%c_CES_calibration_industry_FE_target%" == "1"
+*** Limit industry subsector EEK xi at 0.85
+sm_tmp = smax((t,regi_dyn29(regi),
+               cesOut2cesIn(ue_industry_dyn37(out),ppfKap(in))),
+	   pm_cesdata(t,regi,in,"quantity")
+	 * pm_cesdata(t,regi,in,"price")
+	 / pm_cesdata(t,regi,out,"quantity")
+	 );
+if (1 le sm_tmp,
+  put logfile, ">>> Industry EEK Quantity Rescaling <<<" /;
+  loop ((t,regi_dyn29(regi),
+         cesOut2cesIn(ue_industry_dyn37(out),ppfKap(in))),
+    sm_tmp
+    = pm_cesdata(t,regi,in,"quantity")
+    * pm_cesdata(t,regi,in,"price")
+    / pm_cesdata(t,regi,out,"quantity");
+
+    if (1 le sm_tmp,
+      put pm_cesdata.tn(t,regi,in,"quantity"), 
+          @60 pm_cesdata(t,regi,in,"quantity"), " -> ",
+	  ( 0.85 
+	  * pm_cesdata(t,regi,out,"quantity") 
+	  / pm_cesdata(t,regi,in,"price")
+	  ) /;
+
+      pm_cesdata(t,regi,in,"quantity")
+      = 0.85
+      * pm_cesdata(t,regi,out,"quantity")
+      / pm_cesdata(t,regi,in,"price");
+    );
+  );
+  putclose logfile, " " /;
+);
+
 *** Check for industry EEK value to be lower than subsector output quantity
 sm_tmp = smin((t,regi_dyn29(regi),
                cesOut2cesIn(ue_industry_dyn37(out),ppfKap(in))),
