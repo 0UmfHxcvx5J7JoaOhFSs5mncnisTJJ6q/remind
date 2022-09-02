@@ -6,33 +6,20 @@
 *** |  Contact: remind@pik-potsdam.de
 *** SOF ./modules/47_regipol/PPCAcoalExit/bounds.gms
 
-* Execute_Loadpoint 'input_ref' p47_prodCouple = pm_prodCouple;
-* Execute_Loadpoint 'input_ref' p47_prodSe = vm_prodSe.l;
-* Execute_Loadpoint 'input_ref' p47_prodFe = vm_prodFe.l;
-* Execute_Loadpoint 'input_ref' p47_co2CCS = vm_co2CCS.l;
-
-
+** Fix each unabated coal generation technology in each PPCA run to the  
+** 2025 capacities in the NPi root of the DPE cascade 
 $ifthen.ref not "%cm_PPCA_size%" == "none"
 Execute_Loadpoint 'input_ref' p47_cap = vm_cap.l;
-
-* Set upper bound on all technologies to 4x reference scenario to prevent corner solutions
-* loop(t$(t.val ge cm_startyear),
-*     loop(regi,
-*         loop(te,
-*             if( (p47_cap(t,regi,te,"1") gt 1e-4 and vm_cap.up(t,regi,te,"1") gt (10 * p47_cap(t,regi,te,"1")) ),
-*                 vm_cap.up(t,regi,te,"1") = 10 * p47_cap(t,regi,te,"1");
-*             elseif(p47_cap(t,regi,te,"1") le 1e-4 and vm_cap.up(t,regi,te,"1") gt (1e3 * p47_cap(t,regi,te,"1")) ),
-*                 vm_cap.up(t,regi,te,"1") = 1e3 * p47_cap(t,regi,te,"1");
-*             );
-*         );
-*     );
-* );
 
 $ifthen.cov_coal not %cm_COVID_coal_scen% == "none"
 vm_cap.fx("2025",regi,"pc",rlf) = p47_cap("2025",regi,"pc",rlf);
 vm_cap.fx("2025",regi,"coalchp",rlf) = p47_cap("2025",regi,"coalchp",rlf);
 vm_cap.fx("2025",regi,"igcc",rlf) = p47_cap("2025",regi,"igcc",rlf);
 $endif.cov_coal
+
+** Test constraints that fix EV and RE capacities to NPi levels
+** Not active in final scenarios - used to confirm the retardation of EV
+** and RE penetration caused by PPCA
 $ifthen.EVRE %cm_EVRE% == "EV"
 vm_cap.lo(t,regi,"apCarElT",rlf)$(t.val ge cm_startyear) = p47_cap(t,regi,"apCarElT",rlf);
 $elseif.EVRE %cm_EVRE% == "RE"
@@ -47,10 +34,6 @@ $endif.EVRE
 $endif.ref
 
 $ifthen.policy %cm_PPCA_pol% == "demand"
-
-* Fix sector shares to reference levels to prevent wild fluctuations due to coal phaseout
-* Execute_Loadpoint 'input_ref' p11_share_sector = p11_share_sector;
-* Execute_Loadpoint 'input_ref' p47_demPe = vm_demPe.l;
 
 
 $endif.policy

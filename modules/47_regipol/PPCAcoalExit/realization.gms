@@ -8,8 +8,8 @@
 
 *' @description  
 *'
-*' The `PPCAcoalExit` realization enables the implementation of coal phase-out policies only in regions which might 
-*' conceivably be politically willing, based on empirical analysis of the Powering Past Coal Alliance (PPCA)
+*' The `PPCAcoalExit` realization enables the implementation of coal phase-out policies only in countries which are 
+*' considered politically willing based on empirical analysis of the Powering Past Coal Alliance (PPCA) by COALogit
 *'
 *' @authors Stephen Bi 
 
