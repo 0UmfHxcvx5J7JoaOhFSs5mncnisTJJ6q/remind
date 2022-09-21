@@ -640,6 +640,8 @@ cm_indst_H2costDecayEnd = 0.1;  !! def 10%
 *** industry
 * minimum secondary steel share
 $setglobal cm_steel_secondary_max_share_scenario  off !! def off
+* industry energy/energy-efficiency-capital substitution elasticity
+$setglobal cm_industry_en_eek_sigma 1.7
 
 *** EU bioenergy switches
 cm_BioSupply_Adjust_EU = 3; !! def 1
