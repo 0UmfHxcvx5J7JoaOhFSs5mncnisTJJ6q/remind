@@ -7,51 +7,90 @@
 *** SOF ./modules/47_regipol/PPCAcoalExit/equations.gms
 
 $ifthen.current %cm_PPCA_size% == "current"
-$ifthen.finpol %cm_pubfinex_pol% == "RE_sub"
+$ifthen.finpol %cm_pubfinex_pol% == "REdirect"
 *** Coal-to-RE substitution: set RE deltaCap to previously committed coal capacity ***
-q47_finex_pol_REsub(ttot,regi)$(ttot.val eq 2025 or ttot.val eq 2030)..
-sum(te2rlf(te,rlf)$(teLearn(te)), 
-  vm_deltaCap(ttot,regi,te,rlf))
-   =g= 
-   sum(te2rlf(te,rlf)$(teLearn(te)), 
-    p47_deltaCap(ttot,regi,te,rlf)) 
-      + p47_deltaCap_REsub(ttot,regi)
+q47_finex_pol_REsub(regi)..
+sum(
+$ifthenE.OG (sameas('%cm_REdir_mobil%','oilgas_oecd'))
+ttot$(ttot.val eq 2025 or ttot.val eq 2030),
+$elseifE.OG (sameas('%cm_REdir_mobil%','oilgas_pub'))  
+ttot$(ttot.val eq 2025 or ttot.val eq 2030),
+$else.OG  
+ttot$(ttot.val eq 2025),
+$endif.OG
+  sum(en2en(enty,enty2,te)$(teVRE(te) and not sameas(te,"csp")),
+      v_costInvTeDir(ttot,regi,te) + v_costInvTeAdj(ttot,regi,te)$teAdj(te) 
+  )
+  +
+  sum(teNoTransform$(not sameas(teNoTransform,"storcsp") and not sameas(teNoTransform,"gridcsp")),
+    v_costInvTeDir(ttot,regi,teNoTransform) + v_costInvTeAdj(ttot,regi,teNoTransform)$teAdj(teNoTransform)
+  )
+)
+=g=
+sum(
+$ifthenE.OG (sameas('%cm_REdir_mobil%','oilgas_oecd'))
+ttot$(ttot.val eq 2025 or ttot.val eq 2030),
+$elseifE.OG (sameas('%cm_REdir_mobil%','oilgas_pub'))  
+ttot$(ttot.val eq 2025 or ttot.val eq 2030), 
+$else.OG  
+ttot$(ttot.val eq 2025),
+$endif.OG
+  (p47_REdir_vol(regi) * 1e-3)  !! G20 coal REdirect
+  +
+  sum(en2en(enty,enty2,te)$(teVRE(te) and not sameas(te,"csp")),
+      p47_ref_costInvTeDir_RE(ttot,regi,te) + p47_ref_costInvTeAdj_RE(ttot,regi,te)$teAdj(te)  !! Reference VRE investment
+  )
+  +
+  sum(teNoTransform$(not sameas(teNoTransform,"storcsp") and not sameas(teNoTransform,"gridcsp")),
+    p47_ref_costInvTeDir_RE(ttot,regi,teNoTransform) + p47_ref_costInvTeAdj_RE(ttot,regi,teNoTransform)$teAdj(teNoTransform)  !! Reference grid + storage investment
+  )
+$ifthen.oilgas %cm_REdir_mobil% == "oilgas_pub"
+  +  0.231 * 
+  sum(enty$(sameas(enty,"peoil") or sameas(enty,"pegas")), vm_prodPe(ttot,regi,enty)) / 
+      sum(regi2, sum(enty$(sameas(enty,"peoil") or sameas(enty,"pegas")), vm_prodPe(ttot,regi2,enty)))
+$elseif.oilgas %cm_REdir_mobil% == "oilgas_oecd"
+  + 0.231 * 1.77 * 
+  sum(enty$(sameas(enty,"peoil") or sameas(enty,"pegas")), vm_prodPe(ttot,regi,enty)) / 
+      sum(regi2, sum(enty$(sameas(enty,"peoil") or sameas(enty,"pegas")), vm_prodPe(ttot,regi2,enty)))
+$elseif.oilgas %cm_REdir_mobil% == "oilgas_pub_dev"
+  +  0.231 * 
+  sum(enty$(sameas(enty,"peoil") or sameas(enty,"pegas")), vm_prodPe(ttot,regi,enty)) / 
+      sum(regi2$(p47_REdir_vol(regi2) gt 0), sum(enty$(sameas(enty,"peoil") or sameas(enty,"pegas")), vm_prodPe(ttot,regi2,enty)))
+$elseif.oilgas %cm_REdir_mobil% == "oilgas_oecd_hi"
+  + 0.231 * 2.13 * 
+  sum(enty$(sameas(enty,"peoil") or sameas(enty,"pegas")), vm_prodPe(ttot,regi,enty)) / 
+      sum(regi2, sum(enty$(sameas(enty,"peoil") or sameas(enty,"pegas")), vm_prodPe(ttot,regi2,enty)))
+$endif.oilgas
+)
 ;
+
+* sum(te2rlf(te,rlf)$(teLearn(te)), 
+*   vm_deltaCap(ttot,regi,te,rlf))
+*    =g= 
+*    sum(te2rlf(te,rlf)$(teLearn(te)), 
+*     p47_deltaCap(ttot,regi,te,rlf)) 
+*       + p47_deltaCap_REsub(ttot,regi)
+* ;
 
 $endif.finpol
 
 $ifthen.cov_coal not %cm_COVID_coal_scen% == "none"
-$ifthen.sub %cm_pubfinex_pol% == "RE_sub"
-q47_CovidCoalCap(ttot,regi,cov_coal)$(sameas(cov_coal,"%cm_COVID_coal_scen%") AND (ttot.val eq 2025 OR (ttot.val eq 2030 AND p47_deltaCap_REsub("2030",regi) ge 1e-3 AND p47_coalCapCOVID("2030",regi,cov_coal) ge 1e-4)))..
-sum(te2rlf(te,rlf)$(sameas(te,"pc") OR sameas(te,"igcc") OR sameas(te,"coalchp")),
-    vm_cap(ttot,regi,te,rlf))
-    =l= 
-    1.01*p47_coalCapCOVID(ttot,regi,cov_coal)
-  ;
-
-q47_CovidCoalFloor(ttot,regi,cov_coal)$(sameas(cov_coal,"%cm_COVID_coal_scen%") AND (ttot.val eq 2025 OR (ttot.val eq 2030 AND p47_deltaCap_REsub("2030",regi) ge 1e-3 AND p47_coalCapCOVID("2030",regi,cov_coal) ge 1e-4)))..
-sum(te2rlf(te,rlf)$(sameas(te,"pc") OR sameas(te,"igcc") OR sameas(te,"coalchp")),
-    vm_cap(ttot,regi,te,rlf))
-    =g= 
-    0.99*p47_coalCapCOVID(ttot,regi,cov_coal)
-  ;
-
-$else.sub
 
 q47_CovidCoalCap(ttot,regi,cov_coal)$(sameas(cov_coal,"%cm_COVID_coal_scen%") AND (ttot.val eq 2025))..
 sum(te2rlf(te,rlf)$(sameas(te,"pc") OR sameas(te,"igcc") OR sameas(te,"coalchp")),
     vm_cap(ttot,regi,te,rlf))
     =l= 
-    1.01*p47_coalCapCOVID(ttot,regi,cov_coal)
+    p47_coalCapCOVID(ttot,regi,cov_coal)
   ;
 
+$ifthen.nofinex %cm_pubfinex_pol% == "none"
 q47_CovidCoalFloor(ttot,regi,cov_coal)$(sameas(cov_coal,"%cm_COVID_coal_scen%") AND (ttot.val eq 2025))..
 sum(te2rlf(te,rlf)$(sameas(te,"pc") OR sameas(te,"igcc") OR sameas(te,"coalchp")),
     vm_cap(ttot,regi,te,rlf))
     =g= 
-    0.99*p47_coalCapCOVID(ttot,regi,cov_coal)
+    0.98*p47_coalCapCOVID(ttot,regi,cov_coal)
   ;
-$endif.sub
+$endif.nofinex
 $endif.cov_coal
 $endif.current
 

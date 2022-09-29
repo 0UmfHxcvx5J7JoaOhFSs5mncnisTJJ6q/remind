@@ -18,7 +18,10 @@ $ifthen.cov not %cm_COVID_coal_scen% == "none"
 $ifthen.ref "%cm_PPCA_size%" == "current"
 equations
 q47_CovidCoalCap(ttot,all_regi,cov_coal)                                  "2025 post-COVID Coal capacity scenarios upper limit"
+
+$ifthen.nofinex %cm_pubfinex_pol% == "none"
 q47_CovidCoalFloor(ttot,all_regi,cov_coal)                                  "2025 post-COVID Coal capacity scenarios lower limit"
+$endif.nofinex
 ;
 $else.ref
 
@@ -28,11 +31,11 @@ p47_cap(ttot,all_regi,all_te,rlf)
 $endif.ref
 $endif.cov
 
-$ifthen.fin not %cm_pubfinex_pol% == "none"
-parameters
-p47_deltaCap(ttot,all_regi,all_te,rlf)
-;
-$endif.fin
+* $ifthen.fin not %cm_pubfinex_pol% == "none"
+* parameters
+* p47_deltaCap(ttot,all_regi,all_te,rlf)
+* ;
+* $endif.fin
 
 $ifthen.policy not %cm_PPCA_pol% == "none"
 equations
@@ -73,12 +76,19 @@ $endif.dem
 ;
 $endif.policy
 
-$ifthen.size %cm_PPCA_size% == "current"
-$ifthen.finpol %cm_pubfinex_pol% == "RE_sub"
-equations
-q47_finex_pol_REsub(ttot,all_regi)
+$ifthen.finpol %cm_pubfinex_pol% == "REdirect"
+parameters 
+p47_ref_costInvTeDir_RE(ttot,all_regi,all_te)                                  "RE direct investment volume in reference scenario"
+p47_ref_costInvTeAdj_RE(ttot,all_regi,all_te)                                  "RE adjustment cost investment volume in reference scenario"
+
 ;
-$endif.finpol
+
+$ifthen.size %cm_PPCA_size% == "current"
+equations
+q47_finex_pol_REsub(all_regi)
+;
 $endif.size
+
+$endif.finpol
 
 *** EOF ./modules/47_regipol/PPCAcoalExit/declarations.gms

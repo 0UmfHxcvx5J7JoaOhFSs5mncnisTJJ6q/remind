@@ -10,7 +10,8 @@ $ifthen.finex %cm_pubfinex_pol% == "none"
 parameter p47_coalCapCOVID(tall,all_regi,COV_coal) "2025 coal capacity scenarios based on COVID recovery scenarios"
 /
 $ondelim
-$include "./modules/47_regipol/PPCAcoalExit/input/p47_coalCapCOVID_mar10.cs4r"
+* $include "./modules/47_regipol/PPCAcoalExit/input/p47_coalCapCOVID_mar10.cs4r"
+$include "./modules/47_regipol/PPCAcoalExit/input/p47_coalCapCOVID_2020data.cs4r"
 $offdelim
 /
 ;
@@ -19,25 +20,62 @@ $else.finex
 parameter p47_coalCapCOVID(tall,all_regi,COV_coal) "2025-2030 coal capacity scenarios based on COVID recovery scenarios and public overseas finance exit pledges"
 /
 $ondelim
-$include "./modules/47_regipol/PPCAcoalExit/input/p47_coalCapCOVID_pubfinex_nov29.cs4r"
+* $include "./modules/47_regipol/PPCAcoalExit/input/p47_coalCapCOVID_pubfinex_nov29.cs4r"
+$include "./modules/47_regipol/PPCAcoalExit/input/p47_coalCapCOVID_finEx.cs4r"
 $offdelim
 /
 ;
 $endif.finex
 
-* $if.REsub %cm_pubfinex_pol% == "RE_sub"
-parameter p47_deltaCap_REsub(tall,all_regi) "2025-2030 overseas financed RE capacity, equal to public overseas coal finance exit pledges"
-/
-$ondelim
-$include "./modules/47_regipol/PPCAcoalExit/input/p47_pubfinex_capREsub.cs4r"
-$offdelim
-/
-;
+* $if.REsub %cm_pubfinex_pol% == "REdirect"
+* parameter p47_deltaCap_REsub(tall,all_regi) "2025-2030 overseas financed RE capacity, equal to public overseas coal finance exit pledges"
+* /
+* $ondelim
+* $include "./modules/47_regipol/PPCAcoalExit/input/p47_pubfinex_capREsub.cs4r"
+* $offdelim
+* /
+* ;
 * $endif.REsub
 
 * $ifthen.size %cm_PPCA_size% == "current"
-$ifthen.REsub %cm_pubfinex_pol% == "RE_sub"
-Execute_Loadpoint 'input_ref' p47_deltaCap = vm_deltaCap.l;
+
+$ifthen.REsub %cm_pubfinex_pol% == "REdirect"
+
+* Execute_Loadpoint 'input_ref' p47_deltaCap = vm_deltaCap.l;
+
+Execute_Loadpoint 'input_ref' p47_ref_costInvTeDir_RE = v_costInvTeDir.l;
+Execute_Loadpoint 'input_ref' p47_ref_costInvTeAdj_RE = v_costInvTeAdj.l;
+
+parameter p47_REdir_vol(all_regi)
+/
+$ifthen.mobil %cm_REdir_mobil% == "OECD"
+$ondelim
+$include "./modules/47_regipol/PPCAcoalExit/input/p47_FinEx_REdirect_oecd_nat_mob.cs3r"
+$offdelim
+
+$elseif.mobil %cm_REdir_mobil% == "none"
+$ondelim
+$include "./modules/47_regipol/PPCAcoalExit/input/p47_FinEx_REdirect_pubOnly.cs3r"
+$offdelim
+
+$elseif.mobil %cm_REdir_mobil% == "oilgas_oecd"
+$ondelim
+$include "./modules/47_regipol/PPCAcoalExit/input/p47_FinEx_REdirect_oecd_nat_mob.cs3r"
+$offdelim
+
+$elseif.mobil %cm_REdir_mobil% == "oilgas_pub"
+$ondelim
+$include "./modules/47_regipol/PPCAcoalExit/input/p47_FinEx_REdirect_pubOnly.cs3r"
+$offdelim
+
+$elseif.mobil %cm_REdir_mobil% == "oilgas_oecd_med"
+$ondelim
+$include "./modules/47_regipol/PPCAcoalExit/input/p47_FinEx_REdirect_oecd_nat_mob.cs3r"
+$offdelim
+
+$endif.mobil
+/
+;
 $endif.REsub
 * $endif.size
 

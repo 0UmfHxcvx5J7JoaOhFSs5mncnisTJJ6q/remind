@@ -84,7 +84,7 @@
 * 
 * Input data revision: 5.979
 * 
-* Last modification (input data): Mon Dec  6 01:31:28 2021
+* Last modification (input data): Tue Jun 21 12:35:52 2022
 * 
 *###################### R SECTION END (VERSION INFO) ###########################
 
@@ -139,7 +139,7 @@ option profile = 0;
 
 
 ***---------------------    Run name    -----------------------------------------
-$setGlobal c_expname  PPCA-nonOECD-3p-pubfinex-pledged
+$setGlobal c_expname  FinEx-REdirect-nonOECD_PPCA-2p-noCSP-teRe95cap-noMob
 
 ***------------------------------------------------------------------------------
 ***                           MODULES
@@ -316,7 +316,7 @@ cm_FlexTaxFeedback          "switch deciding whether flexibility tax feedback on
 cm_iteration_max       = 1;     !! def = 1
 c_solver_try_max       = 2;     !! def = 2
 c_keep_iteration_gdxes = 0;     !! def = 0
-cm_nash_autoconverge   = 2;     !! def = 1
+cm_nash_autoconverge   = 1;     !! def = 1
 $setglobal cm_MAgPIE_coupling  off     !! def = "off"
 
 cm_emiscen        = 9;         !! def = 1
@@ -470,12 +470,13 @@ $setglobal cm_techcosts  REG       !! def = REG
 $setglobal cm_regNetNegCO2  on       !! def = on
 
 $setglobal cm_PPCA_pol  power !! def = power
-$setglobal cm_PPCA_size  3p     !! def = current
+$setglobal cm_PPCA_size  2p     !! def = current
 $setglobal cm_COVID_coal_scen  Neutral  !! def = none
 $setglobal cm_PPCA_OECD  on    !! def = off
 $setglobal cm_PPCA_nonOECD  on    !! def = off
 
-$setglobal cm_pubfinex_pol  pledged !! def = none
+$setglobal cm_pubfinex_pol  REdirect !! def = none
+$setglobal cm_REdir_mobil  none  !! def = none
 
 $setglobal cm_coalExitRegi  none   !! def = none
 

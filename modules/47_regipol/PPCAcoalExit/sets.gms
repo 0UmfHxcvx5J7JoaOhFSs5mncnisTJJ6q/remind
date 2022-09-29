@@ -29,7 +29,6 @@ oecd
 nonoecd
 /
 
-
 $ifthen %cm_PPCA_pol% == "demand"
 dem_sector  "Demand exit phases out steel, solids and total demand separately"
 /

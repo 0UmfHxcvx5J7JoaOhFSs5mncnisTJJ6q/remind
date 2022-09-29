@@ -9,7 +9,7 @@
 display vm_cap.l, vm_prodFe.l, vm_emiTeDetail.l;
 $ifthen.cov_coal not %cm_COVID_coal_scen% == "none"
 $ifthen.ppcapol %cm_PPCA_pol% == "none"
-display p47_coalCapCOVID, q47_CovidCoalCap.l, q47_CovidCoalFloor.l;
+*display p47_coalCapCOVID, q47_CovidCoalCap.l, q47_CovidCoalFloor.l;
 $endif.ppcapol
 $endif.cov_coal
 
