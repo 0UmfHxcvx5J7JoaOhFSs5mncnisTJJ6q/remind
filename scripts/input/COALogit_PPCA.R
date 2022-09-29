@@ -10,7 +10,7 @@ COALogit_PPCA <- function(refgdx,recovery,size,PPCA_pol,oecd,nonoecd,outputfolde
   
   # Set configuration specific to snapshot of input data used in publication 
   if (!is.null(rev))  setConfig(cachefolder = paste0("/p/projects/rd3mod/inputdata/cache/",rev))
-  else  setConfig(cachefolder = "/p/projects/rd3mod/inputdata/cache/rev5.964")
+  else  setConfig(cachefolder = "/p/projects/rd3mod/inputdata/cache/SB_GCPT")
   setConfig(outputfolder = outputfolder)
   subtype <- "inputdata"
   setConfig(forcecache = T)
@@ -413,8 +413,10 @@ COALogit_PPCA <- function(refgdx,recovery,size,PPCA_pol,oecd,nonoecd,outputfolde
             excess <- dimSums(leakage_allowance * coalgen_2030_c[reg_excess,"y2030",] - logit_coalgen_2030_c[reg_excess,,], dim=1)
             print(excess)
 
+            
+
             # Set them to the maximum allowed leakage
-            logit_coalshare_2030_c[reg_excess,,] <- leakage_allowance * coalshare_2030_c[reg_excess,"y2030",]
+            # logit_coalshare_2030_c[reg_excess,,] <- leakage_allowance * coalshare_2030_c[reg_excess,"y2030",]
 
             reg_nonzero_freeriders <- reg_nonzero_freeriders[which(!(reg_nonzero_freeriders %in% reg_excess))]
             

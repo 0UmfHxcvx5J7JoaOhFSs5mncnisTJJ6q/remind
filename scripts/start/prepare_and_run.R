@@ -286,7 +286,8 @@ prepare <- function() {
     cat("Running logit model to determine PPCA coalition membership...\n")
     source("scripts/input/COALogit_PPCA.R")
     COALogit_PPCA(refgdx=refgdx, recovery=cfg$gms$cm_COVID_coal_scen, size=cfg$gms$cm_PPCA_size, PPCA_pol=cfg$gms$cm_PPCA_pol,
-      oecd=cfg$gms$cm_PPCA_OECD, nonoecd=cfg$gms$cm_PPCA_nonOECD, outputfolder=cfg$results_folder,rev=cfg$revision, title=cfg$title)
+      oecd=cfg$gms$cm_PPCA_OECD, nonoecd=cfg$gms$cm_PPCA_nonOECD, outputfolder=cfg$results_folder,rev=NULL, title=cfg$title, 
+      plot =  NULL)
   }
 
   
