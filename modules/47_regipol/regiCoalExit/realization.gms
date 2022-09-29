@@ -18,7 +18,6 @@
 $Ifi "%phase%" == "sets" $include "./modules/47_regipol/regiCoalExit/sets.gms"
 $Ifi "%phase%" == "declarations" $include "./modules/47_regipol/regiCoalExit/declarations.gms"
 $Ifi "%phase%" == "datainput" $include "./modules/47_regipol/regiCoalExit/datainput.gms"
-$Ifi "%phase%" == "equations" $include "./modules/47_regipol/regiCoalExit/equations.gms"
 $Ifi "%phase%" == "bounds" $include "./modules/47_regipol/regiCoalExit/bounds.gms"
 *######################## R SECTION END (PHASES) ###############################
 
