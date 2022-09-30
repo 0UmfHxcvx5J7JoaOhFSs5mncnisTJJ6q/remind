@@ -756,7 +756,7 @@ COALogit_PPCA <- function(refgdx,recovery,size,PPCA_pol,oecd,nonoecd,outputfolde
 
       file <- paste0(paste("f47",phase[ii],recovery,PPCA_pol,size,sep="_"),".cs4r")
       cat("Writing",file,"to ./modules/47_regipol/PPCAcoalExit/input/\n")
-      # write.magpie(out_reg,file_folder = "./modules/47_regipol/PPCAcoalExit/input/", file_name = file,append = ifelse(subpolicy[jj]=="none",FALSE,TRUE))
+      write.magpie(out_reg,file_folder = "./modules/47_regipol/PPCAcoalExit/input/", file_name = file,append = ifelse(subpolicy[jj]=="none",FALSE,TRUE))
       write.magpie(out_reg,file_folder = outputfolder, file_name = file,append = ifelse(subpolicy[jj]=="none",FALSE,TRUE))
     }
   }
