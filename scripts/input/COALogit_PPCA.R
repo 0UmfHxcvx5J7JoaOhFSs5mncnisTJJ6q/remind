@@ -416,6 +416,8 @@ COALogit_PPCA <- function(refgdx,recovery,size,PPCA_pol,oecd,nonoecd,outputfolde
             excess <- dimSums(leakage_allowance * coalgen_2030_c[reg_excess,"y2030",] - logit_coalgen_2030_c[reg_excess,,], dim=1)
             print(excess)
 
+            
+
             # Set them to the maximum allowed leakage
             logit_coalgen_2030_c[reg_excess,,] <- leakage_allowance * coalgen_2030_c[reg_excess,"y2030",]
 
