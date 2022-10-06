@@ -15,19 +15,6 @@
 $ifthen.ref not "%cm_PPCA_size%" == "current"
 Execute_Loadpoint 'input_ref' p47_cap = vm_cap.l;
 
-* Set upper bound on all technologies to 4x reference scenario to prevent corner solutions
-* loop(t$(t.val ge cm_startyear),
-*     loop(regi,
-*         loop(te,
-*             if( (p47_cap(t,regi,te,"1") gt 1e-4 and vm_cap.up(t,regi,te,"1") gt (10 * p47_cap(t,regi,te,"1")) ),
-*                 vm_cap.up(t,regi,te,"1") = 10 * p47_cap(t,regi,te,"1");
-*             elseif(p47_cap(t,regi,te,"1") le 1e-4 and vm_cap.up(t,regi,te,"1") gt (1e3 * p47_cap(t,regi,te,"1")) ),
-*                 vm_cap.up(t,regi,te,"1") = 1e3 * p47_cap(t,regi,te,"1");
-*             );
-*         );
-*     );
-* );
-
 $ifthen.cov_coal not %cm_COVID_coal_scen% == "none"
 vm_cap.l("2025",regi,"pc",rlf) = p47_cap("2025",regi,"pc",rlf);
 vm_cap.l("2025",regi,"coalchp",rlf) = p47_cap("2025",regi,"coalchp",rlf);
@@ -68,10 +55,6 @@ $endif.EVRE
 $endif.ref
 
 $ifthen.policy %cm_PPCA_pol% == "demand"
-
-* Fix sector shares to reference levels to prevent wild fluctuations due to coal phaseout
-* Execute_Loadpoint 'input_ref' p11_share_sector = p11_share_sector;
-* Execute_Loadpoint 'input_ref' p47_demPe = vm_demPe.l;
 
 
 $endif.policy

@@ -85,10 +85,11 @@ $endif.REsub
 * $endif.ppca
 
 
+*** 2030 OECD PPCA phase-out ***
 $ifthen.phase1 %cm_PPCA_OECD% == "on"
-
+*** Power-exit policy ***
 $ifthen.polscen %cm_PPCA_pol% == "power"
-*** 2030 OECD PPCA phase-out
+
 parameter p47_max_coal_el_share_oecd(all_regi)    "Maximum share of met coal emissions from total coal emissions after the OECD phases out steel sector coal demand"
 /
 $ifthen.recovery1 %cm_COVID_coal_scen% == "none"
@@ -121,16 +122,19 @@ $ondelim
 $include "./modules/47_regipol/PPCAcoalExit/input/f47_OECD_BAU_power_current.cs4r"
 $offdelim
 
+*** 95%-probable 1p coalition (renamed to 95p in manuscript) ***
 $elseif.coalition1 %cm_PPCA_size% == "1p"
 $ondelim
 $include "./modules/47_regipol/PPCAcoalExit/input/f47_OECD_BAU_power_1p.cs4r"
 $offdelim
 
+*** 50%-probable 2p coalition (renamed to 50p in manuscript) ***
 $elseif.coalition1 %cm_PPCA_size% == "2p"
 $ondelim
 $include "./modules/47_regipol/PPCAcoalExit/input/f47_OECD_BAU_power_2p.cs4r"
 $offdelim
 
+*** 5%-probable 3p coalition (renamed to 5p in manuscript) ***
 $elseif.coalition1 %cm_PPCA_size% == "3p"
 $ondelim
 $include "./modules/47_regipol/PPCAcoalExit/input/f47_OECD_BAU_power_3p.cs4r"
@@ -139,6 +143,7 @@ $offdelim
 $endif.coalition1
 $endif.recovery
 
+*** Brown Covid recovery ***
 $ifthen.recovery2 %cm_COVID_coal_scen% == "Brown"
 
 $ifthen.coalition2 %cm_PPCA_size% == "current"
@@ -164,6 +169,7 @@ $offdelim
 $endif.coalition2
 $endif.recovery2
 
+*** Green Covid recovery ***
 $ifthen.recovery3 %cm_COVID_coal_scen% == "Green"
 
 $ifthen.coalition3 %cm_PPCA_size% == "current"
@@ -188,6 +194,32 @@ $offdelim
 
 $endif.coalition3
 $endif.recovery3
+
+*** Scenarios with no Covid considerations (not reported in study) ***
+$ifthen.recovery1 %cm_COVID_coal_scen% == "none"
+$ifthen.coalition %cm_PPCA_size% == "current"
+$ondelim
+$include "./modules/47_regipol/PPCAcoalExit/input/f47_OECD_noCOV_power_current.cs4r"
+$offdelim
+
+$elseif.coalition %cm_PPCA_size% == "1p"
+$ondelim
+$include "./modules/47_regipol/PPCAcoalExit/input/f47_OECD_noCOV_power_1p.cs4r"
+$offdelim
+
+$elseif.coalition %cm_PPCA_size% == "2p"
+$ondelim
+$include "./modules/47_regipol/PPCAcoalExit/input/f47_OECD_noCOV_power_2p.cs4r"
+$offdelim
+
+$elseif.coalition %cm_PPCA_size% == "3p"
+$ondelim
+$include "./modules/47_regipol/PPCAcoalExit/input/f47_OECD_noCOV_power_3p.cs4r"
+$offdelim
+
+$endif.coalition
+$endif.recovery1
+
 /
 ;
 
@@ -295,8 +327,9 @@ $endif.polscen
 $endif.phase1
 
 
+*** Non-OECD 2050 power-exit ***
+
 $ifthen.phase2 %cm_PPCA_nonOECD% == "on"
-*** Non-OECD 2050 coal phase-out ***
 $ifthen.polscen2 %cm_PPCA_pol% == "power"
 parameter p47_max_coal_el_share_nonoecd(all_regi)     "Maximum regional coal share from 2050 on as a result of non-OECD PPCA countries phasing out coal"
 /
@@ -399,10 +432,8 @@ $endif.recovery6
 ;
 
 
-*** Non-OECD 2045 coal phase-out ***
-
+*** Non-OECD demand-exit ***
 $elseif.polscen2 %cm_PPCA_pol% == "demand"
-*** Non-OECD 2050 coal demand phase-out ***
 parameter p47_max_coal_dem_share_nonoecd(all_regi,dem_sector)     "Maximum regional coal share from 2050 on as a result of non-OECD PPCA countries phasing out coal"
 /
 $ifthen.recovery10 %cm_COVID_coal_scen% == "Neutral"
