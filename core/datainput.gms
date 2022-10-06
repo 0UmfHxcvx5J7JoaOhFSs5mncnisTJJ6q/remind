@@ -470,16 +470,18 @@ pm_delta_histCap(tall,regi,te) = pm_histCap(tall,regi,te) - pm_histCap(tall-1,re
 *** read-in of p_PE_histCap.cs3r
 table p_PE_histCap(tall,all_regi,all_enty,all_enty)     "historical installed capacity"
 $ondelim
-$include "./core/input/p_PE_histCap.cs3r"
+$include "./core/input/p_PE_histCap_PPCA_new_feb22.cs3r"
+* $include "./core/input/p_PE_histCap.cs3r"
 $offdelim
 ;
 
 *** installed capacity availability
 *** read-in of f_cf.cs3r
-$Offlisting
+* $Offlisting
 table   f_cf(tall,all_regi,all_te)     "installed capacity availability"
 $ondelim
-$include "./core/input/f_cf.cs3r"
+$include "./core/input/f_cf_PPCA_CHA.cs3r"
+* $include "./core/input/f_cf.cs3r"
 $offdelim
 ;
 $Onlisting

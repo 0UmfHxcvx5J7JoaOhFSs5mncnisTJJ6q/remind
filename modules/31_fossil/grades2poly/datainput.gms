@@ -8,6 +8,9 @@
 ***----------------------------------------------------------------------
 *** Get uranium extraction-cost data (3rd-order grades2poly)
 ***----------------------------------------------------------------------
+
+s31_fuEx_startyr = 2005;  !! The fossil cost curves and rent discounting should always begin in the initial period.
+
 table f31_costExPoly(all_regi,all_enty,xirog)  "3rd-order polynomial coefficients (Uranium)"
 $ondelim
 $include "./modules/31_fossil/grades2poly/input/f31_costExPoly.cs3r"

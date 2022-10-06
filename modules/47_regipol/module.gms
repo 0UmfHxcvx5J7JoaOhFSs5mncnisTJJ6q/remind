@@ -17,8 +17,10 @@
 *' @authors Renato Rodrigues, Felix Schreyer
 
 *###################### R SECTION START (MODULETYPES) ##########################
+$Ifi "%regipol%" == "PPCAcoalExit" $include "./modules/47_regipol/PPCAcoalExit/realization.gms"
 $Ifi "%regipol%" == "none" $include "./modules/47_regipol/none/realization.gms"
 $Ifi "%regipol%" == "regiCarbonPrice" $include "./modules/47_regipol/regiCarbonPrice/realization.gms"
+$Ifi "%regipol%" == "regiCoalExit" $include "./modules/47_regipol/regiCoalExit/realization.gms"
 *###################### R SECTION END (MODULETYPES) ############################
 
 *** EOF ./modules/47_regipol/module.gms

@@ -194,7 +194,7 @@ $setglobal industry  subsectors     !! def = subsectors
 ***---------------------    39_CCU    -------------------------------------------
 $setglobal CCU  on !! def = on
 ***---------------------    40_techpol  -----------------------------------------
-$setglobal techpol  none              !! def = none
+$setglobal techpol  NPi2018              !! def = none
 ***---------------------    41_emicapregi  --------------------------------------
 $setglobal emicapregi  none           !! def = none
 ***---------------------    42_banking  -----------------------------------------
@@ -210,7 +210,7 @@ $setGlobal damages  off               !! def = off
 ***---------------------    51_internalizeDamages    ----------------------------
 $setGlobal internalizeDamages  off               !! def = off
 ***---------------------    70_water  -------------------------------------------
-$setglobal water  off                 !! def = off
+$setglobal water  heat                 !! def = off
 ***---------------------    80_optimization    ----------------------------------
 $setGlobal optimization  nash         !! def = nash
 ***---------------------    81_codePerformance    -------------------------------
@@ -288,7 +288,9 @@ parameters
   cm_LimRock                "limit amount of rock spread each year [Gt]"
   c_tau_so2_xmpt            "switch for temporarily (mainly in the past) exempting chinese SO2 emissions from the SO2 tax"
   cm_expoLinear_yearStart   "time at which carbon price increases lineraly instead of exponentially"
-  
+  cm_NPi_startyr         "year in which NPi policies should begin to take effect"
+  cm_EVRE               "PPCA-specific bound"
+
   c_budgetCO2from2020FFI "carbon budget for CO2 emissions starting from 2020 from FFI (in GtCO2)"
   c_abtrdy              "first year in which advanced bio-energy technology are ready (unit is year; e.g. 2050)"
   c_abtcst              "scaling of the cost of advanced bio-energy technologies (no unit, 50% increase means 1.5)"
@@ -409,12 +411,15 @@ $setglobal cm_demScen  gdp_SSP2EU     !! def = gdp_SSP2EU
 cm_GDPcovid      = 0;            !! def = 0
 
 *AG* and *CB* for cm_startyear greater than 2005, you have to copy the fulldata.gdx (rename it to: input_ref.gdx) from the run you want to build your new run onto.
-cm_startyear      = 2005;      !! def = 2005 for a BAU, 2015 for policy runs
+cm_startyear      = 2035;      !! def = 2005 for a BAU, 2015 for policy runs
+* cm_rentdisc_startyr     = 2005;     !! def = 2025
+cm_NPi_startyr     = 2025;      !! def = 2025
+$setglobal cm_EVRE  none     !! def = none
 c_start_budget    = 2100;      !! def = 2100
 
 cm_prtpScen         = 3;         !! def = 3
 cm_fetaxscen        = 3;         !! def = 3
-cm_multigasscen     = 2;         !! def = 2
+cm_multigasscen     = 3;         !! def = 2
 cm_permittradescen  = 1;         !! def = 1
 cm_limit_peur_scen  = 1;         !! def = 1
 $setGlobal cm_oil_scen  medOil         !! def = medOil
@@ -598,14 +603,14 @@ $setGlobal cm_nash_mode  parallel      !! def = parallel
 $SetGlobal cm_quick_mode  off          !! def = off
 $setGLobal cm_debug_preloop  off !! def = off
 $setGlobal c_EARLYRETIRE       on         !! def = on
-$setGlobal cm_OILRETIRE  on        !! def = on
+$setGlobal cm_OILRETIRE  off        !! def = on
 $setglobal cm_INCONV_PENALTY  on         !! def = on
 $setglobal cm_INCONV_PENALTY_FESwitch  on !! def = on
 $setGlobal cm_so2_out_of_opt  on         !! def = on
 $setGlobal c_skip_output  off        !! def = off
 $setGlobal cm_MOFEX  off        !! def = off
 $setGlobal cm_conoptv  conopt3    !! def = conopt3
-$setGlobal cm_ccsfosall  off        !! def = off
+$setGlobal cm_ccsfosall  on        !! def = off
 
 $setGlobal cm_APscen  SSP2          !! def = SSP2
 $setGlobal cm_magicc_calibrateTemperature2000  uncalibrated  !! def=uncalibrated
@@ -673,6 +678,19 @@ $setglobal cm_feShareLimits  off  !! def = off
 $setglobal cm_altTransBunkersShare  off      !! def = off
 
 $setglobal cm_wind_offshore  1      !! def = 0
+
+*** PPCA DPE switches
+$setglobal cm_PPCA_pol  power !! def = power
+$setglobal cm_PPCA_size  2p     !! def = current
+$setglobal cm_COVID_coal_scen  Neutral  !! def = none
+$setglobal cm_PPCA_OECD  on    !! def = off
+$setglobal cm_PPCA_nonOECD  on    !! def = off
+
+$setglobal cm_pubfinex_pol  REdirect !! def = none
+$setglobal cm_REdir_mobil  none  !! def = none
+
+$setglobal cm_coalExitRegi  none   !! def = none
+
 *** --------------------------------------------------------------------------------------------------------------------------------------------------------------------
 *** --------------------------------------------------------------------------------------------------------------------------------------------------------------------
 ***                                  END OF WARNING ZONE

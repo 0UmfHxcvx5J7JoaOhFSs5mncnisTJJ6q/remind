@@ -311,6 +311,34 @@ prepare <- function() {
     create_input_for_45_carbonprice_exogenous(as.character(cfg$files2export$start["input_carbonprice.gdx"]))
   }
 
+  # For PPCA coal phase-out scenarios, the logit model below is run prior to REMIND using data from input_ref 
+  if(!is.null(cfg$gms$regipol) && cfg$gms$regipol=="PPCAcoalExit" && cfg$gms$cm_PPCA_pol!="none") {
+    refgdx <- as.character(cfg$files2export$start["input_ref.gdx"])
+    cat("\n",refgdx,"\n")
+    cat(cfg$title,"\n")
+    cat(cfg$results_folder,"\n")
+    cat(paste0(gsub("fulldata.gdx","REMIND_generic_",refgdx),strsplit(strsplit(refgdx,"output/",fixed=T)[[1]][2],"_202[0-9]",fixed=F)[[1]][1],".mif"),"\n")
+    if (file.exists(refgdx)) {
+      count <- 0
+      while(!file.exists(paste0(gsub("fulldata.gdx","REMIND_generic_",refgdx),strsplit(strsplit(refgdx,"output/",fixed=T)[[1]][2],"_202[0-9]",fixed=F)[[1]][1],".mif"))) {
+        Sys.sleep(60)
+        count <- count+1
+        if (count > 30)  {
+          stop(paste0(gsub("fulldata.gdx","REMIND_generic_",refgdx),strsplit(strsplit(refgdx,"output/",fixed=T)[[1]][2],"_202[0-9]",fixed=F)[[1]][1],".mif"),
+            " not found - please ensure the reference run is valid and reporting scripts have finished running.")
+        }
+      }
+    }else {
+      stop(refgdx," not found - please provide gdx from reference run")
+    }
+    cat("Running logit model to determine PPCA coalition membership...\n")
+    source("scripts/input/COALogit_PPCA.R")
+    COALogit_PPCA(refgdx=refgdx, recovery=cfg$gms$cm_COVID_coal_scen, size=cfg$gms$cm_PPCA_size, PPCA_pol=cfg$gms$cm_PPCA_pol,
+      oecd=cfg$gms$cm_PPCA_OECD, nonoecd=cfg$gms$cm_PPCA_nonOECD, outputfolder=cfg$results_folder,rev=cfg$revision, title=cfg$title, 
+      plot =  NULL, fin_pol=cfg$gms$cm_pubfinex_pol, uncertainty="90_CI")
+  }
+
+
   # Calculate CES configuration string
   cfg$gms$cm_CES_configuration <- paste0("indu_",cfg$gms$industry,"-",
                                          "buil_",cfg$gms$buildings,"-",
@@ -953,8 +981,9 @@ run <- function(start_subsequent_runs = TRUE) {
         getLoadFile()
 
         # Store all the interesting output
-        file.copy("full.lst", sprintf("full_%02i.lst", cal_itr), overwrite = TRUE)
-        file.copy("full.log", sprintf("full_%02i.log", cal_itr), overwrite = TRUE)
+        interestingOutput <- c("full.lst", "full.log", "fulldata.gdx", "non_optimal.gdx", "abort.gdx")
+        file.copy(from = interestingOutput,
+                  to = sub("^(.*)(\\.[^\\.]+)$", sprintf("\\1_%02i\\2", cal_itr), interestingOutput), overwrite = TRUE)
         file.copy("fulldata.gdx", "input.gdx", overwrite = TRUE)
         file.copy("fulldata.gdx", paste0(cfg$gms$cm_CES_configuration,".gdx"), overwrite = TRUE)
         file.copy("fulldata.gdx", sprintf("input_%02i.gdx", cal_itr),
@@ -962,7 +991,6 @@ run <- function(start_subsequent_runs = TRUE) {
 
         # Update file modification time
         fulldata_m_time <- file.info("fulldata.gdx")$mtime
-
       } else {
         break
       }
@@ -1171,6 +1199,13 @@ run <- function(start_subsequent_runs = TRUE) {
   # Postprocessing / Output Generation
   output    <- cfg$output
   outputdir <- cfg$results_folder
+
+  # make sure the renv used for the run is also used for generating output
+  if (!is.null(renv::project())) {
+    stopifnot(`loaded renv and outputdir must be equal` = normalizePath(renv::project()) == normalizePath(outputdir))
+    argv <- c(get0("argv"), paste0("--renv=", renv::project()))
+  }
+
   sys.source("output.R",envir=new.env())
   # get runtime for output
   timeOutputEnd <- Sys.time()

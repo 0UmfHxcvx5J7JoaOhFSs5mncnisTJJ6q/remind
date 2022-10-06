@@ -10,8 +10,8 @@ Execute_Loadpoint "input_ref" pm_taxCO2eq = pm_taxCO2eq;
 
 *** convergence scheme post 2020: exponential increase of 5$ dollar in 2020with 1.25% AND regional convergence
 pm_taxCO2eq(ttot,regi)$(ttot.val ge cm_startyear) =
-  (sum(ttot2,(pm_taxCO2eq(ttot2,regi)$(ttot2.val eq cm_startyear -5)))*max(2100-cm_startyear-5-ttot.val+cm_startyear,0)
-  + 5 * sm_DptCO2_2_TDpGtC * 1.0125**(ttot.val-cm_startyear)*min(ttot.val-cm_startyear,2100-cm_startyear))/(2100-cm_startyear);
+  (sum(ttot2,(pm_taxCO2eq(ttot2,regi)$(ttot2.val eq cm_NPi_startyr -5)))*max(2100-cm_NPi_startyr-5-ttot.val+cm_NPi_startyr,0)
+  + 5 * sm_DptCO2_2_TDpGtC * 1.0125**(ttot.val-cm_NPi_startyr)*min(ttot.val-cm_NPi_startyr,2100-cm_NPi_startyr))/(2100-cm_NPi_startyr);
 
 display pm_taxCO2eq;
 *** EOF ./modules/45_carbonprice/NPi2018/datainput.gms

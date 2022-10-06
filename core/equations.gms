@@ -857,15 +857,29 @@ q_eqadj(regi,ttot,teAdj(te))$(ttot.val ge max(2010, cm_startyear)) ..
 q_limitCapEarlyReti(ttot,regi,te)$(ttot.val lt 2109 AND pm_ttot_val(ttot+1) ge max(2010, cm_startyear))..
         vm_capEarlyReti(ttot+1,regi,te)
         =g=
-        vm_capEarlyReti(ttot,regi,te);
+        vm_capEarlyReti(ttot,regi,te)
+        ;
 
 q_smoothphaseoutCapEarlyReti(ttot,regi,te)$(ttot.val lt 2120 AND pm_ttot_val(ttot+1) gt max(2010, cm_startyear))..
         vm_capEarlyReti(ttot+1,regi,te)
         =l=
         vm_capEarlyReti(ttot,regi,te) + (pm_ttot_val(ttot+1)-pm_ttot_val(ttot)) * 
 *** Region- and tech-specific max early retirement rates, e.g. more retirement possible for coal power plants in CHA, EUR, REF and USA to account for relatively old fleet or short historical lifespans
-        pm_regiEarlyRetiRate(ttot,regi,te) 
-    ;
+        (pm_regiEarlyRetiRate(ttot,regi,te) 
+*** more coal plant retirement possible for OECD members who join the PPCA and must phase out coal by 2030
+$ifthen.ppca %regipol% == "PPCAcoalExit"
+$ifthen.oecd %cm_PPCA_OECD% == "on"
+$ifthen.pol %cm_PPCA_pol% == "power"
+    + (0.11 - pm_regiEarlyRetiRate(2025,regi,coalElTeNoCCS(te)))$(p47_max_coal_el_share_oecd(regi) lt 0.25 AND p47_max_coal_el_share_oecd(regi) gt 0)
+$elseif.pol %cm_PPCA_pol% == "demand"
+    + (0.11 - pm_regiEarlyRetiRate(2025,regi,coalNonSolTe(all_te)))$(p47_max_coal_dem_share_oecd(regi,"demand") lt 0.25 AND p47_max_coal_dem_share_oecd(regi,"demand") gt 0)
+    + (0.11 - pm_regiEarlyRetiRate(2025,regi,"coaltr"))$(p47_max_coal_dem_share_oecd(regi,"demand") lt 0.25 AND p47_max_coal_dem_share_oecd(regi,"demand") gt 0)
+$endif.pol
+$endif.oecd
+    + (0.07 - pm_regiEarlyRetiRate(2020,regi,coalElTeNoCCS(te)))$(p47_coalCapCOVID("2025",regi,"%cm_COVID_coal_scen%") le (0.55 * p_PE_histCap("2020",regi,"pecoal","seel")))
+$endif.ppca
+    )
+;
 
 
 

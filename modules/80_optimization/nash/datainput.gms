@@ -19,7 +19,7 @@ pm_co2eqForeign(t, regi) = (1 - pm_shPerm(t,regi)) * pm_emicapglob(t);
 if(cm_nash_autoconverge gt 0,
 
 *** set max number of iterations
-cm_iteration_max = 100;
+cm_iteration_max = 200;
 
  if(cm_nash_autoconverge eq 1,
 ***convergences thresholds - coarse 
@@ -29,9 +29,10 @@ cm_iteration_max = 100;
    );
  if(cm_nash_autoconverge eq 2,
 ***convergences thresholds - fine 
-  p80_surplusMaxTolerance(tradePe) = 0.3 * sm_EJ_2_TWa;          !! convert EJ/yr into internal unit TWa
-  p80_surplusMaxTolerance("good") = 20/1000;                  !! in internal unit, trillion Dollar
+  p80_surplusMaxTolerance(tradePe) = 0.4 * sm_EJ_2_TWa;          !! convert EJ/yr into internal unit TWa
+  p80_surplusMaxTolerance("good") = 60/1000;                  !! in internal unit, trillion Dollar
   p80_surplusMaxTolerance("perm") = 70 * 12/44 / 1000 ;                !! convert MtCO2eq into internal unit GtC
+* p80_surplusMaxTolerance("pecoal") = 1.5 * sm_EJ_2_TWa;  
    );
 );
     
