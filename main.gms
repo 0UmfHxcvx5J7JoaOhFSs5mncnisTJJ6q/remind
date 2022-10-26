@@ -87,7 +87,7 @@
 * 
 * Input data revision: 6.311
 * 
-* Last modification (input data): Thu Jun 23 10:11:30 2022
+* Last modification (input data): Wed Oct 26 22:52:59 2022
 * 
 *###################### R SECTION END (VERSION INFO) ###########################
 
@@ -142,8 +142,8 @@ option profile = 0;
 
 
 ***---------------------    Run name and description    -------------------------
-$setGlobal c_expname  default
-$setGlobal c_description  REMIND run with default settings
+$setGlobal c_expname  REdirect_HI-PPCAcop26-iea2019_csp-covfloor
+$setGlobal c_description  REMIND run REdirect_HI-PPCAcop26-iea2019_csp-covfloor started by config/scenario_config_FinEx_3p0.csv.
 
 ***------------------------------------------------------------------------------
 ***                           MODULES
@@ -200,11 +200,11 @@ $setglobal emicapregi  none           !! def = none
 ***---------------------    42_banking  -----------------------------------------
 $setglobal banking  off               !! def = off
 ***---------------------    45_carbonprice  -------------------------------------
-$setglobal carbonprice  none          !! def = none
+$setglobal carbonprice  NPi2018          !! def = none
 ***---------------------    46_carbonpriceRegi  ---------------------------------
 $setglobal carbonpriceRegi  none      !! def = none
 ***---------------------    47_regipol  -----------------------------------------
-$setglobal regipol  none              !! def = none
+$setglobal regipol  PPCAcoalExit              !! def = none
 ***---------------------    50_damages    ---------------------------------------
 $setGlobal damages  off               !! def = off
 ***---------------------    51_internalizeDamages    ----------------------------
@@ -367,13 +367,13 @@ cm_abortOnConsecFail   = 0;     !! def = 0
 c_solver_try_max       = 2;     !! def = 2
 c_keep_iteration_gdxes = 0;     !! def = 0
 cm_keep_presolve_gdxes  = 0;     !! def = 0
-cm_nash_autoconverge   = 1;     !! def = 1
+cm_nash_autoconverge   = 2;     !! def = 1
 $setglobal cm_MAgPIE_coupling  off     !! def = "off"
 
-cm_emiscen        = 1;               !! def = 1
-$setglobal cm_rcp_scen  none         !! def = "none"
+cm_emiscen        = 9;               !! def = 1
+$setglobal cm_rcp_scen  rcp45         !! def = "none"
 $setglobal cm_rcp_scen_build  none   !! def = "none"
-cm_co2_tax_2020   = -1;              !! def = -1
+cm_co2_tax_2020   = 1;              !! def = -1
 cm_co2_tax_growth = 1.05;            !! def = 1.05
 c_macscen         = 1;               !! def = 1
 
@@ -408,10 +408,10 @@ $setglobal cm_POPscen  pop_SSP2EU  !! def = pop_SSP2EU
 $setglobal cm_GDPscen  gdp_SSP2EU  !! def = gdp_SSP2EU
 $setglobal c_GDPpcScen  SSP2EU     !! def = gdp_SSP2   (automatically adjusted by start_run() based on GDPscen) 
 $setglobal cm_demScen  gdp_SSP2EU     !! def = gdp_SSP2EU
-cm_GDPcovid      = 0;            !! def = 0
+cm_GDPcovid      = 1;            !! def = 0
 
 *AG* and *CB* for cm_startyear greater than 2005, you have to copy the fulldata.gdx (rename it to: input_ref.gdx) from the run you want to build your new run onto.
-cm_startyear      = 2035;      !! def = 2005 for a BAU, 2015 for policy runs
+cm_startyear      = 2025;      !! def = 2005 for a BAU, 2015 for policy runs
 * cm_rentdisc_startyr     = 2005;     !! def = 2025
 cm_NPi_startyr     = 2025;      !! def = 2025
 $setglobal cm_EVRE  none     !! def = none
@@ -435,7 +435,7 @@ cm_rentdisccoal     = 0.4;       !! def 0.4
 cm_rentdisccoal2    = 0.6;       !! def 0.6
 cm_rentconvcoal     = 50;        !! def 50
 $setglobal c_regi_earlyreti_rate  GLO 0.09, EUR_regi 0.15      !! def = GLO 0.09, EUR_regi 0.15
-$setglobal c_tech_earlyreti_rate  GLO.(biodiesel 0.14, bioeths 0.14), EUR_regi.(biodiesel 0.15, bioeths 0.15), USA_regi.pc 0.13, REF_regi.pc 0.13, CHA_regi.pc 0.13 !! def = GLO.(biodiesel 0.14, bioeths 0.14), EUR_regi.(biodiesel 0.15, bioeths 0.15), USA_regi.pc 0.13, REF_regi.pc 0.13, CHA_regi.pc 0.13
+$setglobal c_tech_earlyreti_rate   GLO.(biodiesel 0.14, bioeths 0.14), EUR_regi.(biodiesel 0.15, bioeths 0.15), USA_regi.pc 0.13, REF_regi.pc 0.13, CHA_regi.pc 0.13 !! def = GLO.(biodiesel 0.14, bioeths 0.14), EUR_regi.(biodiesel 0.15, bioeths 0.15), USA_regi.pc 0.13, REF_regi.pc 0.13, CHA_regi.pc 0.13
 
 cm_so2tax_scen        = 1;         !! def =
 c_cint_scen           = 1;         !! def = 1
@@ -446,7 +446,7 @@ c_ccsinjecratescen    = 1;         !! def = 1
 $setglobal c_ccsinjecrateRegi  off  !! def = "off"
 c_ccscapratescen      = 1;         !! def = 1
 c_export_tax_scen     = 0;         !! def = 0
-cm_iterative_target_adj  = 0;      !! def = 0
+cm_iterative_target_adj  = 3;      !! def = 0
 $setglobal cm_NDC_version  2022_cond    !! def = 2022_cond
 cm_NDC_divergentScenario = 0;           !! def = 0
 $setglobal cm_CO2TaxSectorMarkup  off   !! def = off
@@ -460,12 +460,12 @@ cm_expoLinear_yearStart  = 2050;   !! def = 2050
 c_budgetCO2from2020FFI   = 700;    !! def = 700 
 c_abtrdy                 = 2010;   !! def = 2010
 c_abtcst                 = 1;      !! def = 1
-c_budgetCO2from2020      = 1150;   !! def = 1150
+c_budgetCO2from2020      = 0;   !! def = 1150
 $setGlobal cm_regiExoPrice  off    !! def = off
 $setGlobal cm_regiCO2target  off   !! def = off
 cm_postTargetIncrease    = 2;      !! def = 2
 $setGlobal cm_quantity_regiCO2target  off !! def = off
-cm_peakBudgYr            = 2050;   !! def = 2050
+cm_peakBudgYr            = 2100;   !! def = 2050
 cm_taxCO2inc_after_peakBudgYr = 3; !! def = 3
 cm_CO2priceRegConvEndYr  = 2050;   !! def = 2050
 $setGlobal cm_emiMktETS  off       !! def = off
@@ -566,7 +566,7 @@ $setglobal cm_steel_secondary_max_share_scenario  off !! def off
 
 *** EU bioenergy switches
 cm_BioSupply_Adjust_EU = 3; !! def 1
-cm_BioImportTax_EU = 1; !! def 0.25
+cm_BioImportTax_EU = 0; !! def 0.25
 
 cm_noPeFosCCDeu = 0; !! def 0
 
@@ -610,7 +610,7 @@ $setGlobal cm_so2_out_of_opt  on         !! def = on
 $setGlobal c_skip_output  off        !! def = off
 $setGlobal cm_MOFEX  off        !! def = off
 $setGlobal cm_conoptv  conopt3    !! def = conopt3
-$setGlobal cm_ccsfosall  on        !! def = off
+$setGlobal cm_ccsfosall  off        !! def = off
 
 $setGlobal cm_APscen  SSP2          !! def = SSP2
 $setGlobal cm_magicc_calibrateTemperature2000  uncalibrated  !! def=uncalibrated
@@ -633,7 +633,7 @@ $setglobal cm_CES_calibration_default_prices  0.01  !!  def  =  0.01
 $setglobal c_CES_calibration_industry_FE_target  1
 $setglobal cm_calibration_string  off    !!  def  =  off
 
-$setglobal c_testOneRegi_region  EUR       !! def = EUR
+$setglobal c_testOneRegi_region  NEU       !! def = EUR
 
 $setglobal cm_cooling_shares  dynamic    !! def = dynamic
 $setglobal cm_techcosts  REG       !! def = REG
@@ -681,13 +681,13 @@ $setglobal cm_wind_offshore  1      !! def = 0
 
 *** PPCA DPE switches
 $setglobal cm_PPCA_pol  power !! def = power
-$setglobal cm_PPCA_size  2p     !! def = current
+$setglobal cm_PPCA_size  current     !! def = current
 $setglobal cm_COVID_coal_scen  Neutral  !! def = none
 $setglobal cm_PPCA_OECD  on    !! def = off
 $setglobal cm_PPCA_nonOECD  on    !! def = off
 
 $setglobal cm_pubfinex_pol  REdirect !! def = none
-$setglobal cm_REdir_mobil  none  !! def = none
+$setglobal cm_REdir_mobil  hi_oecd_2030  !! def = none
 
 $setglobal cm_coalExitRegi  none   !! def = none
 

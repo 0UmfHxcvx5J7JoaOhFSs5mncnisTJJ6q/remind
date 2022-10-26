@@ -7,20 +7,18 @@
 *** SOF ./modules/47_regipol/PPCAcoalExit/declarations.gms
 
 $ifthen.cov not %cm_COVID_coal_scen% == "none"
-$ifthen.ref "%cm_PPCA_size%" == "current"
+* $ifthen.ref "%cm_PPCA_size%" == "current"
 equations
 q47_CovidCoalCap(ttot,all_regi,cov_coal)                                  "2025 post-COVID Coal capacity scenarios upper limit"
 
-$ifthen.nofinex %cm_pubfinex_pol% == "none"
 q47_CovidCoalFloor(ttot,all_regi,cov_coal)                                  "2025 post-COVID Coal capacity scenarios lower limit"
-$endif.nofinex
 ;
-$else.ref
+* $else.ref
 
 parameters 
 p47_cap(ttot,all_regi,all_te,rlf) 
 ;
-$endif.ref
+* $endif.ref
 $endif.cov
 
 * $ifthen.fin not %cm_pubfinex_pol% == "none"

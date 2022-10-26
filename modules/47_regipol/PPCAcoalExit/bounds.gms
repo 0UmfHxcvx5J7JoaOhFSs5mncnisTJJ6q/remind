@@ -27,11 +27,11 @@ vm_cap.l("2025",regi,"igcc",rlf) = p47_cap("2025",regi,"igcc",rlf);
 $endif.cov_coal
 
 $ifthen.REdirect %cm_pubfinex_pol% == "REdirect"
-vm_cap.lo("2025",regi,teRe(te),rlf) = 0.95*p47_cap("2025",regi,te,rlf);
-vm_cap.lo("2025",regi,teNoTransform(te),rlf) = 0.95*p47_cap("2025",regi,te,rlf);
+vm_cap.lo("2025",regi,teRe(te),rlf) = 0.99*p47_cap("2025",regi,te,rlf);
+vm_cap.lo("2025",regi,teNoTransform(te),rlf) = 0.99*p47_cap("2025",regi,te,rlf);
 
-vm_cap.lo("2025",regi,teRe(te),rlf) = 0.95*p47_cap("2025",regi,te,rlf);
-vm_cap.lo("2025",regi,teNoTransform(te),rlf) = 0.95*p47_cap("2025",regi,te,rlf);
+vm_cap.lo("2025",regi,teRe(te),rlf) = 0.99*p47_cap("2025",regi,te,rlf);
+vm_cap.lo("2025",regi,teNoTransform(te),rlf) = 0.99*p47_cap("2025",regi,te,rlf);
 
 * v_costInvTeDir.lo("2025",regi,teRe(te)) = 0.9*p47_ref_costInvTeDir_RE("2025",regi,te);
 * v_costInvTeDir.lo("2025",regi,teNoTransform(te)) = 0.9*p47_ref_costInvTeDir_RE("2025",regi,te);

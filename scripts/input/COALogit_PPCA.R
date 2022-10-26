@@ -1,4 +1,4 @@
-COALogit_PPCA <- function(refgdx,recovery,size,PPCA_pol,oecd,nonoecd,outputfolder,title,rev=NULL,fin_pol="none",uncertainty="90_CI",run=NULL,plot=NULL) {
+COALogit_PPCA <- function(refgdx,recovery,size,PPCA_pol,oecd,nonoecd,outputfolder,title,rev=NULL,fin_pol="none",mob,uncertainty="90CI",run=NULL,plot=NULL) {
   require(stats, quietly = TRUE,warn.conflicts =FALSE)
   require(dplyr, quietly = TRUE,warn.conflicts =FALSE)
   require(madrat, quietly = TRUE,warn.conflicts =FALSE)
@@ -10,7 +10,7 @@ COALogit_PPCA <- function(refgdx,recovery,size,PPCA_pol,oecd,nonoecd,outputfolde
   
   # Set configuration specific to snapshot of input data used in publication 
   if (!is.null(rev))  setConfig(cachefolder = paste0("/p/projects/rd3mod/inputdata/cache/",rev))
-  else  setConfig(cachefolder = "/p/projects/rd3mod/inputdata/cache/SB_GCPT")
+  else  setConfig(cachefolder = "/p/tmp/stephenb/cache/SB_GCPT")
   setConfig(outputfolder = outputfolder)
   subtype <- "inputdata"
   setConfig(forcecache = T)
@@ -50,7 +50,7 @@ COALogit_PPCA <- function(refgdx,recovery,size,PPCA_pol,oecd,nonoecd,outputfolde
   
   if (is.null(run)) {
     mif <- strsplit(strsplit(refgdx,"output/",fixed=T)[[1]][2],"_202[0-9]",fixed=F)[[1]][1]
-    mif <- paste0("REMIND_generic_",mif,".mif")
+    mif <- paste0("REMIND_generic_",mif,"_withoutPlus.mif")
     run <- gsub("fulldata.gdx",mif,refgdx)
     cat("Retrieving data from",run,"\n")
   }
@@ -113,7 +113,7 @@ COALogit_PPCA <- function(refgdx,recovery,size,PPCA_pol,oecd,nonoecd,outputfolde
       #   loadfactor_c[,y,][which(hist_cap_c[,y,]==0 & cap_2025_c[,,"Green"]==0)] <- 0
       #   
       #   loadfactor_c[,y,][which(hist_cap_c[,y,]==0 & cap_2025_c[,,"Brown"]!=0)] <-
-      #     loadfactor_R[,y,][map$RegionCode[which(map$CountryCode %in% getRegions(loadfactor_c[which(hist_cap_c[,y,]==0 & cap_2025_c[,,"Brown"]!=0)]))],,]
+      #     loadfactor_R[,y,][map$RegionCode[which(map$CountryCode %in% getItems(dim = 1,  x = loadfactor_c[which(hist_cap_c[,y,]==0 & cap_2025_c[,,"Brown"]!=0)]))],,]
       # }
       
       if (is.null(recovery)) {
@@ -131,7 +131,7 @@ COALogit_PPCA <- function(refgdx,recovery,size,PPCA_pol,oecd,nonoecd,outputfolde
       popGrowth <- popC[,getYears(popC)>"y2015",] - popC[,2015,]
       getYears(popGrowth) <- gsub(".y2015","",getYears(popGrowth))
       
-      weight <- new.magpie(getRegions(popC),getYears(popGrowth),fill=0)
+      weight <- new.magpie(getItems(dim = 1,  x = popC),getYears(popGrowth),fill=0)
       # Aggregation weights for downscaling regional model output (and re-aggregating)
       for (yr in getYears(weight)) {
         weight[,yr,] <- data[,2015,"TOTAL.ELOUTPUT"] + 
@@ -144,7 +144,7 @@ COALogit_PPCA <- function(refgdx,recovery,size,PPCA_pol,oecd,nonoecd,outputfolde
       # except countries with no historical or planned coal demand are given zero weights.
       coalweight <- weight
       pipeline <- readSource("GCPT",subtype="status",convert=F)
-      zero_pipe_reg <- getRegions(pipeline)[which(dimSums(pipeline[,,c("Announced","Pre-permit","Permitted","Construction","Shelved","Operating")],dim=3)==0)]
+      zero_pipe_reg <- getItems(dim = 1,  x = pipeline)[which(dimSums(pipeline[,,c("Announced","Pre-permit","Permitted","Construction","Shelved","Operating")],dim=3)==0)]
       coalweight[zero_pipe_reg,getYears(coalweight)<"y2100",] <- 0
       
       #####################################
@@ -152,20 +152,20 @@ COALogit_PPCA <- function(refgdx,recovery,size,PPCA_pol,oecd,nonoecd,outputfolde
       #####################################
       downscale_coal <- function(coal_c_t1,total_c_t1,coal_R_t1,total_R_t1,coal_R_t2,total_R_t2) {
         # Make sure all arguments are at country level (for regional variables, assign each country its region's value) 
-        if (length(getRegions(coal_R_t1))<length(getRegions(coal_c_t1)))  
-          coal_R_t1 <- toolAggregate(coal_R_t1[-which(getRegions(coal_R_t1)=="GLO"),,],map,NULL)
-        if (length(getRegions(total_R_t1))<length(getRegions(coal_c_t1)))  
-            total_R_t1 <- toolAggregate(total_R_t1[-which(getRegions(total_R_t1)=="GLO"),,],map,NULL)
-        if (length(getRegions(coal_R_t2))<length(getRegions(coal_c_t1)))  
-            coal_R_t2 <- toolAggregate(coal_R_t2[-which(getRegions(coal_R_t2)=="GLO"),,],map,NULL)
-        if (length(getRegions(total_R_t2))<length(getRegions(coal_c_t1)))  
-            total_R_t2 <- toolAggregate(total_R_t2[-which(getRegions(total_R_t2)=="GLO"),,],map,NULL)
+        if (length(getItems(dim = 1,  x = coal_R_t1))<length(getItems(dim = 1,  x = coal_c_t1)))  
+          coal_R_t1 <- toolAggregate(coal_R_t1[-which(getItems(dim = 1,  x = coal_R_t1)=="GLO"),,],map,NULL)
+        if (length(getItems(dim = 1,  x = total_R_t1))<length(getItems(dim = 1,  x = coal_c_t1)))  
+            total_R_t1 <- toolAggregate(total_R_t1[-which(getItems(dim = 1,  x = total_R_t1)=="GLO"),,],map,NULL)
+        if (length(getItems(dim = 1,  x = coal_R_t2))<length(getItems(dim = 1,  x = coal_c_t1)))  
+            coal_R_t2 <- toolAggregate(coal_R_t2[-which(getItems(dim = 1,  x = coal_R_t2)=="GLO"),,],map,NULL)
+        if (length(getItems(dim = 1,  x = total_R_t2))<length(getItems(dim = 1,  x = coal_c_t1)))  
+            total_R_t2 <- toolAggregate(total_R_t2[-which(getItems(dim = 1,  x = total_R_t2)=="GLO"),,],map,NULL)
         # Define known national (t1) and regional (t1 and t2) coal-power-shares
         share_c_t1 <- replace_non_finite(coal_c_t1/total_c_t1,replace=0)
         share_R_t1 <- replace_non_finite(coal_R_t1/total_R_t1,replace=0)
         share_R_t2 <- replace_non_finite(coal_R_t2/total_R_t2,replace=0)
         # Initialize new variable for national coal-power-shares in t2
-        share_c_t2 <- new.magpie(getRegions(coal_c_t1),getYears(coal_R_t2),getNames(coal_c_t1),fill=0)
+        share_c_t2 <- new.magpie(getItems(dim = 1,  x = coal_c_t1),getYears(coal_R_t2),getNames(coal_c_t1),fill=0)
         for (reg in unique(map$RegionCode)) {
           reg_all <- map$CountryCode[which(map$RegionCode==reg)]
           # Only apply function to regions multinational regions
@@ -202,7 +202,7 @@ COALogit_PPCA <- function(refgdx,recovery,size,PPCA_pol,oecd,nonoecd,outputfolde
       # Cases with no coal capacity constraint in 2025 due to Covid or FinEx
       if (recovery=="none" | grepl("REdirect",fin_pol)) {
         coalgen_2025_R <- rundata[,"y2025","SE|Electricity|Coal (EJ/yr)"]
-        coalgen_2025_R <- toolAggregate(coalgen_2025_R[-which(getRegions(coalgen_2025_R)=="GLO"),,],map,NULL)
+        coalgen_2025_R <- toolAggregate(coalgen_2025_R[-which(getItems(dim = 1,  x = coalgen_2025_R)=="GLO"),,],map,NULL)
         
         # Proportional country-region relationship from 2015
         Kc <- toolNAreplace(coalgen_2015_c/coalgen_2015_R,replaceby=0)[[1]]
@@ -215,8 +215,8 @@ COALogit_PPCA <- function(refgdx,recovery,size,PPCA_pol,oecd,nonoecd,outputfolde
       
       # Cases with fixed 2025 capacity due to Covid recovery or FinEx scenario
       }else {
-        if (fin_pol=="G20_coal") {
-          cap_2025_c <- readGCPT_finEx(subtype = "G20_FinEx_2020")
+        if (fin_pol=="FinEx") {
+          cap_2025_c <- readGCPT_finEx(subtype = "G20_FinEx_2021")[,,recovery]
         }else if (fin_pol=="none") {
           #Read coal capacity data from GCPT for the given COVID recovery scenario
           cap_2025_c <- readSource("GCPT",subtype="future",convert=F)[,,recovery]
@@ -224,7 +224,6 @@ COALogit_PPCA <- function(refgdx,recovery,size,PPCA_pol,oecd,nonoecd,outputfolde
         
         # Aggregate capacity to REMIND regional level and report for sanity check
         cap_R_2025 <- toolAggregate(cap_2025_c,rel=map,weight=NULL)
-        print(cap_R_2025)
 
         #Derive 2025 coal generation in exajoules from coal capacity and default REMIND country-level load factor assumptions
         coalgen_2025_c <- cap_2025_c * loadfactor_c[,2025,] *365*24/277777.77778
@@ -233,42 +232,68 @@ COALogit_PPCA <- function(refgdx,recovery,size,PPCA_pol,oecd,nonoecd,outputfolde
         coalgen_2025_R <- toolAggregate(toolAggregate(coalgen_2025_c,map,NULL),map,NULL)
       }
       getYears(coalgen_2025_c) <- "y2025"
-      
       #########################################
       ### Total Electricity generation 2025 ###
       #########################################
       # Regional data from REMIND output
       totalgen_2025_R <- rundata[,"y2025","SE|Electricity (EJ/yr)"]
       # Downscale regional REMIND results to national level using disaggregation weight defined above
-      totalgen_2025_c <- toolAggregate(totalgen_2025_R[-which(getRegions(totalgen_2025_R)=="GLO"),,],map,weight[,2025,])
-      
+      totalgen_2025_c <- toolAggregate(totalgen_2025_R[-which(getItems(dim = 1,  x = totalgen_2025_R)=="GLO"),,],map,weight[,2025,])
+
       ### Safeguard in case downscaling results in countries with coal power share >100% ###
       # Loop over regions
-      for (reg in getRegions(totalgen_2025_R)) {
+      for (reg in unique(map$RegionCode)) {
         # All countries in reg
         reg_all <- map$CountryCode[which(map$RegionCode==reg)]
         # Countries with coal share >100%
         reg_excess <- reg_all[which(coalgen_2025_c[reg_all,,]/totalgen_2025_c[reg_all,,] > 1)]
-        # Countries with nonzero coal generation
-        reg_nonzero <- reg_all[which(totalgen_2025_c[reg_all,,] > 0)]
         
-        if (length(reg_excess)) {
-          # Each nonzero country's share of total electricity among all nonzero countries in region
-          reg_normalized <- totalgen_2025_c[reg_nonzero,,] /
-            dimSums(totalgen_2025_c[reg_nonzero,,],dim=1)
-          # Excess coal power generation among all countries in region with coal share >100%
-          excess <- dimSums(coalgen_2025_c[reg_excess,,] - totalgen_2025_c[reg_excess,,] / 
-            max(coalgen_2015_c[reg_all,,]/totalgen_2015_c[reg_all,,],na.rm=TRUE), dim=1)
-          # Increase those countries' total electricity generation so that their coal power shares equal the regional max in 2015
-          totalgen_2025_c[reg_excess,,] <- coalgen_2025_c[reg_excess,,] / 
-            max(coalgen_2015_c[reg_all,,]/totalgen_2015_c[reg_all,,],na.rm=TRUE)
-          # Decrease total electricity generation in all other nonzero countries by the proportional amount 
-          totalgen_2025_c[reg_nonzero,,] <- totalgen_2025_c[reg_nonzero,,] - 
-            excess * reg_normalized
+        # Countries with nonzero coal generation
+        # reg_nonzero <- reg_all[which(totalgen_2025_c[reg_all,,] > 0)]
+        
+        while (length(reg_excess)) {
+          # Each country's share of the region's total electricity generation
+          reg_normalized <- totalgen_2025_c[reg_all,,] /
+            as.numeric(totalgen_2025_R[reg,,])
+
+          # Increase total electricity generation in >100% coal-share countries so that their coal-share equals the global max in 2015
+          totalgen_2025_c[reg_excess,,] <- coalgen_2025_c[reg_excess,,] / as.numeric(max(coalgen_2015_c / totalgen_2015_c, na.rm = T))
+
+          print("max 2015 coal share:")
+          print(as.numeric(max(coalgen_2015_c / totalgen_2015_c, na.rm = T)))
+          print("totalgen_2025_c[reg_excess,,]:")
+          print(totalgen_2025_c[reg_excess,,])
+
+          # Resulting excess power generation in region 
+          excess <- as.numeric(dimSums(totalgen_2025_c[reg_all,,],dim=1) - as.numeric(totalgen_2025_R[reg,,]))
+          # as.numeric(dimSums(coalgen_2025_c[reg_excess,,] - totalgen_2025_c[reg_excess,,], dim=1)
+          print("excess 2025:")
+          print(excess)
+
+          # Decrease total electricity generation in all other countries in the region by the proportional amount 
+          totalgen_2025_c[setdiff(reg_all, reg_excess),,] <- totalgen_2025_c[setdiff(reg_all, reg_excess),,] - 
+                                                              excess * (reg_normalized[setdiff(reg_all, reg_excess),,] / as.numeric(dimSums(reg_normalized[setdiff(reg_all, reg_excess),,],dim=1)))
+          print("totalgen_2025_c[setdiff(reg_all, reg_excess),,]:")
+          print(totalgen_2025_c[setdiff(reg_all, reg_excess),,])
+          # totalgen_2025_c[setdiff(reg_all, reg_excess),,] <- totalgen_2025_c[setdiff(reg_all, reg_excess),,] - excess * reg_normalized[setdiff(reg_all, reg_excess),,]
+          # / length(setdiff(reg_all, reg_excess)) 
+          
+          # Transfer a proportional amount of the rest of the region's electricity generation to each excess country
+          # totalgen_2025_c[reg_excess,,] <- totalgen_2025_c[reg_excess,,] +  excess * reg_normalized[reg_excess,,]  
+          # / length(reg_excess) 
+          # reg_normalized[reg_excess,,] * as.numeric(dimSums(excess * reg_normalized[setdiff(reg_all, reg_excess),,], dim = 1))
+
+          # print("reg_nonzero coal share:") 
+          # print(coalgen_2025_c[reg_nonzero,,] / totalgen_2025_c[reg_nonzero,,])
+          
+          reg_excess <- reg_all[which(coalgen_2025_c[reg_all,,]/totalgen_2025_c[reg_all,,] > 1.001)]
+
+          print("reg_excess coal share:") 
+          print(coalgen_2025_c[reg_excess,,] / totalgen_2025_c[reg_excess,,])            
         }
       }
       getYears(totalgen_2025_c) <- "y2025"
-      
+
       #Derive country-level coal shares
       coalShare_2025_c <- replace_non_finite(coalgen_2025_c/totalgen_2025_c,replace = 0)
            
@@ -294,7 +319,8 @@ COALogit_PPCA <- function(refgdx,recovery,size,PPCA_pol,oecd,nonoecd,outputfolde
         #################################################
         # Read file tracking the current status of the PPCA which contains GDPpc, % coal in electricity, 
         # standing coal power capacity, among other data
-        histData <- read.csv(paste0(getConfig("sourcefolder"),"/PPCA/PPCA_status_SSP2_2015.csv"),stringsAsFactors = F,sep = ",")
+        histData <- read.csv(paste0(getConfig("sourcefolder"),"/PPCA/PPCA_status_COP26_combo_16_19.csv"),stringsAsFactors = F,sep = ",")
+        # histData <- read.csv(paste0(getConfig("sourcefolder"),"/PPCA/PPCA_status_SSP2_2015.csv"),stringsAsFactors = F,sep = ",")
         # If file doesn't contain column with binary values for PPCA membership, add it
         if (!is.element("PPCA.Bin",colnames(histData)))  histData <- histData %>% mutate(PPCA.Bin=ifelse(PPCA=="PPCA",1,0))
                 
@@ -306,12 +332,11 @@ COALogit_PPCA <- function(refgdx,recovery,size,PPCA_pol,oecd,nonoecd,outputfolde
         slope <- -(summary(logit_model)$coef[2]/summary(logit_model)$coef[3])
         # All countries lying above this line are members of the given coalition scenario
         ln <- data.frame(Ic = ic, Slope = slope, Prob = as.character(p))
-        
+
         getNames(coalShare_2025_c) <- recovery
         getYears(coalShare_2025_c) <- "y2025"
-        
         ### New data frame containing 2025 data for logit analysis
-        OECD <- data.frame(country=sort(getRegions(coalShare_2025_c)),
+        OECD <- data.frame(country=sort(getItems(dim = 1,  x = coalShare_2025_c)),
                            oecd=as.character(oecd_map),
                            ppca=as.character(ppca_map),
                            gdp=as.numeric(gdppc[,2025,]),
@@ -350,43 +375,37 @@ COALogit_PPCA <- function(refgdx,recovery,size,PPCA_pol,oecd,nonoecd,outputfolde
           oecd_members <- as.character(oecd_5p[,1])
         }
       }
-      print("OECD members")
-      print(oecd_members)
+
       ################################################
       ########### POWER EXIT REMIND DATA #############
       ################################################
       
       # Use regional downscaling of REMIND results to derive country-level coal and total electricity generation in 2030
       coalgen_2030_R <- rundata[,getYears(rundata)>="y2030","SE|Electricity|Coal (EJ/yr)"]
-      coalgen_2030_R <- toolAggregate(coalgen_2030_R[-which(getRegions(coalgen_2030_R)=="GLO"),,],map,NULL)
+      coalgen_2030_R <- toolAggregate(coalgen_2030_R[-which(getItems(dim = 1,  x = coalgen_2030_R)=="GLO"),,],map,NULL)
       
       totalgen_2030_R <- rundata[,getYears(rundata)>="y2030","SE|Electricity (EJ/yr)"]
-      totalgen_2030_c <- toolAggregate(totalgen_2030_R[-which(getRegions(totalgen_2030_R)=="GLO"),,],map,weight[,2030,])
-      print("weight 2030 OAS")
-      print(100 * weight[map$CountryCode[which(map$RegionCode=="OAS")],2030,] / dimSums(weight[map$CountryCode[which(map$RegionCode=="OAS")],2030,],dim=1))
+      totalgen_2030_c <- toolAggregate(totalgen_2030_R[-which(getItems(dim = 1,  x = totalgen_2030_R)=="GLO"),,],map,weight[,2030,])
       
       # Apply downscale formula to derive 2030 coal generation by country
       coalshare_2030_c <- downscale_coal(coalgen_2025_c,totalgen_2025_c,coalgen_2025_R,totalgen_2025_R,coalgen_2030_R,totalgen_2030_R)
       coalgen_2030_c <- coalshare_2030_c * totalgen_2030_c
       #Read 2045 total electricity generation from appropriate OECD phase-out REMIND scenario
       totalgen_2045_R <- rundata[,"y2045","SE|Electricity (EJ/yr)"]
-      totalgen_2045_c <- toolAggregate(totalgen_2045_R[-which(getRegions(totalgen_2045_R)=="GLO"),,],map,weight[,2045,])
+      totalgen_2045_c <- toolAggregate(totalgen_2045_R[-which(getItems(dim = 1,  x = totalgen_2045_R)=="GLO"),,],map,weight[,2045,])
       
       coalgen_2045_R <- rundata[,"y2045","SE|Electricity|Coal (EJ/yr)"]
-      # coalgen_2045_c <- toolAggregate(coalgen_2045_R[-which(getRegions(coalgen_2045_R)=="GLO"),,],map,coalweight[,2045,])
-      coalgen_2045_R <- toolAggregate(coalgen_2045_R[-which(getRegions(coalgen_2045_R)=="GLO"),,],map,NULL)
+      # coalgen_2045_c <- toolAggregate(coalgen_2045_R[-which(getItems(dim = 1,  x = coalgen_2045_R)=="GLO"),,],map,coalweight[,2045,])
+      coalgen_2045_R <- toolAggregate(coalgen_2045_R[-which(getItems(dim = 1,  x = coalgen_2045_R)=="GLO"),,],map,NULL)
       
       #Read 2050 total electricity generation from appropriate OECD phase-out REMIND scenario
       totalgen_2050_R <- rundata[,getYears(rundata)>="y2050","SE|Electricity (EJ/yr)"]
-      totalgen_2050_c <- toolAggregate(totalgen_2050_R[-which(getRegions(totalgen_2050_R)=="GLO"),,],map,weight[,2050,])
+      totalgen_2050_c <- toolAggregate(totalgen_2050_R[-which(getItems(dim = 1,  x = totalgen_2050_R)=="GLO"),,],map,weight[,2050,])
       
       coalgen_2050_R <- rundata[,getYears(rundata)>="y2050","SE|Electricity|Coal (EJ/yr)"]
-      # coalgen_2050_c <- toolAggregate(coalgen_2050_R[-which(getRegions(coalgen_2050_R)=="GLO"),,],map,coalweight[,2050,])
-      coalgen_2050_R <- toolAggregate(coalgen_2050_R[-which(getRegions(coalgen_2050_R)=="GLO"),,],map,NULL)
-      
-      print("coalshare_2030_c * leakage_allowance")
-      print(coalshare_2030_c[map$CountryCode[which(map$RegionCode=="OAS")],2030,] * leakage_allowance)
-              
+      # coalgen_2050_c <- toolAggregate(coalgen_2050_R[-which(getItems(dim = 1,  x = coalgen_2050_R)=="GLO"),,],map,coalweight[,2050,])
+      coalgen_2050_R <- toolAggregate(coalgen_2050_R[-which(getItems(dim = 1,  x = coalgen_2050_R)=="GLO"),,],map,NULL)
+                   
       ##################################################
       ### 2045 COAL SHARE IN ELECTRICITY CALCULATION ###
       ##################################################
@@ -395,50 +414,81 @@ COALogit_PPCA <- function(refgdx,recovery,size,PPCA_pol,oecd,nonoecd,outputfolde
         reg_oecd_members <- map$CountryCode[which(map$CountryCode %in% oecd_members & map$RegionCode==reg)]
         reg_all <- map$CountryCode[which(map$RegionCode==reg)]
         reg_freeriders <- setdiff(reg_all,reg_oecd_members)
-        reg_nonzero_freeriders <- getRegions(logit_coalgen_2030_c[reg_freeriders,,])[which(logit_coalgen_2030_c[reg_freeriders,,]>0)]
+        reg_nonzero_freeriders <- getItems(dim = 1,  x = logit_coalgen_2030_c[reg_freeriders,,])[which(logit_coalgen_2030_c[reg_freeriders,,]>0)]
         
         # Set OECD PPCA members' 2030 coal share to 0
         logit_coalgen_2030_c[reg_oecd_members,,] <- 0 
           
         ## If there are both OECD PPCA members and freeriders in the region, distribute the PPCA members' coal to the freeriders
         if (length(reg_oecd_members) & length(reg_nonzero_freeriders)) {
-          reg_normalized_pow_dem <- totalgen_2030_c[reg_nonzero_freeriders,"y2030",]/dimSums(totalgen_2030_c[reg_nonzero_freeriders,"y2030",],dim=1)
+          # Each country's share of the region's total electricity generation
+          reg_normalized <- totalgen_2030_c[reg_all,"y2030",] / as.numeric(totalgen_2030_R[reg,2030,])
+
+          # Each nonzero freerider's share of all nonzero freeriders' total electricity generation
+          reg_normalized_nzfree <- totalgen_2030_c[reg_nonzero_freeriders,"y2030",] / as.numeric(totalgen_2030_R[reg,2030,])
 
           logit_coalgen_2030_c[reg_nonzero_freeriders,,] <- logit_coalgen_2030_c[reg_nonzero_freeriders,,] + 
-            dimSums(coalgen_2030_c[reg_oecd_members,"y2030",]-logit_coalgen_2030_c[reg_oecd_members,,],dim=1) * reg_normalized_pow_dem
+            as.numeric(dimSums(coalgen_2030_c[reg_oecd_members,"y2030",]-logit_coalgen_2030_c[reg_oecd_members,,],dim=1)) * reg_normalized_nzfree
           
           logit_coalshare_2030_c <- logit_coalgen_2030_c / totalgen_2030_c[,"y2030",]
           
           reg_excess <- reg_nonzero_freeriders[which(logit_coalshare_2030_c[reg_nonzero_freeriders,,] > 1)]
 
+
           ## If the redistribution of coal results in other countries with >100% share in coal...
-          while (length(reg_excess) & length(reg_nonzero_freeriders)) {
-            excess <- dimSums(leakage_allowance * coalgen_2030_c[reg_excess,"y2030",] - logit_coalgen_2030_c[reg_excess,,], dim=1)
+          while (length(reg_excess)) {
+            # Increase total electricity generation in >100% coal-share countries so that their coal-share equals the global max in 2015
+            totalgen_2030_c[reg_excess,,] <- logit_coalgen_2030_c[reg_excess,,] / max(coalgen_2015_c / totalgen_2015_c, na.rm = T)
+
+            # Resulting excess power generation in region 
+            excess <- as.numeric(dimSums(totalgen_2030_c[reg_all,,],dim=1) - as.numeric(totalgen_2030_R[reg,2030,]))
+            # as.numeric(dimSums(logit_coalgen_2030_c[reg_excess,,] - totalgen_2030_c[reg_excess,,], dim=1))
+            print("excess 2030:")
             print(excess)
 
-            
+            # Decrease total electricity generation in all other countries in the region by the proportional amount 
+            totalgen_2030_c[setdiff(reg_all, reg_excess),,] <- totalgen_2030_c[setdiff(reg_all, reg_excess),,] - 
+                                                                excess * (reg_normalized[setdiff(reg_all, reg_excess),,] / 
+                                                                          as.numeric(dimSums(reg_normalized[setdiff(reg_all, reg_excess),,],dim=1)))
 
-            # Set them to the maximum allowed leakage
-            logit_coalgen_2030_c[reg_excess,,] <- leakage_allowance * coalgen_2030_c[reg_excess,"y2030",]
 
-            reg_nonzero_freeriders <- reg_nonzero_freeriders[which(!(reg_nonzero_freeriders %in% reg_excess))]
+            # excess <- as.numeric(dimSums(logit_coalgen_2030_c[reg_excess,,] - totalgen_2030_c[reg_excess,,], dim=1))
+            # print("excess 2030:")
+            # print(excess)
+
+            # Decrease total electricity generation in all other nonzero countries by the proportional amount 
+            # totalgen_2030_c[setdiff(reg_nonzero_freeriders, reg_excess),,] <- totalgen_2030_c[setdiff(reg_nonzero_freeriders, reg_excess),,] - excess * reg_normalized_nzfree[setdiff(reg_nonzero_freeriders, reg_excess),,]
+            # / length(setdiff(reg_all, reg_excess)) 
+            # (1 - reg_normalized_nzfree[setdiff(reg_all, reg_excess),,])
+
+            # Transfer a proportional amount of the rest of the region's electricity generation to each excess country
+            # totalgen_2030_c[reg_excess,,] <- totalgen_2030_c[reg_excess,,] + excess * reg_normalized_nzfree[reg_excess,,]
+            # / length(reg_excess)
+            # totalgen_2030_c[reg_excess,,] <- totalgen_2030_c[reg_excess,,] + reg_normalized_nzfree[reg_excess,,] * as.numeric(dimSums(excess * (1 - reg_normalized_nzfree[setdiff(reg_all, reg_excess),,]), dim = 1))
+
+            # logit_coalgen_2030_c[reg_excess,,] <- leakage_allowance * coalgen_2030_c[reg_excess,"y2030",]
+            logit_coalshare_2030_c[reg_all,,] <- logit_coalgen_2030_c[reg_all,,] / totalgen_2030_c[reg_all,"y2030",]
+
+            # Check if any are still over 100% 
+            reg_excess <- reg_excess[which(logit_coalshare_2030_c[reg_excess,,] > 1.001)]
+
+            print("reg_excess coal share 2030:")
+            print(logit_coalshare_2030_c[reg_excess,,])
+
+            reg_normalized_nzfree <- totalgen_2030_c[reg_all,"y2030",] / as.numeric(totalgen_2030_R[reg,2030,])
+
+            # reg_nonzero_freeriders <- reg_nonzero_freeriders[which(!(reg_nonzero_freeriders %in% reg_excess))]
             
             # And redistribute the excess to other freeriding nations (if any)
-            if (length(reg_nonzero_freeriders)) {
-              reg_normalized_pow_dem <- totalgen_2030_c[reg_nonzero_freeriders,"y2030",]/dimSums(totalgen_2030_c[reg_nonzero_freeriders,"y2030",],dim=1)
-              logit_coalgen_2030_c[reg_nonzero_freeriders,,] <- logit_coalgen_2030_c[reg_nonzero_freeriders,,] + excess * reg_normalized_pow_dem
-
-              # Check again if this causes any countries to exceed 100%
-              reg_excess <- reg_nonzero_freeriders[which(logit_coalgen_2030_c[reg_nonzero_freeriders,,]/totalgen_2030_c[reg_nonzero_freeriders,"y2030",] > 1)]
-
-            }
+            # if (length(reg_nonzero_freeriders)) {
+            #   reg_normalized_nzfree <- totalgen_2030_c[reg_nonzero_freeriders,"y2030",]/dimSums(totalgen_2030_c[reg_nonzero_freeriders,"y2030",],dim=1))
+            #   logit_coalgen_2030_c[reg_nonzero_freeriders,,] <- logit_coalgen_2030_c[reg_nonzero_freeriders,,] + excess * reg_normalized_nzfree
+            
+            # }
           }
         }
       }
       
-      print("coalshare_2030_c OAS")
-      print(logit_coalgen_2030_c[map$CountryCode[which(map$RegionCode=="OAS")],2030,] / totalgen_2030_c[map$CountryCode[which(map$RegionCode=="OAS")],2030,])
-
       # Derive 2045 coal share in electricity for use in logistic regression
       logit_coalShare_2045_c <- downscale_coal(logit_coalgen_2030_c,totalgen_2030_c[,"y2030",],coalgen_2030_R[,"y2030",],totalgen_2030_R[,"y2030",],coalgen_2045_R[,"y2045",],totalgen_2045_R[,"y2045",])
       logit_coalgen_2045_c <- logit_coalShare_2045_c * totalgen_2045_c[,"y2045",]
@@ -456,7 +506,7 @@ COALogit_PPCA <- function(refgdx,recovery,size,PPCA_pol,oecd,nonoecd,outputfolde
             ifelse(data[,2015,"TOTAL.TFC"] + (data[,2015,"TOTAL.TFC"]/popC[,2015,]) * popGrowth[,yr,] > 0,
                   (data[,2015,"TOTAL.TFC"]/popC[,2015,]) * popGrowth[,yr,], 0)
         }
-        zero_coal_dem <- getRegions(data)[which(dimSums(data[,2015,paste0(coalvars,".TFC")],dim=3)==0)]
+        zero_coal_dem <- getItems(dim = 1,  x = data)[which(dimSums(data[,2015,paste0(coalvars,".TFC")],dim=3)==0)]
         coalweight[intersect(zero_coal_dem,zero_pipe_reg),getYears(coalweight)<"y2100",] <- 0
         
         # setConfig(forcecache=T)
@@ -467,7 +517,7 @@ COALogit_PPCA <- function(refgdx,recovery,size,PPCA_pol,oecd,nonoecd,outputfolde
 
           # 2040 steel sector coal demand from REMIND run (using coalemi_2030 for convenience)
           coalemi_2030_R <- rundata[,getYears(rundata)>="y2040",]
-          coalemi_2030_R <- coalemi_2030_R[-which(getRegions(coalemi_2030_R)=="GLO"),,"Emi|CO2|FFaI|Industry|Steel|Fuel|Coal (Mt CO2/yr)"]
+          coalemi_2030_R <- coalemi_2030_R[-which(getItems(dim = 1,  x = coalemi_2030_R)=="GLO"),,"Emi|CO2|FFaI|Industry|Steel|Fuel|Coal (Mt CO2/yr)"]
           totalemi_2030_R <- dimSums(rundata[,getYears(rundata)>="y2040","Emi|CO2|w/ Bunkers (Mt CO2/yr)"],dim=3)
           
         }else if (grepl("solids",subpolicy[jj])) {
@@ -476,10 +526,10 @@ COALogit_PPCA <- function(refgdx,recovery,size,PPCA_pol,oecd,nonoecd,outputfolde
           
           # Coal solids emissions except from steel sector in 2030
           coalemi_2030_R <- rundata[,getYears(rundata)>="y2030",]
-          coalemi_2030_R <- coalemi_2030_R[-which(getRegions(coalemi_2030_R)=="GLO"),,"Emi|CO2|Energy|Demand|Solids|After IndustryCCS (Mt CO2/yr)"] * 
-            (coalemi_2030_R[-which(getRegions(coalemi_2030_R)=="GLO"),,"PE|Coal|Solids (EJ/yr)"] / 
-            (coalemi_2030_R[-which(getRegions(coalemi_2030_R)=="GLO"),,"PE|Coal|Solids (EJ/yr)"] + coalemi_2030_R[-which(getRegions(coalemi_2030_R)=="GLO"),,"PE|Biomass|Solids (EJ/yr)"])) - 
-            coalemi_2030_R[-which(getRegions(coalemi_2030_R)=="GLO"),,"Emi|CO2|FFaI|Industry|Steel|Fuel|Coal (Mt CO2/yr)"]
+          coalemi_2030_R <- coalemi_2030_R[-which(getItems(dim = 1,  x = coalemi_2030_R)=="GLO"),,"Emi|CO2|Energy|Demand|Solids|After IndustryCCS (Mt CO2/yr)"] * 
+            (coalemi_2030_R[-which(getItems(dim = 1,  x = coalemi_2030_R)=="GLO"),,"PE|Coal|Solids (EJ/yr)"] / 
+            (coalemi_2030_R[-which(getItems(dim = 1,  x = coalemi_2030_R)=="GLO"),,"PE|Coal|Solids (EJ/yr)"] + coalemi_2030_R[-which(getItems(dim = 1,  x = coalemi_2030_R)=="GLO"),,"PE|Biomass|Solids (EJ/yr)"])) - 
+            coalemi_2030_R[-which(getItems(dim = 1,  x = coalemi_2030_R)=="GLO"),,"Emi|CO2|FFaI|Industry|Steel|Fuel|Coal (Mt CO2/yr)"]
           totalemi_2030_R <- dimSums(rundata[,getYears(rundata)>="y2030","Emi|CO2|w/ Bunkers (Mt CO2/yr)"],dim=3)
         
         }else {
@@ -488,10 +538,10 @@ COALogit_PPCA <- function(refgdx,recovery,size,PPCA_pol,oecd,nonoecd,outputfolde
           
           # 2030 Coal demand from REMIND run
           coalemi_2030_R <- rundata[,getYears(rundata)>="y2030",]
-          coalemi_2030_R <- coalemi_2030_R[-which(getRegions(coalemi_2030_R)=="GLO"),,"Emi|CO2|Fossil Fuels and Industry|Coal|Before IndustryCCS (Mt CO2/yr)"] - 
-            coalemi_2030_R[-which(getRegions(coalemi_2030_R)=="GLO"),,"Emi|CO2|Energy|Demand|Solids|After IndustryCCS (Mt CO2/yr)"] *
-              (coalemi_2030_R[-which(getRegions(coalemi_2030_R)=="GLO"),,"PE|Coal|Solids (EJ/yr)"] / 
-              (coalemi_2030_R[-which(getRegions(coalemi_2030_R)=="GLO"),,"PE|Coal|Solids (EJ/yr)"] + coalemi_2030_R[-which(getRegions(coalemi_2030_R)=="GLO"),,"PE|Biomass|Solids (EJ/yr)"]))            
+          coalemi_2030_R <- coalemi_2030_R[-which(getItems(dim = 1,  x = coalemi_2030_R)=="GLO"),,"Emi|CO2|Fossil Fuels and Industry|Coal|Before IndustryCCS (Mt CO2/yr)"] - 
+            coalemi_2030_R[-which(getItems(dim = 1,  x = coalemi_2030_R)=="GLO"),,"Emi|CO2|Energy|Demand|Solids|After IndustryCCS (Mt CO2/yr)"] *
+              (coalemi_2030_R[-which(getItems(dim = 1,  x = coalemi_2030_R)=="GLO"),,"PE|Coal|Solids (EJ/yr)"] / 
+              (coalemi_2030_R[-which(getItems(dim = 1,  x = coalemi_2030_R)=="GLO"),,"PE|Coal|Solids (EJ/yr)"] + coalemi_2030_R[-which(getItems(dim = 1,  x = coalemi_2030_R)=="GLO"),,"PE|Biomass|Solids (EJ/yr)"]))            
           totalemi_2030_R <- dimSums(rundata[,getYears(rundata)>="y2030","Emi|CO2|w/ Bunkers (Mt CO2/yr)"],dim=3)
         }
         
@@ -508,7 +558,7 @@ COALogit_PPCA <- function(refgdx,recovery,size,PPCA_pol,oecd,nonoecd,outputfolde
         totalemi_R <- toolAggregate(toolAggregate(totalemi_c,map,NULL),map,NULL)
         
         ## Downscale total emissions from REMIND energy demand and population disaggregation weight
-        totalemi_2030_c <- toolAggregate(totalemi_2030_R[-which(getRegions(totalemi_2030_R)=="GLO"),,],map,weight[,getYears(totalemi_2030_R),])
+        totalemi_2030_c <- toolAggregate(totalemi_2030_R[-which(getItems(dim = 1,  x = totalemi_2030_R)=="GLO"),,],map,weight[,getYears(totalemi_2030_R),])
         coalemi_2030_R <- toolAggregate(coalemi_2030_R,map,NULL)
         
         # Extrapolate country-level coal emissions from historical 2015 data
@@ -530,7 +580,7 @@ COALogit_PPCA <- function(refgdx,recovery,size,PPCA_pol,oecd,nonoecd,outputfolde
       ################ NON-OECD LOGIT #################
       #################################################
       if (!grepl("current",size)) {
-        nonOECD <- data.frame(country=sort(getRegions(logit_coalShare_2045_c)),
+        nonOECD <- data.frame(country=sort(getItems(dim = 1,  x = logit_coalShare_2045_c)),
                               oecd=as.character(oecd_map),
                               ppca=as.character(ppca_map),
                               share_2045=as.numeric(logit_coalShare_2045_c),
@@ -586,27 +636,27 @@ COALogit_PPCA <- function(refgdx,recovery,size,PPCA_pol,oecd,nonoecd,outputfolde
         if (grepl("steel",subpolicy[jj])) {
           # Coal emissions from steel sector in 2060 (using 2050 vars for convenience)
           coalemi_2050_R <- rundata[,getYears(rundata)>="y2060",]
-          coalemi_2050_R <- coalemi_2050_R[-which(getRegions(coalemi_2050_R)=="GLO"),,"Emi|CO2|FFaI|Industry|Steel|Fuel|Coal (Mt CO2/yr)"]
+          coalemi_2050_R <- coalemi_2050_R[-which(getItems(dim = 1,  x = coalemi_2050_R)=="GLO"),,"Emi|CO2|FFaI|Industry|Steel|Fuel|Coal (Mt CO2/yr)"]
           totalemi_2050_R <- dimSums(rundata[,getYears(rundata)>="y2060","Emi|CO2|w/ Bunkers (Mt CO2/yr)"],dim=3)
         }else if (grepl("solids",subpolicy[jj])) {
           # Coal solids emissions except from steel sector in 2050
           coalemi_2050_R <- rundata[,getYears(rundata)>="y2050",]
-          coalemi_2050_R <- coalemi_2050_R[-which(getRegions(coalemi_2050_R)=="GLO"),,"Emi|CO2|Energy|Demand|Solids|After IndustryCCS (Mt CO2/yr)"] *
-            (coalemi_2050_R[-which(getRegions(coalemi_2050_R)=="GLO"),,"PE|Coal|Solids (EJ/yr)"] / 
-            (coalemi_2050_R[-which(getRegions(coalemi_2050_R)=="GLO"),,"PE|Coal|Solids (EJ/yr)"] + coalemi_2050_R[-which(getRegions(coalemi_2050_R)=="GLO"),,"PE|Biomass|Solids (EJ/yr)"])) - 
-            coalemi_2050_R[-which(getRegions(coalemi_2050_R)=="GLO"),,"Emi|CO2|FFaI|Industry|Steel|Fuel|Coal (Mt CO2/yr)"]
+          coalemi_2050_R <- coalemi_2050_R[-which(getItems(dim = 1,  x = coalemi_2050_R)=="GLO"),,"Emi|CO2|Energy|Demand|Solids|After IndustryCCS (Mt CO2/yr)"] *
+            (coalemi_2050_R[-which(getItems(dim = 1,  x = coalemi_2050_R)=="GLO"),,"PE|Coal|Solids (EJ/yr)"] / 
+            (coalemi_2050_R[-which(getItems(dim = 1,  x = coalemi_2050_R)=="GLO"),,"PE|Coal|Solids (EJ/yr)"] + coalemi_2050_R[-which(getItems(dim = 1,  x = coalemi_2050_R)=="GLO"),,"PE|Biomass|Solids (EJ/yr)"])) - 
+            coalemi_2050_R[-which(getItems(dim = 1,  x = coalemi_2050_R)=="GLO"),,"Emi|CO2|FFaI|Industry|Steel|Fuel|Coal (Mt CO2/yr)"]
           totalemi_2050_R <- dimSums(rundata[,getYears(rundata)>="y2050","Emi|CO2|w/ Bunkers (Mt CO2/yr)"],dim=3)
         }else {
           # Coal emissions (except from solids) from 2050 time step of the reference scenario
           coalemi_2050_R <- rundata[,getYears(rundata)>="y2050",]
-          coalemi_2050_R <- coalemi_2050_R[-which(getRegions(coalemi_2050_R)=="GLO"),,"Emi|CO2|Fossil Fuels and Industry|Coal|Before IndustryCCS (Mt CO2/yr)"] *
-            (coalemi_2050_R[-which(getRegions(coalemi_2050_R)=="GLO"),,"PE|Coal|Solids (EJ/yr)"] / 
-            (coalemi_2050_R[-which(getRegions(coalemi_2050_R)=="GLO"),,"PE|Coal|Solids (EJ/yr)"] + coalemi_2050_R[-which(getRegions(coalemi_2050_R)=="GLO"),,"PE|Biomass|Solids (EJ/yr)"])) - 
-            coalemi_2050_R[-which(getRegions(coalemi_2050_R)=="GLO"),,"Emi|CO2|Energy|Demand|Solids|After IndustryCCS (Mt CO2/yr)"]
+          coalemi_2050_R <- coalemi_2050_R[-which(getItems(dim = 1,  x = coalemi_2050_R)=="GLO"),,"Emi|CO2|Fossil Fuels and Industry|Coal|Before IndustryCCS (Mt CO2/yr)"] *
+            (coalemi_2050_R[-which(getItems(dim = 1,  x = coalemi_2050_R)=="GLO"),,"PE|Coal|Solids (EJ/yr)"] / 
+            (coalemi_2050_R[-which(getItems(dim = 1,  x = coalemi_2050_R)=="GLO"),,"PE|Coal|Solids (EJ/yr)"] + coalemi_2050_R[-which(getItems(dim = 1,  x = coalemi_2050_R)=="GLO"),,"PE|Biomass|Solids (EJ/yr)"])) - 
+            coalemi_2050_R[-which(getItems(dim = 1,  x = coalemi_2050_R)=="GLO"),,"Emi|CO2|Energy|Demand|Solids|After IndustryCCS (Mt CO2/yr)"]
           totalemi_2050_R <- dimSums(rundata[,getYears(rundata)>="y2050","Emi|CO2|w/ Bunkers (Mt CO2/yr)"],dim=3)
         }
 
-        totalemi_2050_c <- toolAggregate(totalemi_2050_R[-which(getRegions(totalemi_2050_R)=="GLO"),,],map,weight[,getYears(totalemi_2050_R),])
+        totalemi_2050_c <- toolAggregate(totalemi_2050_R[-which(getItems(dim = 1,  x = totalemi_2050_R)=="GLO"),,],map,weight[,getYears(totalemi_2050_R),])
         coalemi_2050_R <- toolAggregate(coalemi_2050_R,map,NULL)
         
         # Extrapolate 2050 national coal shares from 2030
@@ -619,19 +669,19 @@ COALogit_PPCA <- function(refgdx,recovery,size,PPCA_pol,oecd,nonoecd,outputfolde
       }
       
       # Unmanipulated reference scenario variables
-      coalgen_ttot_R <- rundata[-which(getRegions(rundata)=="GLO"),getYears(coalweight),"SE|Electricity|Coal (EJ/yr)"]
-      coalgen_ttot_c <- toolAggregate(coalgen_ttot_R,map,coalweight)
+      # coalgen_ttot_R <- rundata[-which(getItems(dim = 1,  x = rundata)=="GLO"),getYears(coalweight),"SE|Electricity|Coal (EJ/yr)"]
+      # coalgen_ttot_c <- toolAggregate(coalgen_ttot_R,map,coalweight)
       
-      totalgen_ttot_R <- rundata[-which(getRegions(rundata)=="GLO"),getYears(weight),"SE|Electricity (EJ/yr)"]
-      totalgen_ttot_c <- toolAggregate(totalgen_ttot_R,map,weight)
+      # totalgen_ttot_R <- rundata[-which(getItems(dim = 1,  x = rundata)=="GLO"),getYears(weight),"SE|Electricity (EJ/yr)"]
+      # totalgen_ttot_c <- toolAggregate(totalgen_ttot_R,map,weight)
       
-      coalemi_ttot_R <- rundata[-which(getRegions(rundata)=="GLO"),getYears(coalweight),"Emi|CO2|Fossil Fuels and Industry|Coal|Before IndustryCCS (Mt CO2/yr)"]
-      coalemi_ttot_c <- toolAggregate(coalemi_ttot_R,map,coalweight)
+      # coalemi_ttot_R <- rundata[-which(getItems(dim = 1,  x = rundata)=="GLO"),getYears(coalweight),"Emi|CO2|Fossil Fuels and Industry|Coal|Before IndustryCCS (Mt CO2/yr)"]
+      # coalemi_ttot_c <- toolAggregate(coalemi_ttot_R,map,coalweight)
       
-      totalemi_ttot_R <- rundata[-which(getRegions(rundata)=="GLO"),getYears(weight),"Emi|CO2 (Mt CO2/yr)"]
-      totalemi_ttot_c <- toolAggregate(totalemi_ttot_R,map,weight)
+      # totalemi_ttot_R <- rundata[-which(getItems(dim = 1,  x = rundata)=="GLO"),getYears(weight),"Emi|CO2 (Mt CO2/yr)"]
+      # totalemi_ttot_c <- toolAggregate(totalemi_ttot_R,map,weight)
       
-      endem_ttot_R <- rundata[-which(getRegions(rundata)=="GLO"),getYears(weight),"PE (EJ/yr)"]
+      endem_ttot_R <- rundata[-which(getItems(dim = 1,  x = rundata)=="GLO"),getYears(weight),"PE (EJ/yr)"]
       endem_ttot_c <- toolAggregate(endem_ttot_R,map,weight)
       
       ##### Derive output for implementation of policy coalition in REMIND #####
@@ -760,6 +810,7 @@ COALogit_PPCA <- function(refgdx,recovery,size,PPCA_pol,oecd,nonoecd,outputfolde
       file <- paste0(paste("f47",phase[ii],recovery,PPCA_pol,size,sep="_"),".cs4r")
       cat("Writing",file,"to ./modules/47_regipol/PPCAcoalExit/input/\n")
       write.magpie(out_reg,file_folder = "./modules/47_regipol/PPCAcoalExit/input/", file_name = file,append = ifelse(subpolicy[jj]=="none",FALSE,TRUE))
+      cat("Writing",file,"to output folder:", outputfolder, "\n")
       write.magpie(out_reg,file_folder = outputfolder, file_name = file,append = ifelse(subpolicy[jj]=="none",FALSE,TRUE))
     }
   }
@@ -768,7 +819,8 @@ COALogit_PPCA <- function(refgdx,recovery,size,PPCA_pol,oecd,nonoecd,outputfolde
   #######################################################
   ### RETURN DYNAMIC FEASIBILITY SPACE (BUBBLE CHART) ###
   #######################################################
-  if (!is.null(plot)) {  
+  if (!is.null(plot) & size != "current") {  
+    # install.packages("ggnewscale")
     setConfig(forcecache = T)
     
     require(ggplot2)
@@ -779,6 +831,14 @@ COALogit_PPCA <- function(refgdx,recovery,size,PPCA_pol,oecd,nonoecd,outputfolde
     require(scales)
     require(readxl)
     require(countrycode)
+
+    if (isTRUE(plot)) {
+      plot <- paste("DFS", ifelse(nonoecd=="on", "2045", "2025"), recovery, PPCA_pol, size, fin_pol, uncertainty,  sep = "_")
+    }
+    
+    if (!grepl('.', plot, fixed = TRUE)) {
+      plot <- paste0(plot,".png")
+    }
     
     #Relevant regional mappings and country classifications
     #Current members of PPCA
@@ -802,16 +862,23 @@ COALogit_PPCA <- function(refgdx,recovery,size,PPCA_pol,oecd,nonoecd,outputfolde
     if (recovery=="Neutral")  recovery <- "BAU"
     
     ##Probability levels and line types
-    if (!is.null(file)) {
-      if (grepl("50CI",file))  p <- c(.25, 0.5, 0.75)
-      else if (grepl("33CI",file))  p <- c(.33, 0.5, 0.67)
-      else if (grepl("60CI",file))  p <- c(0.2, 0.5, 0.8)
-      else if (grepl("70CI",file))  p <- c(0.15, 0.5, 0.85)
-      else if (grepl("90CI",file))  p <- c(0.05, 0.5, 0.95)
-      else  p <- c(0.05, 0.5, 0.95)
-    }
+    # if (!is.null(file)) {
+      # if (grepl("50CI",file))  p <- c(.25, 0.5, 0.75)
+      # else if (grepl("33CI",file))  p <- c(.33, 0.5, 0.67)
+      # else if (grepl("60CI",file))  p <- c(0.2, 0.5, 0.8)
+      # else if (grepl("70CI",file))  p <- c(0.15, 0.5, 0.85)
+      # else if (grepl("90CI",file))  p <- c(0.05, 0.5, 0.95)
+      # else  p <- c(0.05, 0.5, 0.95)
+    # }
+    if (grepl("50CI",uncertainty))  p <- c(.25, 0.5, 0.75)
+    else if (grepl("33CI",uncertainty))  p <- c(.33, 0.5, 0.67)
+    else if (grepl("60CI",uncertainty))  p <- c(0.2, 0.5, 0.8)
+    else if (grepl("70CI",uncertainty))  p <- c(0.15, 0.5, 0.85)
+    else if (grepl("90CI",uncertainty))  p <- c(0.05, 0.5, 0.95)
+    else if (uncertainty=="10step")      p <- seq(10,90,10)
+    else  p <- c(0.05, 0.5, 0.95)
     
-    lts <- c("0.5" = 2, "0.05" = 3, "0.95" = 4)
+    # lts <- setNames(c(3, 2, 4), nm = p) 
 
     # Read file tracking the current status of the PPCA which contains GDPpc, % coal in electricity, 
     # standing coal power capacity, among other data
@@ -821,11 +888,12 @@ COALogit_PPCA <- function(refgdx,recovery,size,PPCA_pol,oecd,nonoecd,outputfolde
     #GDP.PC - GDP per capita (1000 USD)
     #Coal.Share - Share of coal in electricity supply
     #GW Capacity - total installed capacity of coal-fired fleet
-    histData <- read.csv(paste0(getConfig("sourcefolder"),"/PPCA/PPCA_status_SSP2_2015.csv"),stringsAsFactors = F,sep = ",")
+    # histData <- read.csv(paste0(getConfig("sourcefolder"),"/PPCA/PPCA_status_SSP2_COP26.csv"),stringsAsFactors = F,sep = ";")
+    # histData <- read.csv(paste0(getConfig("sourcefolder"),"/PPCA/PPCA_status_SSP2_2015.csv"),stringsAsFactors = F,sep = ",")
 
     #Logit regression of existing PPCA membership 
       
-    logit_model <- glm(data = histData, PPCA.Bin ~  Coal.Share + GDP.PC , family = "binomial")
+    # logit_model <- glm(data = histData, PPCA.Bin ~  Coal.Share + GDP.PC , family = "binomial")
     
     ## Run COALogit subfunction to retrieve national coal shares, capacities, GDPpc
     # testData <- mrremind:::calcPPCA(phase=phase,policy=policy,subpolicy="none",recovery=recovery,size=size,run=run,subtype="bubble") 
@@ -845,7 +913,7 @@ COALogit_PPCA <- function(refgdx,recovery,size,PPCA_pol,oecd,nonoecd,outputfolde
     
     # print(testData %>% filter(Region=="OAS"))
     ## Sanity check test data 
-    testData$share[which(testData$share>1)] <- max(testData$share[which(testData$share<1)])
+    testData$share[which(testData$share>1)] <- max(testData$share[which(testData$share<1)], na.rm = T)
     
     if (phase=="OECD" & recovery=="BAU") 
       testData <- testData %>% mutate(nudge = ifelse(country=="MAR",-0.02,ifelse(country=="CHN",0.065,0.025+Capacity/1.5e4)))
@@ -870,12 +938,12 @@ COALogit_PPCA <- function(refgdx,recovery,size,PPCA_pol,oecd,nonoecd,outputfolde
     if (recovery=="BAU")  recovery <- "Neutral"
     
     
-    plotData <- plotData %>% 
-      mutate(country=ifelse(country %in% new_mem_july21,
-                            paste0(country,"*"),
-                            ifelse(country %in% newest_mem_cop26,
-                                    paste0(country,"^"),
-                                    as.character(country))))
+    # plotData <- plotData %>% 
+    #   mutate(country=ifelse(country %in% new_mem_july21,
+    #                         paste0(country,"*"),
+    #                         ifelse(country %in% newest_mem_cop26,
+    #                                 paste0(country,"^"),
+    #                                 as.character(country))))
 
     clrs <- c("OECD"="#E41A1C", "Non-OECD"="#789FC6","PPCA" = "goldenrod3", "Free" = "#000000")
     # colnames(plotData)[which(grepl("cap_",colnames(plotData)))] <- paste0("GW Capacity (",gsub("cap_","",colnames(plotData)[which(grepl("cap_",colnames(plotData)))]),")")
@@ -934,16 +1002,20 @@ COALogit_PPCA <- function(refgdx,recovery,size,PPCA_pol,oecd,nonoecd,outputfolde
             legend.text = element_text(size=3.5*6),
             legend.title = element_text(size=3.5*7)) +
       scale_size_continuous(range = 2.9*c(0.15, 13), breaks = c(10, 50, 250, 900),name=paste(ifelse(grepl("non",phase,ignore.case = T),"2045","2025"),"Capacity (GW)"),guide=guide_legend(order=1)) +
-      labs(title = ifelse(grepl("REdir",run,ignore.case = T),
-                          ifelse(grepl("non",phase,ignore.case = T),
-                                  paste0("2045 PPCA Feasibility Space (G20", ifelse(grepl("oilgas",run)," + G7 "," "), "FinEx REdirect", ifelse(grepl("noMob",run),")"," + Mobilization)")),
-                                  "2025 PPCA Feasibility Space (G20 Pledged FinEx)"),
-                          ifelse(grepl("non",phase,ignore.case = T),
-                                  paste("PPCA Feasibility Space",paste0("(",year),recovery,size,paste0(toupper(substr(PPCA_pol,1,1)),substr(PPCA_pol,2,nchar(PPCA_pol))),"Exit)"),
-                                  paste("PPCA Feasibility Space",paste0("(",year),recovery,paste0(toupper(substr(PPCA_pol,1,1)),substr(PPCA_pol,2,nchar(PPCA_pol))),"Exit)"))))
-    
-      ggsave(paste(outputfolder,plot,sep="/"),width=6.3*3,height=4.63*3,units="in",dpi="retina")
+      labs(title = paste0(ifelse(nonoecd=="on", "2045", "2025"), " PPCA Feasibility Space (", fin_pol, " ", ifelse(mob=="none","", paste0(mob,"mobil")),")"))
+
+      # ifelse(fin_pol=="REdirect",
+      #                     ifelse(grepl("non",phase,ignore.case = T),
+      #                             paste0("2045 PPCA Feasibility Space (G20", ifelse(grepl("oilgas",run)," + G7 "," "), "FinEx REdirect", ifelse(grepl("noMob",run),")"," + Mobilization)")),
+      #                             "2025 PPCA Feasibility Space (G20 Pledged FinEx)"),
+      #                     ifelse(grepl("non",phase,ignore.case = T),
+      #                             paste("PPCA Feasibility Space",paste0("(",year),recovery,size,paste0(toupper(substr(PPCA_pol,1,1)),substr(PPCA_pol,2,nchar(PPCA_pol))),"Exit)"),
+      #                             paste("PPCA Feasibility Space",paste0("(",year),recovery,paste0(toupper(substr(PPCA_pol,1,1)),substr(PPCA_pol,2,nchar(PPCA_pol))),"Exit)"))))
       
+      cat("Savinf figure",plot,"to output folder:", outputfolder, "\n")
+
+      ggsave(paste(outputfolder,plot,sep="/"),width=6.3*3,height=4.63*3,units="in",device = "png", dpi="retina")
+      paste(outputfolder,plot,sep="/")
     }
     setConfig(forcecache = F)
 

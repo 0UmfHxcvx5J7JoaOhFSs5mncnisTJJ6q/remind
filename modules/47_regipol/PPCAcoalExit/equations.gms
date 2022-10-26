@@ -8,21 +8,23 @@
 
 $ifthen.current %cm_PPCA_size% == "current"
 $ifthen.finpol %cm_pubfinex_pol% == "REdirect"
-*** Coal-to-RE substitution: set RE deltaCap to previously committed coal capacity ***
+*** REdirect G20 public coal finance to renewables (excluding CSP) ***
 q47_finex_pol_REsub(regi)..
 sum(
 $ifthenE.OG (sameas('%cm_REdir_mobil%','oilgas_oecd'))
 ttot$(ttot.val eq 2025 or ttot.val eq 2030),
-$elseifE.OG (sameas('%cm_REdir_mobil%','oilgas_pub'))  
+$elseifE.OG (sameas('%cm_REdir_mobil%','hi_oecd_2030'))
 ttot$(ttot.val eq 2025 or ttot.val eq 2030),
 $else.OG  
 ttot$(ttot.val eq 2025),
 $endif.OG
-  sum(en2en(enty,enty2,te)$(teVRE(te) and not sameas(te,"csp")),
+*sum(en2en(enty,enty2,te)$(teVRE(te) and not sameas(te,"csp")),
+sum(en2en(enty,enty2,te)$(teVRE(te)),
       v_costInvTeDir(ttot,regi,te) + v_costInvTeAdj(ttot,regi,te)$teAdj(te) 
   )
   +
-  sum(teNoTransform$(not sameas(teNoTransform,"storcsp") and not sameas(teNoTransform,"gridcsp")),
+* sum(teNoTransform$(not sameas(teNoTransform,"storcsp") and not sameas(teNoTransform,"gridcsp")),
+sum(teNoTransform,
     v_costInvTeDir(ttot,regi,teNoTransform) + v_costInvTeAdj(ttot,regi,teNoTransform)$teAdj(teNoTransform)
   )
 )
@@ -30,18 +32,20 @@ $endif.OG
 sum(
 $ifthenE.OG (sameas('%cm_REdir_mobil%','oilgas_oecd'))
 ttot$(ttot.val eq 2025 or ttot.val eq 2030),
-$elseifE.OG (sameas('%cm_REdir_mobil%','oilgas_pub'))  
-ttot$(ttot.val eq 2025 or ttot.val eq 2030), 
+$elseifE.OG (sameas('%cm_REdir_mobil%','hi_oecd_2030'))
+ttot$(ttot.val eq 2025 or ttot.val eq 2030),
 $else.OG  
 ttot$(ttot.val eq 2025),
 $endif.OG
   (p47_REdir_vol(regi) * 1e-3)  !! G20 coal REdirect
   +
-  sum(en2en(enty,enty2,te)$(teVRE(te) and not sameas(te,"csp")),
+*  sum(en2en(enty,enty2,te)$(teVRE(te) and not sameas(te,"csp")),
+ sum(en2en(enty,enty2,te)$(teVRE(te)),
       p47_ref_costInvTeDir_RE(ttot,regi,te) + p47_ref_costInvTeAdj_RE(ttot,regi,te)$teAdj(te)  !! Reference VRE investment
   )
   +
-  sum(teNoTransform$(not sameas(teNoTransform,"storcsp") and not sameas(teNoTransform,"gridcsp")),
+* sum(teNoTransform$(not sameas(teNoTransform,"storcsp") and not sameas(teNoTransform,"gridcsp")),
+ sum(teNoTransform,
     p47_ref_costInvTeDir_RE(ttot,regi,teNoTransform) + p47_ref_costInvTeAdj_RE(ttot,regi,teNoTransform)$teAdj(teNoTransform)  !! Reference grid + storage investment
   )
 $ifthen.oilgas %cm_REdir_mobil% == "oilgas_pub"
@@ -73,6 +77,7 @@ $endif.oilgas
 * ;
 
 $endif.finpol
+$endif.current
 
 *** Set the sum of all types of unabated coal-fired power plants in 2025  
 *** to the Covid recovery coal capacity scenario (only in NPi runs, then
@@ -86,16 +91,18 @@ sum(te2rlf(te,rlf)$(sameas(te,"pc") OR sameas(te,"igcc") OR sameas(te,"coalchp")
     p47_coalCapCOVID(ttot,regi,cov_coal)
   ;
 
-$ifthen.nofinex %cm_pubfinex_pol% == "none"
+$ifthen.redir not %cm_pubfinex_pol% == "none"
+* In FinEx and REdirect scenarios, 2025 coal capacity in host regions has no lower bound. 
+q47_CovidCoalFloor(ttot,regi,cov_coal)$(sameas(cov_coal,"%cm_COVID_coal_scen%") AND (ttot.val eq 2025) AND p47_REdir_vol(regi) eq 0)..
+$else.redir
 q47_CovidCoalFloor(ttot,regi,cov_coal)$(sameas(cov_coal,"%cm_COVID_coal_scen%") AND (ttot.val eq 2025))..
 sum(te2rlf(te,rlf)$(sameas(te,"pc") OR sameas(te,"igcc") OR sameas(te,"coalchp")),
     vm_cap(ttot,regi,te,rlf))
     =g= 
     0.98*p47_coalCapCOVID(ttot,regi,cov_coal)
   ;
-$endif.nofinex
+$endif.redir
 $endif.cov_coal
-$endif.current
 
 *** OECD power-exit implementation: limit unabated coal-fired electricity 
 *** from 2030-2100 to a COALogit-determined share of total electricity 
@@ -106,10 +113,12 @@ $ifthen.PPCA_OECD %cm_PPCA_OECD% == "on"
 q47_PPCA_OECD_power_phaseOut(regi,enty2)$(sameas(enty2,"seel") AND p47_max_coal_el_share_oecd(regi) gt 0)..
 sum(ttot$(ttot.val ge 2030 AND ttot.val le 2100),
 * Sum of all unabated coal power
-  sum(pe2se("pecoal",enty2,te)$(sameas(te,"pc") OR sameas(te,"coalchp") OR sameas(te,"igcc")),
-    vm_prodSe(ttot,regi,"pecoal",enty2,te))
-    + sum(pc2te("pecoal",entySE(enty3),te,enty2)$(sameas(te,"coalchp")),
-		pm_prodCouple(regi,"pecoal",enty3,te,enty2) * vm_prodSe(ttot,regi,"pecoal",enty3,te))
+* sum(pe2se("pecoal",enty2,te)$(sameas(te,"pc") OR sameas(te,"coalchp") OR sameas(te,"igcc")),
+  sum(pe2se("pecoal",enty2,teNoCCS),
+    vm_prodSe(ttot,regi,"pecoal",enty2,teNoCCS))
+* + sum(pc2te("pecoal",entySE(enty3),te,enty2)$(sameas(te,"coalchp")),
+    + sum(pc2te("pecoal",entySE(enty3),teNoCCS,enty2),
+		pm_prodCouple(regi,"pecoal",enty3,teNoCCS,enty2) * vm_prodSe(ttot,regi,"pecoal",enty3,teNoCCS))
 )
     =l=
     ( 
@@ -139,15 +148,15 @@ $endif.PPCA_OECD
 $ifthen.PPCA_nonOECD %cm_PPCA_nonOECD% == "on"
 q47_PPCA_nonOECD_power_phaseOut(regi,enty2)$(sameas(enty2,"seel") AND p47_max_coal_el_share_nonoecd(regi) gt 0)..
 sum(ttot$(ttot.val ge 2050 AND ttot.val le 2100),
-  sum(pe2se("pecoal",enty2,te)$(sameas(te,"pc") OR sameas(te,"coalchp") OR sameas(te,"igcc")),
-    vm_prodSe(ttot,regi,"pecoal",enty2,te))
-    + sum(pc2te("pecoal",entySE(enty3),te,enty2)$(sameas(te,"coalchp")),
-		pm_prodCouple(regi,"pecoal",enty3,te,enty2) * vm_prodSe(ttot,regi,"pecoal",enty3,te))
+* sum(pe2se("pecoal",enty2,te)$(sameas(te,"pc") OR sameas(te,"coalchp") OR sameas(te,"igcc")),
+  sum(pe2se("pecoal",enty2,teNoCCS),
+    vm_prodSe(ttot,regi,"pecoal",enty2,teNoCCS))
+* + sum(pc2te("pecoal",entySE(enty3),te,enty2)$(sameas(te,"coalchp")),
+    + sum(pc2te("pecoal",entySE(enty3),teNoCCS,enty2),
+		pm_prodCouple(regi,"pecoal",enty3,teNoCCS,enty2) * vm_prodSe(ttot,regi,"pecoal",enty3,teNoCCS))
 )
-    =l=
-    ( 
+    =l= 
       p47_max_coal_el_share_nonoecd(regi)    !! Regional policy stringency coefficients
-      )
     * (sum(ttot$(ttot.val ge 2050 AND ttot.val le 2100),
         sum(pe2se(enty,enty2,te), vm_prodSe(ttot,regi,enty,enty2,te) )
       + sum(se2se(enty,enty2,te), vm_prodSe(ttot,regi,enty,enty2,te) )
@@ -164,7 +173,7 @@ sum(ttot$(ttot.val ge 2050 AND ttot.val le 2100),
       ;   
 
 * Since the 40 MWh tolerance for phase-out regions is cumulative, this equation forces them to use it up early instead of late
-q47_power_decline(ttot,regi,enty2)$((ttot.val gt 2050 AND sameas(enty2,"seel")AND p47_max_coal_el_share_nonoecd(regi) le 1e-4 AND p47_max_coal_el_share_nonoecd(regi) gt 0 ) OR ttot.val gt 2100)..
+q47_power_decline(ttot,regi,enty2)$((ttot.val gt 2050 AND sameas(enty2,"seel") AND p47_max_coal_el_share_nonoecd(regi) le 1e-3 AND p47_max_coal_el_share_nonoecd(regi) gt 0 ) OR ttot.val gt 2100)..
 sum(pe2se("pecoal",enty2,te)$(sameas(te,"pc") OR sameas(te,"coalchp") OR sameas(te,"igcc")),
     vm_prodSe(ttot,regi,"pecoal",enty2,te))
     + sum(pc2te("pecoal",entySE(enty3),te,enty2)$(sameas(te,"coalchp")),

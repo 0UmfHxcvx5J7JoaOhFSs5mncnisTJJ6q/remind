@@ -27,6 +27,7 @@ $offdelim
 ;
 $endif.finex
 
+
 * $if.REsub %cm_pubfinex_pol% == "REdirect"
 * parameter p47_deltaCap_REsub(tall,all_regi) "2025-2030 overseas financed RE capacity, equal to public overseas coal finance exit pledges"
 * /
@@ -46,7 +47,9 @@ $ifthen.REsub %cm_pubfinex_pol% == "REdirect"
 Execute_Loadpoint 'input_ref' p47_ref_costInvTeDir_RE = v_costInvTeDir.l;
 Execute_Loadpoint 'input_ref' p47_ref_costInvTeAdj_RE = v_costInvTeAdj.l;
 
-parameter p47_REdir_vol(all_regi)
+$elseif.REsub not %cm_pubfinex_pol% == "none"
+
+parameter p47_REdir_vol(all_regi)     !! Finance volume redirected G20 to FinEx hosts
 /
 $ifthen.mobil %cm_REdir_mobil% == "OECD"
 $ondelim
@@ -56,6 +59,21 @@ $offdelim
 $elseif.mobil %cm_REdir_mobil% == "none"
 $ondelim
 $include "./modules/47_regipol/PPCAcoalExit/input/p47_FinEx_REdirect_pubOnly.cs3r"
+$offdelim
+
+$elseif.mobil %cm_REdir_mobil% == "lo_oecd"
+$ondelim
+$include "./modules/47_regipol/PPCAcoalExit/input/p47_FinEx_REdirect_LO_oecd_nat_mob.cs4r"
+$offdelim
+
+$elseif.mobil %cm_REdir_mobil% == "hi_oecd"
+$ondelim
+$include "./modules/47_regipol/PPCAcoalExit/input/p47_FinEx_REdirect_HI_oecd_nat_mob.cs4r"
+$offdelim
+
+$elseif.mobil %cm_REdir_mobil% == "hi_oecd_2030"
+$ondelim
+$include "./modules/47_regipol/PPCAcoalExit/input/p47_FinEx_REdirect_HI_oecd_nat_mob.cs4r"
 $offdelim
 
 $elseif.mobil %cm_REdir_mobil% == "oilgas_oecd"
@@ -538,5 +556,17 @@ $endif.recovery12
 $endif.polscen2
 $endif.phase2
 
+*** Enable rapid early retirement in initial timestep if indicated by Global Coal Plant Tracker data
+pm_regiEarlyRetiRate("2020",regi,coalElTeNoCCS)$(p47_coalCapCOVID("2025",regi,"%cm_COVID_coal_scen%") le (0.55 * p_PE_histCap("2020",regi,"pecoal","seel"))) = 0.16;
+
+*** more coal plant retirement possible for OECD members who join the PPCA and must phase out coal by 2030
+$ifthen.oecd %cm_PPCA_OECD% == "on"
+$ifthen.pol %cm_PPCA_pol% == "power"
+  pm_regiEarlyRetiRate("2025",regi,coalElTeNoCCS)$(p47_max_coal_el_share_oecd(regi) lt 0.25 AND p47_max_coal_el_share_oecd(regi) gt 0) = 0.2;
+$elseif.pol %cm_PPCA_pol% == "demand"
+  pm_regiEarlyRetiRate("2025",regi,coalNonSolTe)$(p47_max_coal_dem_share_oecd(regi,"demand") lt 0.25 AND p47_max_coal_dem_share_oecd(regi,"demand") gt 0) = 0.2;
+  pm_regiEarlyRetiRate("2025",regi,"coaltr")$(p47_max_coal_dem_share_oecd(regi,"solids") lt 0.25 AND p47_max_coal_dem_share_oecd(regi,"solids") gt 0) = 0.2;
+$endif.pol
+$endif.oecd
 
 *** EOF ./modules/47_regipol/PPCAcoalExit/datainput.gms

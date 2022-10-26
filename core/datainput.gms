@@ -533,8 +533,6 @@ loop((ext_regi,te)$p_techEarlyRetiRate(ext_regi,te),
 );
 $ENDIF.tech_earlyreti
 
-
-
 *SB* Time-dependent early retirement rates in Baseline scenarios
 $ifthen.Base_Cprice %carbonprice% == "none"
 $ifthen.Base_techpol %techpol% == "none"
