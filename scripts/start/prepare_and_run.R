@@ -332,10 +332,12 @@ prepare <- function() {
       stop(refgdx," not found - please provide gdx from reference run")
     }
     cat("Running logit model to determine PPCA coalition membership...\n")
-    source("scripts/input/COALogit_PPCA_FinEx.R")
+    if (grepl("2040", cfg$title))    source("scripts/input/COALogit_PPCA_FinEx_2040.R")
+    else if (grepl("2035", cfg$title))    source("scripts/input/COALogit_PPCA_FinEx_2035.R")
+    else  source("scripts/input/COALogit_PPCA_FinEx.R")
     COALogit_PPCA_FinEx(refgdx=refgdx, recovery=cfg$gms$cm_COVID_coal_scen, size=cfg$gms$cm_PPCA_size, PPCA_pol=cfg$gms$cm_PPCA_pol,
       oecd=cfg$gms$cm_PPCA_OECD, nonoecd=cfg$gms$cm_PPCA_nonOECD, outputfolder=cfg$results_folder,rev=cfg$revision, title=cfg$title, 
-      plot =  TRUE, fin_pol=cfg$gms$cm_pubfinex_pol, mob = cfg$gms$cm_REdir_mobil, uncertainty="5step")
+      plot = TRUE, fin_pol=cfg$gms$cm_pubfinex_pol, mob = cfg$gms$cm_REdir_mobil, uncertainty="5step")
   }
 
 

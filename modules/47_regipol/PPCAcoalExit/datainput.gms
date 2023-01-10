@@ -40,25 +40,22 @@ $endif.finex
 
 * $ifthen.size %cm_PPCA_size% == "current"
 
-$ifthen.REsub %cm_pubfinex_pol% == "REdirect"
-
-* Execute_Loadpoint 'input_ref' p47_deltaCap = vm_deltaCap.l;
-
+$ifthen.REdir %cm_pubfinex_pol% == "REdirect"
 Execute_Loadpoint 'input_ref' p47_ref_costInvTeDir_RE = v_costInvTeDir.l;
 Execute_Loadpoint 'input_ref' p47_ref_costInvTeAdj_RE = v_costInvTeAdj.l;
+$endif.REdir
 
-$elseif.REsub not %cm_pubfinex_pol% == "none"
-
+* $ifthen.finEx not %cm_pubfinex_pol% == "none"
 parameter p47_REdir_vol(all_regi)     !! Finance volume redirected G20 to FinEx hosts
 /
-$ifthen.mobil %cm_REdir_mobil% == "OECD"
-$ondelim
-$include "./modules/47_regipol/PPCAcoalExit/input/p47_FinEx_REdirect_oecd_nat_mob.cs3r"
-$offdelim
-
-$elseif.mobil %cm_REdir_mobil% == "none"
+$ifthen.mobil %cm_REdir_mobil% == "none"
 $ondelim
 $include "./modules/47_regipol/PPCAcoalExit/input/p47_FinEx_REdirect_pubOnly.cs3r"
+$offdelim
+
+$elseif.mobil %cm_REdir_mobil% == "OECD"
+$ondelim
+$include "./modules/47_regipol/PPCAcoalExit/input/p47_FinEx_REdirect_oecd_nat_mob.cs3r"
 $offdelim
 
 $elseif.mobil %cm_REdir_mobil% == "lo_oecd"
@@ -75,6 +72,13 @@ $elseif.mobil %cm_REdir_mobil% == "hi_oecd_2030"
 $ondelim
 $include "./modules/47_regipol/PPCAcoalExit/input/p47_FinEx_REdirect_HI_oecd_nat_mob.cs4r"
 $offdelim
+
+$elseif.mobil %cm_REdir_mobil% == "hi_oecd_cond"
+$ondelim
+$include "./modules/47_regipol/PPCAcoalExit/input/p47_FinEx_REdirect_HI_oecd_nat_mob.cs4r"
+$offdelim
+
+* Execute_Loadpoint 'input_ref' p47_deltaCap = vm_deltaCap.l;
 
 $elseif.mobil %cm_REdir_mobil% == "oilgas_oecd"
 $ondelim
@@ -94,7 +98,7 @@ $offdelim
 $endif.mobil
 /
 ;
-$endif.REsub
+* $endif.finEx
 * $endif.size
 
 * *** PPCA coal exit scenario cascade should all have the same C price but includes runs with different startyears

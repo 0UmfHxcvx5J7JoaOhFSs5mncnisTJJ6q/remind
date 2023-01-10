@@ -10,22 +10,17 @@ $ifthen.cov not %cm_COVID_coal_scen% == "none"
 * $ifthen.ref "%cm_PPCA_size%" == "current"
 equations
 q47_CovidCoalCap(ttot,all_regi,cov_coal)                                  "2025 post-COVID Coal capacity scenarios upper limit"
-
-q47_CovidCoalFloor(ttot,all_regi,cov_coal)                                  "2025 post-COVID Coal capacity scenarios lower limit"
+q47_CovidCoalFloor(ttot,all_regi,cov_coal)                                "2025 post-COVID Coal capacity scenarios lower limit"
+q47_limSe(ttot,all_regi)                                                  "Prevent buggy behavior in which some freeriding regions drastically increase all energy demand after 2050"
 ;
 * $else.ref
 
 parameters 
 p47_cap(ttot,all_regi,all_te,rlf) 
+p47_prodSe(ttot,all_regi,all_enty,all_enty,all_te)
 ;
 * $endif.ref
 $endif.cov
-
-* $ifthen.fin not %cm_pubfinex_pol% == "none"
-* parameters
-* p47_deltaCap(ttot,all_regi,all_te,rlf)
-* ;
-* $endif.fin
 
 $ifthen.policy not %cm_PPCA_pol% == "none"
 equations
@@ -57,19 +52,47 @@ $endif.dem
 ;
 $endif.policy
 
+
 $ifthen.finpol %cm_pubfinex_pol% == "REdirect"
+variables
+v47_REdirect(all_regi)
+;
+
 parameters 
+p47_REdirect(all_regi)                                                  
 p47_ref_costInvTeDir_RE(ttot,all_regi,all_te)                                  "RE direct investment volume in reference scenario"
 p47_ref_costInvTeAdj_RE(ttot,all_regi,all_te)                                  "RE adjustment cost investment volume in reference scenario"
-
 ;
 
-$ifthen.size %cm_PPCA_size% == "current"
+* $ifthen.size %cm_PPCA_size% == "current"
 equations
 q47_finex_pol_REsub(all_regi)
+q47_REdirect(all_regi)
 ;
-$endif.size
+
+$ifthen.reinvest %cm_REdir_mobil% == "hi_oecd_cond"
+variables
+v47_ref_coal_opex(all_regi)
+v47_ref_coal_fuelcost(all_regi)
+v47_REdir_opex(all_regi)
+;
+
+parameters
+p47_costTeCapital_bau(ttot,all_regi,all_te)
+p47_prodSe_bau(ttot,all_regi,all_enty,all_enty,all_te)
+p47_deltaCap_bau(tall,all_regi,all_te,rlf)
+;
+
+equations
+q47_REdir_REinvest(all_regi)
+q47_ref_coal_opex(all_regi)
+q47_ref_coal_fuelcost(all_regi)
+q47_REdir_opex(all_regi)
+;
+
+$endif.reinvest
 
 $endif.finpol
+
 
 *** EOF ./modules/47_regipol/PPCAcoalExit/declarations.gms

@@ -14,6 +14,16 @@ coalchp
 igcc
 /
 
+teSeelCoal(all_te)      "All coal power generation technologies"
+/
+pc
+coalchp
+igcc
+pco
+pcc
+igccc
+/
+
 coalNonSolTe(all_te)    "All non-solid coal consuming technologies"
 /
 pc
