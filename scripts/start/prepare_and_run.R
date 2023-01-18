@@ -337,7 +337,7 @@ prepare <- function() {
     else  source("scripts/input/COALogit_PPCA_FinEx.R")
     COALogit_PPCA_FinEx(refgdx=refgdx, recovery=cfg$gms$cm_COVID_coal_scen, size=cfg$gms$cm_PPCA_size, PPCA_pol=cfg$gms$cm_PPCA_pol,
       oecd=cfg$gms$cm_PPCA_OECD, nonoecd=cfg$gms$cm_PPCA_nonOECD, outputfolder=cfg$results_folder,rev=cfg$revision, title=cfg$title, 
-      plot = TRUE, fin_pol=cfg$gms$cm_pubfinex_pol, mob = cfg$gms$cm_REdir_mobil, uncertainty="5step")
+      plot = TRUE, fin_pol=cfg$gms$cm_pubfinex_pol, mob = cfg$gms$cm_REdir_mobil, uncertainty="60CI")
   }
 
 

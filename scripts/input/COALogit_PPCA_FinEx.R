@@ -225,7 +225,7 @@ COALogit_PPCA_FinEx <- function(refgdx, recovery, size, PPCA_pol, oecd, nonoecd,
         # Regional data from REMIND output
         totalgen_2025_R <- rundata[,"y2025","SE|Electricity (EJ/yr)"]
         # Downscale regional REMIND results to national level using disaggregation weight defined above
-        totalgen_2025_c <- toolAggregate(totalgen_2025_R[-which(getItems(dim = 1,  x = totalgen_2025_R)=="GLO"),,],map,weight[,2025,])
+        totalgen_2025_c <- toolAggregate(totalgen_2025_R[-which(getItems(dim = 1,  x = totalgen_2025_R)=="GLO"),,],map,weight[,getYears(totalgen_2025_R),])
 
         ## 2025 coal power generation
         # Scenarios not fixed to Covid- or FinEx-related coal capacity constraint in 2025
@@ -445,12 +445,12 @@ COALogit_PPCA_FinEx <- function(refgdx, recovery, size, PPCA_pol, oecd, nonoecd,
                             oecd=as.character(oecd_map),
                             ppca=as.character(ppca_map),
                             gdp=as.numeric(gdppc[,2025,]),
-                            share=as.numeric(coalShare_2025_c),
-                            Region=map$RegionCode) %>%
+                            share=as.numeric(coalShare_2025_c)) %>%
                     ### Run logit model on 2025 data to get OECD nations' accession probabilities ###
                     mutate(accession_prob = predict(object = logit_model, 
                                                     newdata = data.frame(Coal.Share=share,GDP.PC=gdp),
-                                                    type = "response"))
+                                                    type = "response"),
+                            Region=map$RegionCode[order(map$CountryCode)])
 
             ##########################################
             ### Determine OECD coalition scenarios ###
@@ -493,21 +493,21 @@ COALogit_PPCA_FinEx <- function(refgdx, recovery, size, PPCA_pol, oecd, nonoecd,
         coalgen_2030_R <- toolAggregate(coalgen_2030_R[-which(getItems(dim = 1,  x = coalgen_2030_R)=="GLO"),,],map,NULL)
         
         totalgen_2030_R <- rundata[,getYears(rundata)>="y2030","SE|Electricity (EJ/yr)"]
-        totalgen_2030_c <- toolAggregate(totalgen_2030_R[-which(getItems(dim = 1,  x = totalgen_2030_R)=="GLO"),,],map,weight[,2030,])
+        totalgen_2030_c <- toolAggregate(totalgen_2030_R[-which(getItems(dim = 1,  x = totalgen_2030_R)=="GLO"),,],map,weight[,getYears(totalgen_2030_R),])
         
         # Apply downscale formula to derive 2030 coal generation by country
         coalshare_2030_c <- downscale_coal(coalgen_2025_c,totalgen_2025_c,coalgen_2025_R,totalgen_2025_R,coalgen_2030_R,totalgen_2030_R)
         coalgen_2030_c <- coalshare_2030_c * totalgen_2030_c
         #Read 2045 total electricity generation from appropriate OECD phase-out REMIND scenario
         totalgen_2045_R <- rundata[,"y2045","SE|Electricity (EJ/yr)"]
-        totalgen_2045_c <- toolAggregate(totalgen_2045_R[-which(getItems(dim = 1,  x = totalgen_2045_R)=="GLO"),,],map,weight[,2045,])
+        totalgen_2045_c <- toolAggregate(totalgen_2045_R[-which(getItems(dim = 1,  x = totalgen_2045_R)=="GLO"),,],map,weight[,getYears(totalgen_2045_R),])
         
         coalgen_2045_R <- rundata[,"y2045","SE|Electricity|Coal (EJ/yr)"]
         coalgen_2045_R <- toolAggregate(coalgen_2045_R[-which(getItems(dim = 1,  x = coalgen_2045_R)=="GLO"),,],map,NULL)
         
         #Read 2050 total electricity generation from appropriate OECD phase-out REMIND scenario
         totalgen_2050_R <- rundata[,getYears(rundata)>="y2050","SE|Electricity (EJ/yr)"]
-        totalgen_2050_c <- toolAggregate(totalgen_2050_R[-which(getItems(dim = 1,  x = totalgen_2050_R)=="GLO"),,],map,weight[,2050,])
+        totalgen_2050_c <- toolAggregate(totalgen_2050_R[-which(getItems(dim = 1,  x = totalgen_2050_R)=="GLO"),,],map,weight[,getYears(totalgen_2050_R),])
         
         coalgen_2050_R <- rundata[,getYears(rundata)>="y2050","SE|Electricity|Coal (EJ/yr)"]
         coalgen_2050_R <- toolAggregate(coalgen_2050_R[-which(getItems(dim = 1,  x = coalgen_2050_R)=="GLO"),,],map,NULL)
@@ -691,12 +691,12 @@ COALogit_PPCA_FinEx <- function(refgdx, recovery, size, PPCA_pol, oecd, nonoecd,
                                 oecd=as.character(oecd_map),
                                 ppca=as.character(ppca_map),
                                 share_2045=as.numeric(logit_coalShare_2045_c),
-                                gdp=as.numeric(gdppc[,2045,]),
-                                Region=map$RegionCode) %>%
+                                gdp=as.numeric(gdppc[,2045,])) %>%
                         ### Run logit model on 2045 data to get non-OECD nations' accession probabilities ###
                         mutate(accession_prob = predict(object = logit_model, 
                                                         newdata = data.frame(Coal.Share=share_2045,GDP.PC=gdp),
-                                                        type = "response"))
+                                                        type = "response"),
+                            Region=map$RegionCode[order(map$CountryCode)])
             
             print("nonOECD")
             print(nonOECD)
@@ -934,12 +934,12 @@ COALogit_PPCA_FinEx <- function(refgdx, recovery, size, PPCA_pol, oecd, nonoecd,
                                     oecd=as.character(oecd_map),
                                     ppca=as.character(ppca_map),
                                     share_2045=as.numeric(logit_coalShare_2045_c),
-                                    gdp=as.numeric(gdppc[,2045,]),
-                                    Region=map$RegionCode) %>%
+                                    gdp=as.numeric(gdppc[,2045,])) %>%
                             ### Run logit model on 2045 data to get non-OECD nations' accession probabilities ###
                             mutate(accession_prob = predict(object = logit_model, 
                                                             newdata = data.frame(Coal.Share=share_2045,GDP.PC=gdp),
-                                                            type = "response"))
+                                                            type = "response"),
+                            Region=map$RegionCode[order(map$CountryCode)])
                 
                 ##############################################
                 ### Determine non-OECD coalition scenarios ###
@@ -955,12 +955,12 @@ COALogit_PPCA_FinEx <- function(refgdx, recovery, size, PPCA_pol, oecd, nonoecd,
                             oecd=as.character(oecd_map),
                             ppca=as.character(ppca_map),
                             gdp=as.numeric(gdppc[,2025,]),
-                            share=as.numeric(coalShare_2025_c),
-                            Region=map$RegionCode) %>%
+                            share=as.numeric(coalShare_2025_c)) %>%
                     ### Run logit model on 2025 data to get OECD nations' accession probabilities ###
                     mutate(accession_prob = predict(object = logit_model, 
                                                     newdata = data.frame(Coal.Share=share,GDP.PC=gdp),
-                                                    type = "response"))
+                                                    type = "response"),
+                            Region=map$RegionCode[order(map$CountryCode)])
 
             ##########################################
             ### Determine OECD coalition scenarios ###
