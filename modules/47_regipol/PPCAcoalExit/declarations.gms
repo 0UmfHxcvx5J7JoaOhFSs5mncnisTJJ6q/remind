@@ -11,13 +11,13 @@ $ifthen.cov not %cm_COVID_coal_scen% == "none"
 equations
 q47_CovidCoalCap(ttot,all_regi,cov_coal)                                  "2025 post-COVID Coal capacity scenarios upper limit"
 q47_CovidCoalFloor(ttot,all_regi,cov_coal)                                "2025 post-COVID Coal capacity scenarios lower limit"
-q47_limSe(ttot,all_regi)                                                  "Prevent buggy behavior in which some freeriding regions drastically increase all energy demand after 2050"
+q47_limFe(ttot,all_regi)                                                  "Prevent buggy behavior in which some freeriding regions drastically increase all energy demand after 2050"
 ;
 * $else.ref
 
 parameters 
 p47_cap(ttot,all_regi,all_te,rlf) 
-p47_prodSe(ttot,all_regi,all_enty,all_enty,all_te)
+p47_prodFe(ttot,all_regi,all_enty,all_enty,all_te)
 ;
 * $endif.ref
 $endif.cov
@@ -81,6 +81,7 @@ parameters
 p47_costTeCapital_bau(ttot,all_regi,all_te)
 p47_prodSe_bau(ttot,all_regi,all_enty,all_enty,all_te)
 p47_deltaCap_bau(tall,all_regi,all_te,rlf)
+p47_deltaCap_ref(tall,all_regi,all_te,rlf)
 ;
 
 equations

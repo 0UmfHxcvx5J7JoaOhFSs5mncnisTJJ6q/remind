@@ -10,7 +10,7 @@
 * Execute_Loadpoint 'input_ref' p47_prodFe = vm_prodFe.l;
 * Execute_Loadpoint 'input_ref' p47_co2CCS = vm_co2CCS.l;
 
-Execute_Loadpoint 'input_ref' p47_prodSe = vm_prodSe.l;
+Execute_Loadpoint 'input_ref' p47_prodFe = vm_prodFe.l;
 
 $ifthen.cond %cm_REdir_mobil% == "hi_oecd_cond"
 Execute_Loadpoint 'input_bau' p47_costTeCapital_bau = vm_costTeCapital.l;
@@ -38,17 +38,17 @@ vm_cap.up("2025",regi,"igcc",rlf) = p47_cap("2025",regi,"igcc",rlf);
 $endif.cov_coal
 
 $ifthen.REdirect %cm_pubfinex_pol% == "REdirect"
-vm_cap.lo("2025",regi,teRe(te),rlf) = 0.99*p47_cap("2025",regi,te,rlf);
-vm_cap.lo("2025",regi,teNoTransform(te),rlf) = 0.99*p47_cap("2025",regi,te,rlf);
+vm_cap.lo("2025",regi,teVRE(te),rlf) = p47_cap("2025",regi,te,rlf);
+vm_cap.lo("2025",regi,teNoTransform(te),rlf) = p47_cap("2025",regi,te,rlf);
 
-vm_cap.lo("2025",regi,teRe(te),rlf) = 0.99*p47_cap("2025",regi,te,rlf);
-vm_cap.lo("2025",regi,teNoTransform(te),rlf) = 0.99*p47_cap("2025",regi,te,rlf);
+vm_cap.lo("2025",regi,teVRE(te),rlf) = p47_cap("2025",regi,te,rlf);
+vm_cap.lo("2025",regi,teNoTransform(te),rlf) = p47_cap("2025",regi,te,rlf);
 
-v_costInvTeDir.lo("2025",regi,teRe(te)) = 0.99*p47_ref_costInvTeDir_RE("2025",regi,te);
-v_costInvTeDir.lo("2025",regi,teNoTransform(te)) = 0.99*p47_ref_costInvTeDir_RE("2025",regi,te);
+v_costInvTeDir.lo("2025",regi,teVRE(te)) = p47_ref_costInvTeDir_RE("2025",regi,te);
+v_costInvTeDir.lo("2025",regi,teNoTransform(te)) = p47_ref_costInvTeDir_RE("2025",regi,te);
 
-v_costInvTeAdj.lo("2025",regi,teRe(te)) = 0.99*p47_ref_costInvTeAdj_RE("2025",regi,te);
-v_costInvTeAdj.lo("2025",regi,teNoTransform(te)) = 0.99*p47_ref_costInvTeAdj_RE("2025",regi,te);
+v_costInvTeAdj.lo("2025",regi,teVRE(te)) = p47_ref_costInvTeAdj_RE("2025",regi,te);
+v_costInvTeAdj.lo("2025",regi,teNoTransform(te)) = p47_ref_costInvTeAdj_RE("2025",regi,te);
 
 Execute_Loadpoint 'input_ref' p47_REdirect = v47_REdirect.l;
 
@@ -56,18 +56,45 @@ if(cm_startyear > 2025,
     v47_REdirect.fx(regi) = p47_REdirect(regi);
 );
 
-$ifthenE.himob sameas("%cm_REdir_mobil%","hi_oecd_2030")or(sameas("%cm_REdir_mobil%","hi_oecd_cond"))
-vm_cap.lo("2030",regi,teRe(te),rlf) = 0.99*p47_cap("2030",regi,te,rlf);
-vm_cap.lo("2030",regi,teNoTransform(te),rlf) = 0.99*p47_cap("2030",regi,te,rlf);
+$ifthen.himob %cm_REdir_mobil% == "hi_oecd_2030"
+loop(regi$(p47_REdir_vol(regi) gt 0),
+    vm_cap.lo("2030",regi,teVRE(te),rlf) = 0.98*p47_cap("2030",regi,te,rlf);
+    vm_cap.lo("2030",regi,teNoTransform(te),rlf) = 0.98*p47_cap("2030",regi,te,rlf);
 
-vm_cap.lo("2030",regi,teRe(te),rlf) = 0.99*p47_cap("2030",regi,te,rlf);
-vm_cap.lo("2030",regi,teNoTransform(te),rlf) = 0.99*p47_cap("2030",regi,te,rlf);
+    vm_cap.lo("2030",regi,teVRE(te),rlf) = 0.98*p47_cap("2030",regi,te,rlf);
+    vm_cap.lo("2030",regi,teNoTransform(te),rlf) = 0.98*p47_cap("2030",regi,te,rlf);
 
-v_costInvTeDir.lo("2030",regi,teRe(te)) = 0.99*p47_ref_costInvTeDir_RE("2030",regi,te);
-v_costInvTeDir.lo("2030",regi,teNoTransform(te)) = 0.99*p47_ref_costInvTeDir_RE("2030",regi,te);
+    v_costInvTeDir.lo("2030",regi,teVRE(te)) = 0.98*p47_ref_costInvTeDir_RE("2030",regi,te);
+    v_costInvTeDir.lo("2030",regi,teNoTransform(te)) = 0.98*p47_ref_costInvTeDir_RE("2030",regi,te);
 
-v_costInvTeAdj.lo("2030",regi,teRe(te)) = 0.99*p47_ref_costInvTeAdj_RE("2030",regi,te);
-v_costInvTeAdj.lo("2030",regi,teNoTransform(te)) = 0.99*p47_ref_costInvTeAdj_RE("2030",regi,te);
+    v_costInvTeAdj.lo("2030",regi,teVRE(te)) = 0.98*p47_ref_costInvTeAdj_RE("2030",regi,te);
+    v_costInvTeAdj.lo("2030",regi,teNoTransform(te)) = 0.98*p47_ref_costInvTeAdj_RE("2030",regi,te);
+);
+
+$elseif.himob %cm_REdir_mobil% == "hi_oecd_cond"
+Execute_Loadpoint 'input_ref' p47_deltaCap_ref = vm_deltaCap.L;
+
+loop(regi$(p47_REdir_vol(regi) gt 0),
+    loop(ttot$(ttot.val ge cm_startyear and ttot.val lt %cm_ppca_deadline%),
+* vm_cap.lo(ttot,regi,teVRE(te),rlf) = p47_cap(ttot,regi,te,rlf);
+* vm_cap.lo(ttot,regi,teNoTransform(te),rlf) = p47_cap(ttot,regi,te,rlf);
+
+* vm_cap.lo(ttot,regi,teVRE(te),rlf) = p47_cap(ttot,regi,te,rlf);
+* vm_cap.lo(ttot,regi,teNoTransform(te),rlf) = p47_cap(ttot,regi,te,rlf);  
+
+    vm_deltaCap.lo(ttot,regi,teVRE(te),rlf) = p47_deltaCap_ref(ttot,regi,te,rlf);
+    vm_deltaCap.lo(ttot,regi,teNoTransform(te),rlf) = p47_deltaCap_ref(ttot,regi,te,rlf);
+
+    vm_deltaCap.lo(ttot,regi,teVRE(te),rlf) = p47_deltaCap_ref(ttot,regi,te,rlf);
+    vm_deltaCap.lo(ttot,regi,teNoTransform(te),rlf) = p47_deltaCap_ref(ttot,regi,te,rlf); 
+
+* v_costInvTeDir.lo(ttot,regi,teVRE(te)) = 0.98*p47_ref_costInvTeDir_RE(ttot,regi,te);
+* v_costInvTeDir.lo(ttot,regi,teNoTransform(te)) = 0.98*p47_ref_costInvTeDir_RE(ttot,regi,te);
+
+* v_costInvTeAdj.lo(ttot,regi,teVRE(te)) = 0.98*p47_ref_costInvTeAdj_RE(ttot,regi,te);
+* v_costInvTeAdj.lo(ttot,regi,teNoTransform(te)) = 0.98*p47_ref_costInvTeAdj_RE(ttot,regi,te);    
+    );
+);
 
 $endif.himob
 

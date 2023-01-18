@@ -11,10 +11,10 @@ $ifthen.finpol %cm_pubfinex_pol% == "REdirect"
 
 *** HIGH REDIRECT SCENARIO WHICH FORCES HOST NATIONS TO INVEST FUEL + OPEX COST SAVINGS INTO RE 
 $ifthen.reinvest %cm_REdir_mobil% == "hi_oecd_cond"
-q47_REdir_REinvest(regi)$(p47_REdir_vol(regi) gt 0 and (p47_deltaCap_bau("2025",regi,"pc","1") gt 0 or p47_deltaCap_bau("2025",regi,"igcc","1") gt 0 or p47_deltaCap_bau("2025",regi,"coalchp","1") gt 0))..
+q47_REdir_REinvest(regi)$(p47_REdir_vol(regi) gt 0)..
   sum(ttot$(ttot.val ge 2025 and ttot.val lt %cm_ppca_deadline%),
-  sum(en2en(enty,enty2,te)$(teVRE(te)),
-      v_costInvTeDir(ttot,regi,te) + v_costInvTeAdj(ttot,regi,te)$teAdj(te) )
+  sum(en2en(enty,enty2,teVRE),
+      v_costInvTeDir(ttot,regi,teVRE) + v_costInvTeAdj(ttot,regi,teVRE)$teAdj(teVRE) )
       +
     sum(teNoTransform$(not sameas(teNoTransform,"dac")),
         v_costInvTeDir(ttot,regi,teNoTransform) + v_costInvTeAdj(ttot,regi,teNoTransform)$teAdj(teNoTransform)
@@ -32,12 +32,9 @@ q47_REdir_REinvest(regi)$(p47_REdir_vol(regi) gt 0 and (p47_deltaCap_bau("2025",
       p47_ref_costInvTeDir_RE(ttot,regi,teNoTransform) + p47_ref_costInvTeAdj_RE(ttot,regi,teNoTransform)$teAdj(teNoTransform)  !! Reference grid + storage investment
     )
   )
-  +
-  v47_ref_coal_opex(regi)
-    +
-  v47_ref_coal_fuelcost(regi)
-    -
-  v47_REdir_opex(regi)
+  + v47_ref_coal_opex(regi)
+  + v47_ref_coal_fuelcost(regi)
+  - v47_REdir_opex(regi)$(p47_deltaCap_bau("2025",regi,"pc","1") gt 0 or p47_deltaCap_bau("2025",regi,"igcc","1") gt 0 or p47_deltaCap_bau("2025",regi,"coalchp","1") gt 0)
 ;
 
 
@@ -80,44 +77,26 @@ q47_ref_coal_fuelcost(regi)$(p47_REdir_vol(regi) gt 0)..
 v47_ref_coal_fuelcost(regi)
 =e=
 sum(ttot$(ttot.val ge 2025 and ttot.val le 2030),
-* sum(tall$(tall.val ge ttot.val and tall.val le (ttot.val+38)) ),
-*   pm_PEPrice(tall,regi,"pecoal") 
-*   * sum(teSe2rlf(teEtaConst(coalElTeNoCCS),rlf),
-*         vm_capFac(tall,regi,coalElTeNoCCS) 
-*         * pm_dataren(regi,"nur",rlf,coalElTeNoCCS)
-*         * pm_omeg(regi,p_tall_val(tall)-pm_ttot_val(ttot)+1,coalElTeNoCCS)
-*         * (p47_deltaCap_bau(ttot,regi,coalElTeNoCCS,rlf) 
-*           - vm_deltaCap(ttot,regi,coalElTeNoCCS,rlf)) 
-*         / pm_eta_conv(ttot,regi,coalElTeNoCCS) )
-*     + 
-*     sum(teSe2rlf(teEtaIncr(coalElTeNoCCS),rlf),
-*         vm_capFac(tall,regi,coalElTeNoCCS) 
-*           * pm_dataren(regi,"nur",rlf,coalElTeNoCCS)
-*           * pm_omeg(regi,p_tall_val(tall)-pm_ttot_val(ttot)+1,coalElTeNoCCS)
-*           * (p47_deltaCap_bau(ttot,regi,coalElTeNoCCS,rlf) 
-*             - vm_deltaCap(ttot,regi,coalElTeNoCCS,rlf))
-*             / pm_dataeta(ttot,regi,coalElTeNoCCS) )
-*     )
-sum(opTimeYr2te(teEtaConst(coalElTeNoCCS),opTimeYr)$(tsu2opTimeYr(ttot,opTimeYr) AND (opTimeYr.val gt 1) ),
-  pm_PEPrice(ttot+(pm_tsu2opTimeYr(ttot,opTimeYr)-1),regi,"pecoal") 
-  * (sum(teSe2rlf(coalElTeNoCCS,rlf),
+  sum(opTimeYr2te(teEtaConst(coalElTeNoCCS),opTimeYr)$(tsu2opTimeYr(ttot,opTimeYr) AND (opTimeYr.val gt 1) ),
+    pm_PEPrice(ttot+(pm_tsu2opTimeYr(ttot,opTimeYr)-1),regi,"pecoal") 
+    * (sum(teSe2rlf(coalElTeNoCCS,rlf),
+          vm_capFac(ttot+(pm_tsu2opTimeYr(ttot,opTimeYr)-1),regi,coalElTeNoCCS) 
+          * pm_dataren(regi,"nur",rlf,coalElTeNoCCS)
+          * pm_omeg(regi,opTimeYr+1,coalElTeNoCCS)
+          * (p47_deltaCap_bau(ttot,regi,coalElTeNoCCS,rlf) 
+            - vm_deltaCap(ttot,regi,coalElTeNoCCS,rlf)) 
+          / pm_eta_conv(ttot,regi,coalElTeNoCCS) )
+    ) )
+    + 
+    sum(opTimeYr2te(teEtaIncr(coalElTeNoCCS),opTimeYr)$(tsu2opTimeYr(ttot,opTimeYr) AND (opTimeYr.val gt 1) ),
+    pm_PEPrice(ttot+(pm_tsu2opTimeYr(ttot,opTimeYr)-1),regi,"pecoal") 
+    * sum(teSe2rlf(coalElTeNoCCS,rlf),
         vm_capFac(ttot+(pm_tsu2opTimeYr(ttot,opTimeYr)-1),regi,coalElTeNoCCS) 
-        * pm_dataren(regi,"nur",rlf,coalElTeNoCCS)
-        * pm_omeg(regi,opTimeYr+1,coalElTeNoCCS)
-        * (p47_deltaCap_bau(ttot,regi,coalElTeNoCCS,rlf) 
-          - vm_deltaCap(ttot,regi,coalElTeNoCCS,rlf)) 
-        / pm_eta_conv(ttot,regi,coalElTeNoCCS) )
-  ) )
-  + 
-  sum(opTimeYr2te(teEtaIncr(coalElTeNoCCS),opTimeYr)$(tsu2opTimeYr(ttot,opTimeYr) AND (opTimeYr.val gt 1) ),
-  pm_PEPrice(ttot+(pm_tsu2opTimeYr(ttot,opTimeYr)-1),regi,"pecoal") 
-  * sum(teSe2rlf(coalElTeNoCCS,rlf),
-      vm_capFac(ttot+(pm_tsu2opTimeYr(ttot,opTimeYr)-1),regi,coalElTeNoCCS) 
-        * pm_dataren(regi,"nur",rlf,coalElTeNoCCS)
-        * pm_omeg(regi,opTimeYr+1,coalElTeNoCCS)
-        * (p47_deltaCap_bau(ttot,regi,coalElTeNoCCS,rlf) 
-          - vm_deltaCap(ttot,regi,coalElTeNoCCS,rlf))
-          / pm_dataeta(ttot,regi,coalElTeNoCCS) )
+          * pm_dataren(regi,"nur",rlf,coalElTeNoCCS)
+          * pm_omeg(regi,opTimeYr+1,coalElTeNoCCS)
+          * (p47_deltaCap_bau(ttot,regi,coalElTeNoCCS,rlf) 
+            - vm_deltaCap(ttot,regi,coalElTeNoCCS,rlf))
+            / pm_dataeta(ttot,regi,coalElTeNoCCS) )
       )
     )
     
@@ -149,7 +128,7 @@ $endif.himob
           * pm_omeg(regi,opTimeYr+1,teVRE)
           * (vm_deltaCap(ttot,regi,teVRE,rlf)
             - p47_deltaCap_bau(ttot,regi,teVRE,rlf) ) 
-            / pm_dataeta(ttot,regi,teVRE) )
+            / pm_eta_conv(ttot,regi,teVRE) )
       )
     )
     
@@ -169,8 +148,8 @@ $else.himob
 $endif.himob
 * ttot$(ttot.val eq 2025 and (ttot.val eq 2030)$(sameas('%cm_REdir_mobil%','hi_oecd_2030') or sameas('%cm_REdir_mobil%','hi_oecd_cond'))),
 *sum(en2en(enty,enty2,te)$(teVRE(te) and not sameas(te,"csp")),
-  sum(en2en(enty,enty2,te)$(teVRE(te)),
-      v_costInvTeDir(ttot,regi,te) + v_costInvTeAdj(ttot,regi,te)$teAdj(te) )
+  sum(en2en(enty,enty2,teVRE),
+      v_costInvTeDir(ttot,regi,teVRE) + v_costInvTeAdj(ttot,regi,teVRE)$teAdj(teVRE) )
     +
 * sum(teNoTransform$(not sameas(teNoTransform,"storcsp") and not sameas(teNoTransform,"gridcsp")),
   sum(teNoTransform$(not sameas(teNoTransform,"dac")),
@@ -193,8 +172,8 @@ $endif.himob
   (p47_REdir_vol(regi) * 1e-3)  !! G20 coal REdirect
   +
 *  sum(en2en(enty,enty2,te)$(teVRE(te) and not sameas(te,"csp")),
- sum(en2en(enty,enty2,te)$(teVRE(te)),
-      p47_ref_costInvTeDir_RE(ttot,regi,te) + p47_ref_costInvTeAdj_RE(ttot,regi,te)$teAdj(te)  !! Reference VRE investment
+ sum(en2en(enty,enty2,teVRE),
+      p47_ref_costInvTeDir_RE(ttot,regi,teVRE) + p47_ref_costInvTeAdj_RE(ttot,regi,teVRE)$teAdj(teVRE)  !! Reference VRE investment
   )
   +
 * sum(teNoTransform$(not sameas(teNoTransform,"storcsp") and not sameas(teNoTransform,"gridcsp")),
@@ -314,14 +293,21 @@ sum(pe2se("pecoal",enty2,te)$(sameas(te,"pc") OR sameas(te,"coalchp") OR sameas(
 
 $endif.PPCA_nonOECD
 
-q47_limSe(ttot,regi)$(ttot.val gt 2060)..
-sum(pe2se(enty,"seel",te), 
-vm_prodSe.up(ttot,regi,enty,"seel",te)
+* q47_limSe(ttot,regi)$(ttot.val gt 2060)..
+* sum(pe2se(enty,"seel",te), 
+*   vm_prodSe.up(ttot,regi,enty,"seel",te)
+* ) 
+* =l= 
+* 4 * sum(pe2se(enty,"seel",te), p47_prodSe(ttot,regi,enty,"seel",te))
+* ;
+
+q47_limFe(ttot,regi)$(ttot.val gt 2060)..
+sum(pe2se(enty,enty2,te), 
+  vm_prodFe.up(ttot,regi,enty,enty2,te)
 ) 
 =l= 
-2.5 * sum(pe2se(enty,"seel",te), p47_prodSe(ttot,regi,enty,"seel",te))
+1.5 * sum(pe2se(enty,enty2,te), p47_prodFe(ttot,regi,enty,enty2,te))
 ;
-
 
 *** OECD demand-exit implementation: limit regional CO2 emissions from non-solid 
 *** coal use from 2030-2100 to a COALogit-determined share of total regional 

@@ -87,7 +87,7 @@
 * 
 * Input data revision: 6.311
 * 
-* Last modification (input data): Tue Jan 10 15:08:18 2023
+* Last modification (input data): Wed Jan 18 12:08:02 2023
 * 
 *###################### R SECTION END (VERSION INFO) ###########################
 
@@ -142,8 +142,8 @@ option profile = 0;
 
 
 ***---------------------    Run name and description    -------------------------
-$setGlobal c_expname  REdirect_HI-cond_no_pmts-limSE2p5x2060-oecd50p-NEU
-$setGlobal c_description  REMIND run REdirect_HI-cond_no_pmts-limSE2p5x2060-oecd50p-NEU started by config/scenario_config_FinEx_3p0.csv.
+$setGlobal c_expname  REdirect_HI-cond_lobd_delCap-2040-limFE1p5-nonoecd50p-test
+$setGlobal c_description  REMIND run REdirect_HI-cond_lobd_delCap-2040-limFE1p5-nonoecd50p-test started by config/scenario_config_FinEx_3p0.csv.
 
 ***------------------------------------------------------------------------------
 ***                           MODULES
@@ -411,7 +411,7 @@ $setglobal cm_demScen  gdp_SSP2EU     !! def = gdp_SSP2EU
 cm_GDPcovid      = 1;            !! def = 0
 
 *AG* and *CB* for cm_startyear greater than 2005, you have to copy the fulldata.gdx (rename it to: input_ref.gdx) from the run you want to build your new run onto.
-cm_startyear      = 2030;      !! def = 2005 for a BAU, 2015 for policy runs
+cm_startyear      = 2035;      !! def = 2005 for a BAU, 2015 for policy runs
 * cm_rentdisc_startyr     = 2005;     !! def = 2025
 cm_NPi_startyr     = 2025;      !! def = 2025
 $setglobal cm_EVRE  none     !! def = none
@@ -684,8 +684,8 @@ $setglobal cm_PPCA_pol  power !! def = power
 $setglobal cm_PPCA_size  2p     !! def = current
 $setglobal cm_COVID_coal_scen  Neutral  !! def = none
 $setglobal cm_PPCA_OECD  on    !! def = off
-$setglobal cm_PPCA_nonOECD  off    !! def = off
-$setglobal cm_ppca_deadline  2050  !! def = 2050
+$setglobal cm_PPCA_nonOECD  on    !! def = off
+$setglobal cm_ppca_deadline  2040  !! def = 2050
 
 $setglobal cm_pubfinex_pol  REdirect !! def = none
 $setglobal cm_REdir_mobil  hi_oecd_cond  !! def = none
