@@ -71,3 +71,4 @@ plotRuntimeDependencies/
 
 # ignore RStudio project files
 /*.Rproj
+calibration_results
