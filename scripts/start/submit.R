@@ -56,7 +56,6 @@ submit <- function(cfg, restart = FALSE, stopOnFolderCreateError = TRUE) {
                    && !is.null(piamenv::showUpdates())) {
           message("Consider updating with `make update-renv`.")
         }
-      }
 
       message("   Generating lockfile '", file.path(cfg$results_folder, "renv.lock"), "'... ", appendLF = FALSE)
       # suppress output of renv::snapshot
@@ -67,6 +66,11 @@ submit <- function(cfg, restart = FALSE, stopOnFolderCreateError = TRUE) {
         }, type = "message")
       })
       message("done.")
+    } else {
+      # a run renv is loaded, we are presumable starting new run in a cascade
+      message("Copying lockfile into '", cfg$results_folder, "'")
+      file.copy(renv::paths$lockfile(), file.path(cfg$results_folder, "_renv.lock"))
+    }
 
       renvLogPath <- file.path(cfg$results_folder, "log_renv.txt")
       message("   Initializing renv, see ", renvLogPath)
