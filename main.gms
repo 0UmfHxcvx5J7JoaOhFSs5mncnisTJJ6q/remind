@@ -1606,6 +1606,7 @@ $setglobal c_CES_calibration_iterations  10     !!  def  =  10
 $setglobal c_CES_calibration_industry_FE_target  1
 $setglobal c_testOneRegi_region  EUR       !! def = EUR
 $setglobal cm_fixCO2price  off !! def = off
+$setglobal cm_ue_ind_sigma 1.7
 
 *' @stop
 
