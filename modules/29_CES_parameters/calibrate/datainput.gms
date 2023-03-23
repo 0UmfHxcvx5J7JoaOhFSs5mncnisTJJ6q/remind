@@ -195,6 +195,15 @@ $include "./modules/29_CES_parameters/calibrate/input/f29_capitalQuantity.cs4r"
 $offdelim
 /
 ;
+
+*** FIXME fix 2020,NEU,gdp_SSP2EU,kap_steel_primary bug in input data revision 6.335
+f29_capitalQuantity("2010","NEU","gdp_SSP2EU","kap_steel_primary") = 0.000484;
+f29_capitalQuantity("2015","NEU","gdp_SSP2EU","kap_steel_primary") = 0.000644;
+f29_capitalQuantity("2020","NEU","gdp_SSP2EU","kap_steel_primary") = 0.000766;
+f29_capitalQuantity("2025","NEU","gdp_SSP2EU","kap_steel_primary") = 0.000872;
+f29_capitalQuantity("2030","NEU","gdp_SSP2EU","kap_steel_primary") = 0.000856;
+f29_capitalQuantity("2035","NEU","gdp_SSP2EU","kap_steel_primary") = 0.000853;
+
 p29_capitalQuantity(t,regi,ppfKap) = f29_capitalQuantity(t,regi,"%cm_GDPscen%",ppfKap);
 
 *** fix industry energy efficiency capital for mrremind rounding
