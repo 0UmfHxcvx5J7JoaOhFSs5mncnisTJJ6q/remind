@@ -196,13 +196,24 @@ $offdelim
 /
 ;
 
-*** FIXME fix 2020,NEU,gdp_SSP2EU,kap_steel_primary bug in input data revision 6.335
-f29_capitalQuantity("2010","NEU","gdp_SSP2EU","kap_steel_primary") = 0.000484;
-f29_capitalQuantity("2015","NEU","gdp_SSP2EU","kap_steel_primary") = 0.000644;
-f29_capitalQuantity("2020","NEU","gdp_SSP2EU","kap_steel_primary") = 0.000766;
-f29_capitalQuantity("2025","NEU","gdp_SSP2EU","kap_steel_primary") = 0.000872;
-f29_capitalQuantity("2030","NEU","gdp_SSP2EU","kap_steel_primary") = 0.000856;
-f29_capitalQuantity("2035","NEU","gdp_SSP2EU","kap_steel_primary") = 0.000853;
+*** FIXME fix 2020,NEU/NES,gdp_SSP2EU,kap_steel_primary bug in input data revision 6.335
+loop (regi$( sameas(regi,"NEU"),
+  f29_capitalQuantity("2010",regi,"gdp_SSP2EU","kap_steel_primary") = 0.000484;
+  f29_capitalQuantity("2015",regi,"gdp_SSP2EU","kap_steel_primary") = 0.000644;
+  f29_capitalQuantity("2020",regi,"gdp_SSP2EU","kap_steel_primary") = 0.000766;
+  f29_capitalQuantity("2025",regi,"gdp_SSP2EU","kap_steel_primary") = 0.000872;
+  f29_capitalQuantity("2030",regi,"gdp_SSP2EU","kap_steel_primary") = 0.000856;
+  f29_capitalQuantity("2035",regi,"gdp_SSP2EU","kap_steel_primary") = 0.000853;
+);
+
+loop (regi$( sameas(regi,"NES") ),
+  f29_capitalQuantity("2010",regi,"gdp_SSP2EU","kap_steel_primary") = 0.000424;
+  f29_capitalQuantity("2015",regi,"gdp_SSP2EU","kap_steel_primary") = 0.000582;
+  f29_capitalQuantity("2020",regi,"gdp_SSP2EU","kap_steel_primary") = 0.000685;
+  f29_capitalQuantity("2025",regi,"gdp_SSP2EU","kap_steel_primary") = 0.000760;
+  f29_capitalQuantity("2030",regi,"gdp_SSP2EU","kap_steel_primary") = 0.000701;
+  f29_capitalQuantity("2035",regi,"gdp_SSP2EU","kap_steel_primary") = 0.000657;
+);
 
 p29_capitalQuantity(t,regi,ppfKap) = f29_capitalQuantity(t,regi,"%cm_GDPscen%",ppfKap);
 
