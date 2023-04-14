@@ -76,3 +76,4 @@ plotRuntimeDependencies/
 .venv/
 
 calibration_results
+old_output/
