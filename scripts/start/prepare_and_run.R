@@ -313,7 +313,7 @@ prepare <- function() {
 
   # For PPCA coal phase-out scenarios, the logit model below is run prior to REMIND using data from input_ref 
   if(!is.null(cfg$gms$regipol) && cfg$gms$regipol=="PPCAcoalExit" && cfg$gms$cm_PPCA_pol!="none") {
-    refgdx <- as.character(cfg$files2export$start["input_ref.gdx"])
+    refgdx <- gsub('//','/',as.character(cfg$files2export$start["input_ref.gdx"]))
     cat("\n",refgdx,"\n")
     cat(cfg$title,"\n")
     cat(cfg$results_folder,"\n")

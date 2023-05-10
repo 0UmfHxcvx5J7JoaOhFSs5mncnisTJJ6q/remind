@@ -10,18 +10,13 @@
 * Execute_Loadpoint 'input_ref' p47_prodFe = vm_prodFe.l;
 * Execute_Loadpoint 'input_ref' p47_co2CCS = vm_co2CCS.l;
 
-Execute_Loadpoint 'input_ref' p47_prodFe = vm_prodFe.l;
-
-$ifthen.cond %cm_REdir_mobil% == "hi_oecd_cond"
-Execute_Loadpoint 'input_bau' p47_costTeCapital_bau = vm_costTeCapital.l;
-Execute_Loadpoint 'input_bau' p47_prodSe_bau = vm_prodSe.l;
-Execute_Loadpoint 'input_bau' p47_deltaCap_bau = vm_deltaCap.l;
-
-display p47_deltaCap_bau, p47_prodSe_bau, p47_costTeCapital_bau;
-$endif.cond
-
 $ifthen.ref not "%cm_PPCA_size%" == "current"
 Execute_Loadpoint 'input_ref' p47_cap = vm_cap.l;
+
+* $ifthenE.limSe (sameas("%cm_pubfinex_pol%","FinEx")or(sameas("%cm_REdir_mobil%","lo_oecd")))and(sameas("%cm_PPCA_nonOECD%","on"))
+vm_prodSe.L(ttot,regi,enty,enty2,te) = p47_prodSe(ttot,regi,enty,enty2,te);
+* vm_demFeSector.up(ttot,regi,enty,enty2,sector,emiMkt)$(ttot.val gt 2050) = 1.4 * p47_demFeSector(ttot,regi,enty,enty2,sector,emiMkt);
+* $endif.limSe
 
 $ifthen.cov_coal not %cm_COVID_coal_scen% == "none"
 vm_cap.l("2025",regi,"pc",rlf) = p47_cap("2025",regi,"pc",rlf);
@@ -50,11 +45,11 @@ v_costInvTeDir.lo("2025",regi,teNoTransform(te)) = p47_ref_costInvTeDir_RE("2025
 v_costInvTeAdj.lo("2025",regi,teVRE(te)) = p47_ref_costInvTeAdj_RE("2025",regi,te);
 v_costInvTeAdj.lo("2025",regi,teNoTransform(te)) = p47_ref_costInvTeAdj_RE("2025",regi,te);
 
-Execute_Loadpoint 'input_ref' p47_REdirect = v47_REdirect.l;
+* Execute_Loadpoint 'input_ref' p47_REdirect = v47_REdirect.l;
 
-if(cm_startyear > 2025,
-    v47_REdirect.fx(regi) = p47_REdirect(regi);
-);
+* if(cm_startyear > 2025,
+*     v47_REdirect.fx(regi) = p47_REdirect(regi);
+* );
 
 $ifthen.himob %cm_REdir_mobil% == "hi_oecd_2030"
 loop(regi$(p47_REdir_vol(regi) gt 0),
@@ -72,8 +67,6 @@ loop(regi$(p47_REdir_vol(regi) gt 0),
 );
 
 $elseif.himob %cm_REdir_mobil% == "hi_oecd_cond"
-Execute_Loadpoint 'input_ref' p47_deltaCap_ref = vm_deltaCap.L;
-
 loop(regi$(p47_REdir_vol(regi) gt 0),
     loop(ttot$(ttot.val ge cm_startyear and ttot.val lt %cm_ppca_deadline%),
 * vm_cap.lo(ttot,regi,teVRE(te),rlf) = p47_cap(ttot,regi,te,rlf);
@@ -113,10 +106,6 @@ vm_cap.lo(t,regi,"storwind",rlf)$(t.val ge cm_startyear) = p47_cap(t,regi,"storw
 $endif.EVRE
 $endif.ref
 
-* $ifthen.policy %cm_PPCA_pol% == "demand"
-
-
-* $endif.policy
 
 
 ** EOF ./modules/47_regipol/PPCAcoalExit/bounds.gms

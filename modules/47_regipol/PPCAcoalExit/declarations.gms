@@ -11,13 +11,14 @@ $ifthen.cov not %cm_COVID_coal_scen% == "none"
 equations
 q47_CovidCoalCap(ttot,all_regi,cov_coal)                                  "2025 post-COVID Coal capacity scenarios upper limit"
 q47_CovidCoalFloor(ttot,all_regi,cov_coal)                                "2025 post-COVID Coal capacity scenarios lower limit"
-q47_limFe(ttot,all_regi)                                                  "Prevent buggy behavior in which some freeriding regions drastically increase all energy demand after 2050"
+* q47_limSe(ttot,all_regi)                                                  "Prevent buggy behavior in which some freeriding regions drastically increase all energy demand after 2050"
 ;
 * $else.ref
 
 parameters 
 p47_cap(ttot,all_regi,all_te,rlf) 
-p47_prodFe(ttot,all_regi,all_enty,all_enty,all_te)
+p47_prodSe(ttot,all_regi,all_enty,all_enty,all_te)
+p47_demFeSector(ttot,all_regi,all_enty,all_enty,emi_sectors,all_emiMkt)
 ;
 * $endif.ref
 $endif.cov
@@ -54,19 +55,19 @@ $endif.policy
 
 
 $ifthen.finpol %cm_pubfinex_pol% == "REdirect"
-variables
-v47_REdirect(all_regi)
-;
+* variables
+* v47_REdirect(all_regi)
+* ;
 
 parameters 
-p47_REdirect(all_regi)                                                  
-p47_ref_costInvTeDir_RE(ttot,all_regi,all_te)                                  "RE direct investment volume in reference scenario"
-p47_ref_costInvTeAdj_RE(ttot,all_regi,all_te)                                  "RE adjustment cost investment volume in reference scenario"
+* p47_REdirect(all_regi)                                                  
+p47_ref_costInvTeDir_RE(ttot,all_regi,all_te)                                  "RE direct investment volume in upstream scenario"
+p47_ref_costInvTeAdj_RE(ttot,all_regi,all_te)                                  "RE adjustment cost investment volume in upstream scenario"
 ;
 
 * $ifthen.size %cm_PPCA_size% == "current"
 equations
-q47_finex_pol_REsub(all_regi)
+* q47_finex_pol_REsub(all_regi)
 q47_REdirect(all_regi)
 ;
 
@@ -78,10 +79,16 @@ v47_REdir_opex(all_regi)
 ;
 
 parameters
+* p47_ref_coal_opex(all_regi)
+* p47_ref_coal_fuelcost(all_regi)
+* p47_REdir_opex(all_regi)
 p47_costTeCapital_bau(ttot,all_regi,all_te)
 p47_prodSe_bau(ttot,all_regi,all_enty,all_enty,all_te)
 p47_deltaCap_bau(tall,all_regi,all_te,rlf)
 p47_deltaCap_ref(tall,all_regi,all_te,rlf)
+p47_capFac_bau(tall,all_regi,all_te)
+p47_costInvTeDir_bau(ttot,all_regi,all_te)                                  "RE direct investment volume in static PPCA scenario"
+p47_costInvTeAdj_bau(ttot,all_regi,all_te)                                  "RE adjustment cost investment volume in static PPCA scenario"
 ;
 
 equations
