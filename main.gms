@@ -87,7 +87,7 @@
 * 
 * Input data revision: 6.311
 * 
-* Last modification (input data): Sat Apr 15 08:31:45 2023
+* Last modification (input data): Wed Jul 12 03:12:10 2023
 * 
 *###################### R SECTION END (VERSION INFO) ###########################
 
@@ -142,8 +142,8 @@ option profile = 0;
 
 
 ***---------------------    Run name and description    -------------------------
-$setGlobal c_expname  REdirect_nomob-gcpt23_HiLoFix-nonoecd50p
-$setGlobal c_description  REMIND run REdirect_nomob-gcpt23_HiLoFix-nonoecd50p started by config/scenario_config_FinEx_3p0.csv.
+$setGlobal c_expname  REdirect_HI-cond-2040-ann_redir_oct-nonoecd2
+$setGlobal c_description  REMIND run REdirect_HI-cond-2040-ann_redir_oct-nonoecd2 started by config/scenario_config_FinEx_3p0.csv.
 
 ***------------------------------------------------------------------------------
 ***                           MODULES
@@ -367,7 +367,7 @@ cm_abortOnConsecFail   = 0;     !! def = 0
 c_solver_try_max       = 2;     !! def = 2
 c_keep_iteration_gdxes = 0;     !! def = 0
 cm_keep_presolve_gdxes  = 0;     !! def = 0
-cm_nash_autoconverge   = 2;     !! def = 1
+cm_nash_autoconverge   = 1;     !! def = 1
 $setglobal cm_MAgPIE_coupling  off     !! def = "off"
 
 cm_emiscen        = 9;               !! def = 1
@@ -411,7 +411,7 @@ $setglobal cm_demScen  gdp_SSP2EU     !! def = gdp_SSP2EU
 cm_GDPcovid      = 1;            !! def = 0
 
 *AG* and *CB* for cm_startyear greater than 2005, you have to copy the fulldata.gdx (rename it to: input_ref.gdx) from the run you want to build your new run onto.
-cm_startyear      = 2035;      !! def = 2005 for a BAU, 2015 for policy runs
+cm_startyear      = 2045;      !! def = 2005 for a BAU, 2015 for policy runs
 * cm_rentdisc_startyr     = 2005;     !! def = 2025
 cm_NPi_startyr     = 2025;      !! def = 2025
 $setglobal cm_EVRE  none     !! def = none
@@ -688,7 +688,7 @@ $setglobal cm_PPCA_nonOECD  on    !! def = off
 $setglobal cm_ppca_deadline  2050  !! def = 2050
 
 $setglobal cm_pubfinex_pol  REdirect !! def = none
-$setglobal cm_REdir_mobil  none  !! def = none
+$setglobal cm_REdir_mobil  hi_oecd_cond_2030  !! def = none
 
 $setglobal cm_coalExitRegi  none   !! def = none
 

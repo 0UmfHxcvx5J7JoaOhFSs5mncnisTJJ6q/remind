@@ -51,22 +51,22 @@ v_costInvTeAdj.lo("2025",regi,teNoTransform(te)) = p47_ref_costInvTeAdj_RE("2025
 *     v47_REdirect.fx(regi) = p47_REdirect(regi);
 * );
 
-$ifthen.himob %cm_REdir_mobil% == "hi_oecd_2030"
-loop(regi$(p47_REdir_vol(regi) gt 0),
-    vm_cap.lo("2030",regi,teVRE(te),rlf) = 0.98*p47_cap("2030",regi,te,rlf);
-    vm_cap.lo("2030",regi,teNoTransform(te),rlf) = 0.98*p47_cap("2030",regi,te,rlf);
+* $ifthen.himob %cm_REdir_mobil% == "hi_oecd_2030"
+* loop(regi$(p47_REdir_vol(regi) gt 0),
+*     vm_cap.lo("2030",regi,teVRE(te),rlf) = 0.98*p47_cap("2030",regi,te,rlf);
+*     vm_cap.lo("2030",regi,teNoTransform(te),rlf) = 0.98*p47_cap("2030",regi,te,rlf);
 
-    vm_cap.lo("2030",regi,teVRE(te),rlf) = 0.98*p47_cap("2030",regi,te,rlf);
-    vm_cap.lo("2030",regi,teNoTransform(te),rlf) = 0.98*p47_cap("2030",regi,te,rlf);
+*     vm_cap.lo("2030",regi,teVRE(te),rlf) = 0.98*p47_cap("2030",regi,te,rlf);
+*     vm_cap.lo("2030",regi,teNoTransform(te),rlf) = 0.98*p47_cap("2030",regi,te,rlf);
 
-    v_costInvTeDir.lo("2030",regi,teVRE(te)) = 0.98*p47_ref_costInvTeDir_RE("2030",regi,te);
-    v_costInvTeDir.lo("2030",regi,teNoTransform(te)) = 0.98*p47_ref_costInvTeDir_RE("2030",regi,te);
+*     v_costInvTeDir.lo("2030",regi,teVRE(te)) = 0.98*p47_ref_costInvTeDir_RE("2030",regi,te);
+*     v_costInvTeDir.lo("2030",regi,teNoTransform(te)) = 0.98*p47_ref_costInvTeDir_RE("2030",regi,te);
 
-    v_costInvTeAdj.lo("2030",regi,teVRE(te)) = 0.98*p47_ref_costInvTeAdj_RE("2030",regi,te);
-    v_costInvTeAdj.lo("2030",regi,teNoTransform(te)) = 0.98*p47_ref_costInvTeAdj_RE("2030",regi,te);
-);
+*     v_costInvTeAdj.lo("2030",regi,teVRE(te)) = 0.98*p47_ref_costInvTeAdj_RE("2030",regi,te);
+*     v_costInvTeAdj.lo("2030",regi,teNoTransform(te)) = 0.98*p47_ref_costInvTeAdj_RE("2030",regi,te);
+* );
 
-$elseif.himob %cm_REdir_mobil% == "hi_oecd_cond"
+$ifthenE.reinvest sameas("%cm_REdir_mobil%","hi_oecd_cond")or(sameas("%cm_REdir_mobil%","hi_oecd_cond_2030"))
 loop(regi$(p47_REdir_vol(regi) gt 0),
     loop(ttot$(ttot.val ge cm_startyear and ttot.val lt %cm_ppca_deadline%),
 * vm_cap.lo(ttot,regi,teVRE(te),rlf) = p47_cap(ttot,regi,te,rlf);
@@ -89,7 +89,8 @@ loop(regi$(p47_REdir_vol(regi) gt 0),
     );
 );
 
-$endif.himob
+$endif.reinvest
+* $endif.himob
 
 $endif.REdirect
 

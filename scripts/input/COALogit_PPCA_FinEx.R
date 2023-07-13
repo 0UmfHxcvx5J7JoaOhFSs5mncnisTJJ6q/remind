@@ -7,6 +7,7 @@ COALogit_PPCA_FinEx <- function(refgdx, recovery, size, PPCA_pol, oecd, nonoecd,
   require(scales, quietly = TRUE,warn.conflicts =FALSE)
   require(readxl, quietly = TRUE,warn.conflicts =FALSE)
   require(countrycode, quietly = TRUE,warn.conflicts =FALSE)
+  require(ggnewscale, quietly = TRUE,warn.conflicts =FALSE)
   
   # Set configuration specific to snapshot of input data used in publication 
   if (!is.null(rev)) cachedir <- paste0("/p/projects/rd3mod/inputdata/cache/",rev)
@@ -920,19 +921,21 @@ COALogit_PPCA_FinEx <- function(refgdx, recovery, size, PPCA_pol, oecd, nonoecd,
             getYears(out) <- NULL
             weight_out <- dimSums(weight[,getYears(weight)>="y2050",],dim=2)
 
-            # Return status update of top 10 nonOECD coal countries
-            write.csv(current_nonoecd %>% 
-                        left_join(OECD %>% 
-                                mutate(accession_prob_2025 = accession_prob, 
-                                        share_2025 = share, 
-                                        gen_2025 = as.numeric(coalgen_2025_c)) %>% 
-                                select(country, share_2025, accession_prob_2025, gen_2025), by = "country") %>% 
-                        left_join(nonOECD %>% 
-                                mutate(accession_prob_2045 = accession_prob, 
-                                        gen_2045 = as.numeric(coalgen_2045_c[,2045,]),
-                                        elgen_2045 = as.numeric(totalgen_2045_c[,2045,])) %>% 
-                                select(country, share_2045, accession_prob_2045, gen_2045, elgen_2045), by = "country"),
-                      file = paste0(outputfolder,"/nonoecd_top10_status.csv"))
+            if (!grepl("current", size)) {
+                # Return status update of top 10 nonOECD coal countries
+                write.csv(current_nonoecd %>% 
+                            left_join(OECD %>% 
+                                    mutate(accession_prob_2025 = accession_prob, 
+                                            share_2025 = share, 
+                                            gen_2025 = as.numeric(coalgen_2025_c)) %>% 
+                                    select(country, share_2025, accession_prob_2025, gen_2025), by = "country") %>% 
+                            left_join(nonOECD %>% 
+                                    mutate(accession_prob_2045 = accession_prob, 
+                                            gen_2045 = as.numeric(coalgen_2045_c[,2045,]),
+                                            elgen_2045 = as.numeric(totalgen_2045_c[,2045,])) %>% 
+                                    select(country, share_2045, accession_prob_2045, gen_2045, elgen_2045), by = "country"),
+                        file = paste0(outputfolder,"/nonoecd_top10_status.csv"))
+            }
         }else {
             out <- coalshare_2030
             for (country in map$CountryCode[which(!(map$CountryCode %in% c(oecd_members,nonoecd_members)))]) {
@@ -943,15 +946,17 @@ COALogit_PPCA_FinEx <- function(refgdx, recovery, size, PPCA_pol, oecd, nonoecd,
             getYears(out) <- NULL
             weight_out <- dimSums(weight[,getYears(weight)>="y2030",],dim=2)
 
-            # Return status update of top 10 OECD coal countries
-            write.csv(current_oecd_top10 %>% 
-                        left_join(OECD %>% 
-                                mutate(accession_prob_2025 = accession_prob, 
-                                        share_2025 = share, 
-                                        gen_2025 = as.numeric(coalgen_2025_c),
-                                        elgen_2025 = as.numeric(totalgen_2025_c[,2025,])) %>% 
-                                select(country, share_2025, accession_prob_2025, gen_2025, elgen_2025), by = "country"),
-                      file = paste0(outputfolder,"/oecd_top10_status.csv"))            
+            if (!grepl("current", size)) {
+                # Return status update of top 10 OECD coal countries
+                write.csv(current_oecd_top10 %>% 
+                            left_join(OECD %>% 
+                                    mutate(accession_prob_2025 = accession_prob, 
+                                            share_2025 = share, 
+                                            gen_2025 = as.numeric(coalgen_2025_c),
+                                            elgen_2025 = as.numeric(totalgen_2025_c[,2025,])) %>% 
+                                    select(country, share_2025, accession_prob_2025, gen_2025, elgen_2025), by = "country"),
+                        file = paste0(outputfolder,"/oecd_top10_status.csv"))            
+            }
         }
         
         # Assign phase-out stringency based on coal demand type (for compatibility with REMIND bounds)

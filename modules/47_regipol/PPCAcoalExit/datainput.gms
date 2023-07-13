@@ -6,6 +6,46 @@
 *** |  Contact: remind@pik-potsdam.de
 *** SOF ./modules/47_regipol/PPCAcoalExit/datainput.gms
 
+*** Enable rapid early retirement in initial timestep if indicated by Global Coal Plant Tracker data
+pm_regiEarlyRetiRate("2020",regi,coalElTeNoCCS)$(p47_coalCapCOVID("2025",regi,"%cm_COVID_coal_scen%") le (0.55 * p_PE_histCap("2020",regi,"pecoal","seel"))) = 0.16;
+
+*** more coal plant retirement possible for OECD members who join the PPCA and must phase out coal by 2030
+$ifthen.oecd %cm_PPCA_OECD% == "on"
+$ifthen.pol %cm_PPCA_pol% == "power"
+  pm_regiEarlyRetiRate("2025",regi,coalElTeNoCCS)$(p47_max_coal_el_share_oecd(regi) lt 0.25 AND p47_max_coal_el_share_oecd(regi) gt 0) = 0.2;
+$elseif.pol %cm_PPCA_pol% == "demand"
+  pm_regiEarlyRetiRate("2025",regi,coalNonSolTe)$(p47_max_coal_dem_share_oecd(regi,"demand") lt 0.25 AND p47_max_coal_dem_share_oecd(regi,"demand") gt 0) = 0.2;
+  pm_regiEarlyRetiRate("2025",regi,"coaltr")$(p47_max_coal_dem_share_oecd(regi,"solids") lt 0.25 AND p47_max_coal_dem_share_oecd(regi,"solids") gt 0) = 0.2;
+$endif.pol
+$endif.oecd
+
+
+*** Read in variables from reference and upstream (DPE) scenarios
+Execute_Loadpoint 'input_ref' p47_prodSe = vm_prodSe.l;
+Execute_Loadpoint 'input_ref' p47_demFeSector = vm_demFeSector.l;
+
+$ifthenE.reinvest sameas("%cm_REdir_mobil%","hi_oecd_cond")or(sameas("%cm_REdir_mobil%","hi_oecd_cond_2030"))
+Execute_Loadpoint 'input_bau' p47_costTeCapital_bau = vm_costTeCapital.l;
+Execute_Loadpoint 'input_bau' p47_prodSe_bau = vm_prodSe.l;
+Execute_Loadpoint 'input_bau' p47_deltaCap_bau = vm_deltaCap.l;
+Execute_Loadpoint 'input_bau' p47_costInvTeAdj_bau = v_costInvTeAdj.l;
+Execute_Loadpoint 'input_bau' p47_costInvTeDir_bau = v_costInvTeDir.l;
+Execute_Loadpoint 'input_bau' p47_capFac_bau = vm_capFac.l;
+Execute_Loadpoint 'input_bau' p47_pvp = pm_pvp;
+
+Execute_Loadpoint 'input_ref' p47_deltaCap_ref = vm_deltaCap.L;
+
+*** Calculate interest rate from baseline scenario t/(t-1)
+p47_int_rate(ttot) <- (1 - 
+((p47_pvp(ttot,"good")) / (p47_pvp(ttot-1,"good"))) ** 
+(1 / (pm_dt))
+)
+
+
+display p47_deltaCap_bau, p47_prodSe_bau, p47_costTeCapital_bau;
+$endif.reinvest
+
+*** Read scenario-specific PPCA constraints
 $ifthen.finex %cm_pubfinex_pol% == "none"
 parameter p47_coalCapCOVID(tall,all_regi,COV_coal) "2025 coal capacity scenarios based on COVID recovery scenarios"
 /
@@ -73,6 +113,11 @@ $include "./modules/47_regipol/PPCAcoalExit/input/p47_FinEx_REdirect_HI_oecd_nat
 $offdelim
 
 $elseif.mobil %cm_REdir_mobil% == "hi_oecd_cond"
+$ondelim
+$include "./modules/47_regipol/PPCAcoalExit/input/p47_FinEx_REdirect_HI_oecd_nat_mob.cs4r"
+$offdelim
+
+$elseif.mobil %cm_REdir_mobil% == "hi_oecd_cond_2030"
 $ondelim
 $include "./modules/47_regipol/PPCAcoalExit/input/p47_FinEx_REdirect_HI_oecd_nat_mob.cs4r"
 $offdelim
@@ -564,107 +609,6 @@ $endif.recovery12
 
 $endif.polscen2
 $endif.phase2
-
-*** Enable rapid early retirement in initial timestep if indicated by Global Coal Plant Tracker data
-pm_regiEarlyRetiRate("2020",regi,coalElTeNoCCS)$(p47_coalCapCOVID("2025",regi,"%cm_COVID_coal_scen%") le (0.55 * p_PE_histCap("2020",regi,"pecoal","seel"))) = 0.16;
-
-*** more coal plant retirement possible for OECD members who join the PPCA and must phase out coal by 2030
-$ifthen.oecd %cm_PPCA_OECD% == "on"
-$ifthen.pol %cm_PPCA_pol% == "power"
-  pm_regiEarlyRetiRate("2025",regi,coalElTeNoCCS)$(p47_max_coal_el_share_oecd(regi) lt 0.25 AND p47_max_coal_el_share_oecd(regi) gt 0) = 0.2;
-$elseif.pol %cm_PPCA_pol% == "demand"
-  pm_regiEarlyRetiRate("2025",regi,coalNonSolTe)$(p47_max_coal_dem_share_oecd(regi,"demand") lt 0.25 AND p47_max_coal_dem_share_oecd(regi,"demand") gt 0) = 0.2;
-  pm_regiEarlyRetiRate("2025",regi,"coaltr")$(p47_max_coal_dem_share_oecd(regi,"solids") lt 0.25 AND p47_max_coal_dem_share_oecd(regi,"solids") gt 0) = 0.2;
-$endif.pol
-$endif.oecd
-
-
-*** Read in variables from reference and upstream (DPE) scenarios
-Execute_Loadpoint 'input_ref' p47_prodSe = vm_prodSe.l;
-Execute_Loadpoint 'input_ref' p47_demFeSector = vm_demFeSector.l;
-
-$ifthen.cond %cm_REdir_mobil% == "hi_oecd_cond"
-Execute_Loadpoint 'input_bau' p47_costTeCapital_bau = vm_costTeCapital.l;
-Execute_Loadpoint 'input_bau' p47_prodSe_bau = vm_prodSe.l;
-Execute_Loadpoint 'input_bau' p47_deltaCap_bau = vm_deltaCap.l;
-Execute_Loadpoint 'input_bau' p47_costInvTeAdj_bau = v_costInvTeAdj.l;
-Execute_Loadpoint 'input_bau' p47_costInvTeDir_bau = v_costInvTeDir.l;
-Execute_Loadpoint 'input_bau' p47_capFac_bau = vm_capFac.l;
-
-Execute_Loadpoint 'input_ref' p47_deltaCap_ref = vm_deltaCap.L;
-display p47_deltaCap_bau, p47_prodSe_bau, p47_costTeCapital_bau;
-
-*** OPEX on coal power plants in reference scenario 
-* p47_ref_coal_opex(regi)$(p47_REdir_vol(regi)) =
-* sum(
-* * $ifthenE.himob sameas("%cm_REdir_mobil%","hi_oecd_2030")or(sameas("%cm_REdir_mobil%","hi_oecd_cond"))
-*   ttot$(ttot.val ge 2025 and ttot.val le 2030),
-* * $else.himob
-* * ttot$(ttot.val eq 2025),
-* * $endif.himob
-*    sum(te2rlf(coalElTeNoCCS,rlf), 
-*     pm_ts(ttot)
-*     * (pm_data(regi,"omf",coalElTeNoCCS)   
-*         * (p47_costTeCapital_bau(ttot,regi,coalElTeNoCCS) 
-*             * p47_deltaCap_bau(ttot,regi,coalElTeNoCCS,rlf) )
-*       )
-*       + pm_data(regi,"omv",coalElTeNoCCS)
-*       * sum(opTimeYr2te(coalElTeNoCCS,opTimeYr)$(tsu2opTimeYr(ttot,opTimeYr) AND (opTimeYr.val gt 1) ),
-*         pm_omeg(regi,opTimeYr+1,coalElTeNoCCS)
-*           * p47_deltaCap_bau(ttot,regi,coalElTeNoCCS,rlf) 
-*           * p47_capFac_bau(ttot+(pm_tsu2opTimeYr(ttot,opTimeYr)-1),regi,coalElTeNoCCS)  
-*         )
-*       )
-*     )
-* ;
-
-* p47_ref_coal_fuelcost(regi)$(p47_REdir_vol(regi)) =
-* sum(ttot$(ttot.val ge 2025 and ttot.val le 2030),
-*   sum(opTimeYr2te(teEtaConst(coalElTeNoCCS),opTimeYr)$(tsu2opTimeYr(ttot,opTimeYr) AND (opTimeYr.val gt 1) ),
-*     pm_PEPrice(ttot+(pm_tsu2opTimeYr(ttot,opTimeYr)-1),regi,"pecoal") 
-*     * (sum(teSe2rlf(coalElTeNoCCS,rlf),
-*           p47_capFac_bau(ttot+(pm_tsu2opTimeYr(ttot,opTimeYr)-1),regi,coalElTeNoCCS) 
-*           * pm_omeg(regi,opTimeYr+1,coalElTeNoCCS)
-*           * p47_deltaCap_bau(ttot,regi,coalElTeNoCCS,rlf) 
-*           / pm_eta_conv(ttot,regi,coalElTeNoCCS) )
-*        ) 
-*     )
-*     + 
-*     sum(opTimeYr2te(teEtaIncr(coalElTeNoCCS),opTimeYr)$(tsu2opTimeYr(ttot,opTimeYr) AND (opTimeYr.val gt 1) ),
-*         pm_PEPrice(ttot+(pm_tsu2opTimeYr(ttot,opTimeYr)-1),regi,"pecoal") 
-*         * sum(teSe2rlf(coalElTeNoCCS,rlf),
-*             p47_capFac_bau(ttot+(pm_tsu2opTimeYr(ttot,opTimeYr)-1),regi,coalElTeNoCCS) 
-*             * pm_omeg(regi,opTimeYr+1,coalElTeNoCCS)
-*             * p47_deltaCap_bau(ttot,regi,coalElTeNoCCS,rlf) 
-* * - vm_deltaCap.L(ttot,regi,coalElTeNoCCS,rlf))
-*                 / pm_dataeta(ttot,regi,coalElTeNoCCS) )
-*       )
-*     )
-* ;
-
-* p47_REdir_opex(regi)$(p47_REdir_vol(regi) and (p47_deltaCap_bau("2025",regi,"pc","1") or p47_deltaCap_bau("2025",regi,"igcc","1") or p47_deltaCap_bau("2025",regi,"coalchp","1"))) =
-* sum(ttot$(ttot.val ge 2025 and ttot.val le 2030),
-*     sum(te2rlf(teVRE,rlf),
-*       pm_ts(ttot) *  
-*       (pm_data(regi,"omf",teVRE) 
-*       * (vm_costTeCapital.L(ttot,regi,teVRE) 
-*           * vm_deltaCap.L(ttot,regi,teVRE,rlf) 
-*         - p47_costTeCapital_bau(ttot,regi,teVRE)
-*           * p47_deltaCap_bau(ttot,regi,teVRE,rlf)) )
-*       + 
-*       pm_data(regi,"omv",teVRE)
-*       * sum(opTimeYr2te(teVRE,opTimeYr)$(tsu2opTimeYr(ttot,opTimeYr) AND (opTimeYr.val gt 1) AND pm_dataeta(ttot,regi,teVRE) gt 0),
-*           p47_capFac_bau(ttot+(pm_tsu2opTimeYr(ttot,opTimeYr)-1),regi,teVRE) 
-*           * pm_dataren(regi,"nur",rlf,teVRE)
-*           * pm_omeg(regi,opTimeYr+1,teVRE)
-*           * (vm_deltaCap.L(ttot,regi,teVRE,rlf) 
-*             - p47_deltaCap_bau(ttot,regi,teVRE,rlf) ) 
-*             / pm_eta_conv(ttot,regi,teVRE) )
-*       )
-*     )
-* ;
-
-$endif.cond
 
 
 *** EOF ./modules/47_regipol/PPCAcoalExit/datainput.gms

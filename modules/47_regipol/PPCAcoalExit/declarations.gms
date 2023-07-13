@@ -71,7 +71,7 @@ equations
 q47_REdirect(all_regi)
 ;
 
-$ifthen.reinvest %cm_REdir_mobil% == "hi_oecd_cond"
+$ifthenE.reinvest sameas("%cm_REdir_mobil%","hi_oecd_cond")or(sameas("%cm_REdir_mobil%","hi_oecd_cond_2030"))
 variables
 v47_ref_coal_opex(all_regi)
 v47_ref_coal_fuelcost(all_regi)
@@ -89,6 +89,8 @@ p47_deltaCap_ref(tall,all_regi,all_te,rlf)
 p47_capFac_bau(tall,all_regi,all_te)
 p47_costInvTeDir_bau(ttot,all_regi,all_te)                                  "RE direct investment volume in static PPCA scenario"
 p47_costInvTeAdj_bau(ttot,all_regi,all_te)                                  "RE adjustment cost investment volume in static PPCA scenario"
+p47_int_rate(ttot)
+p47_pvp(ttot,all_enty)
 ;
 
 equations
