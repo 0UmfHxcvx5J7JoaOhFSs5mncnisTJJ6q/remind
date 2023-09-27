@@ -87,3 +87,5 @@ calibration_results/
 
 # ignore test logs
 tests/test-full*.log
+
+/old_output/
