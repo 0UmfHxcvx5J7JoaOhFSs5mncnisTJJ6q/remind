@@ -334,7 +334,7 @@ $endif.process_based_steel
   /
 
   
- fe_tax_sub37(all_in,all_in)  "correspondence between tax and subsidy input data resolution and model sectoral resolution"
+  fe_tax_sub37(all_in,all_in)  "correspondence between tax and subsidy input data resolution and model sectoral resolution"
   /
     fesoi . (feso_cement, feso_chemicals, feso_steel, feso_otherInd)
     fehoi . (feli_cement, feli_chemicals, feli_steel, feli_otherInd)
@@ -346,30 +346,33 @@ $endif.process_based_steel
              feelwlth_otherInd)
   /
 
-energy_limits37(all_in,all_in)   "thermodynamic limit of energy"
+  energy_limits37(all_in,all_in)   "thermodynamic limit of energy"
   /
     ue_cement          . en_cement
     ue_steel_primary   . en_steel_primary
     ue_steel_secondary . feel_steel_secondary
   /
 
-entyFECC37(all_enty)  "FE carriers in industry which can be used for CO2 capture"
+  entyFECC37(all_enty)  "FE carriers in industry which can be used for CO2 capture"
   /
     fesos
     fehos
     fegas
   /
 
-entySE_emiFac_feedstocks(all_enty,all_enty) "SE type of emissions factor that should be used to calculate carbon contained in feedstocks"
-
-/
-  sesofos  . fesos
-  seliqfos . fehos
-  segafos  . fegas
-/
-
-ppfen_MkupCost37(all_in)  "primary production factors in industry on which CES mark-up cost can be levied that are counted as expenses in the macroeconomic budget equation"
+  entySE_emiFac_feedstocks(all_enty,all_enty) "SE type of emissions factor that should be used to calculate carbon contained in feedstocks"
   /
+    sesofos  . fesos
+    seliqfos . fehos
+    segafos  . fegas
+  /
+
+  ppfen_MkupCost37(all_in)  "primary production factors in industry on which CES mark-up cost can be levied that are counted as expenses in the macroeconomic budget equation"
+  /
+  feh2_cement
+  feh2_chemicals
+  feh2_steel
+  feh2_otherInd
   /
 ;
 
