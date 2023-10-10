@@ -1584,35 +1584,6 @@ $setGlobal cm_CESMkup_build  standard  !! def = standard
 $setGlobal cm_CESMkup_ind        standard  !! def = standard
 $setGlobal cm_CESMkup_ind_data   ""        !! def = ""
 
-$setglobal CCS ""
-$setglobal H2 ""
-
-$ifthen "%CCS%" == "def"
-$setglobal cm_optimisticMAC 0
-$setglobal cm_industry_CCS_markup "off"
-$elseif "%CCS%" == "opt"
-$setglobal cm_optimisticMAC 1
-$setglobal cm_industry_CCS_markup "off"
-$elseif "%CCS%" == "low"
-$setglobal cm_optimisticMAC 0
-$setglobal cm_industry_CCS_markup 2
-$else
-$abort "Unknown 'CCS' setting: %CCS%"
-$endif
-
-$ifthen "%H2%" == "def"
-$setglobal cm_CESMkup_ind "standard"
-$setglobal cm_inco0Factor "off"
-$elseif "%H2%" == "opt"
-$setglobal cm_CESMkup_ind "feh2_cement 0.43, feh2_chemicals 0.43, feh2_steel 0.1, feh2_otherInd 0.01"
-$setglobal cm_inco0Factor "tdh2s 0.5"
-$elseif "%H2%" == "low"
-$setglobal cm_CESMkup_ind "feh2_cement -0.43, feh2_chemicals -0.43, feh2_steel -0.1, feh2_otherInd -0.01"
-$setglobal cm_inco0Factor "tdh2s 2"
-$else
-$abort "Unknown 'H2' setting: %H2%"
-$endif
-
 *** cm_feShareLimits <-   "off"  # def <- "off", limit the electricity final energy share to be in line with the industry maximum electrification levels (60% by 2050 in the electric scenario), 10% lower (=50% in 2050) in an increased efficiency World, or 20% lower (40% in 2050) in an incumbents future (incumbents). The incumbents scenario also limits a minimal coverage of buildings heat provided by gas and liquids (25% by 2050).
 $setglobal cm_feShareLimits  off  !! def = off
 *** VRE potential switches
