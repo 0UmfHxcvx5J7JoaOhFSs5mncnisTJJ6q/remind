@@ -19,6 +19,8 @@ $endif
 
 pm_taxCO2eq(ttot,regi)$(ttot.val ge 2005) = p45_tau_co2_tax(ttot,regi);
 
+execute_load "input_ref.gdx", pm_taxCO2eq;
+
 else
   pm_taxCO2eq(ttot,regi)$(ttot.val ge 2005) = 0;
 abort "Error: Please set cm_emiscen to 9";
