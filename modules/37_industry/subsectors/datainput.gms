@@ -464,7 +464,7 @@ pm_tau_ces_tax(t,regi,"feh2_otherInd")  = 0.01;
 $elseif.CESMkup "%cm_CESMkup_ind%" == "ELopt"
 loop (fe2ppfen37(fety,in),
   pm_tau_ces_tax(ttot,regi,in)
-  = 0.43
+  = %cm_CESMkup_ind_data%
   * ( 1$(     sameas(fety,"feels") )
     - 1$( NOT sameas(fety,"feels") )
     );
@@ -472,7 +472,7 @@ loop (fe2ppfen37(fety,in),
 $elseif.CESMkup "%cm_CESMkup_ind%" == "H2opt_ELopt%"
 loop (fe2ppfen37(fety,in),
   pm_tau_ces_tax(ttot,regi,in)
-  = 0.43
+  = %cm_CESMkup_ind_data%
   * ( 1$(     sameas(fety,"feels") )
     - 1$( NOT sameas(fety,"feels") )
     );
