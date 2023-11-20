@@ -103,4 +103,5 @@ system(paste('tar --create --gzip --file',
 file.copy(sub('_remind.tgz$', '_validationremind.tgz', idr_tar),
           sub('^.*(rev[0-9\\.]+)_([0-9a-f]{8})_remind.tgz',
               'calibration_results/\\1-lowEn-mod_\\2_validationremind.tgz',
-              idr_tar))
+              idr_tar),
+          overwrite = TRUE)
