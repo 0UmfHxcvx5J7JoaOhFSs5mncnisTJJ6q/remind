@@ -1,4 +1,5 @@
 library(tidyverse)
+library(assertr)
 
 base_path <- '/p/projects/rd3mod/inputdata/output/rev6.60'
 idr_tar <- list.files(dirname(base_path),
@@ -58,17 +59,22 @@ write_csv(
         fe_data %>%
             filter(
                 'gdp_SSP2EU' == scenario,
-                grepl('^(ue|fe.*)_(cement|chemcials|steel|otherInd)', pf)) %>%
+                grepl('^(ue|fe.*)_(cement|chemicals|steel|otherInd)', pf)) %>%
             extract('pf', c(NA, 'subsector'), '^(ue|fe[^_]+)_([^_]+).*',
                     remove = FALSE) %>%
             full_join(lambda, c('t', 'subsector')) %>%
+            assert(not_na, everything()) %>%
             mutate(value = value * lambda) %>%
             select(-lambda, -subsector),
 
         fe_data %>%
             filter(  'gdp_SSP2EU' != scenario
-                   | !grepl('^(ue|fe.*)_(cement|chemcials|steel|otherInd)', pf))
-    ),
+                   | !grepl('^(ue|fe.*)_(cement|chemicals|steel|otherInd)', pf))
+    ) %>%
+    group_by(t, regi, scenario, pf) %>%
+    mutate(count = n()) %>%
+    verify(1 == count) %>%
+    select(-count),
     file = fe_file, append = TRUE, col_names = FALSE)
 
 write_lines(
@@ -83,14 +89,24 @@ write_csv(
             filter('gdp_SSP2EU' == scenario,
                    grepl('^kap_(cement|chemicals|steel|otherInd)', pf)) %>%
             extract('pf', 'subsector', '^kap_([^_]+).*', remove = FALSE) %>%
-            full_join(lambda, c('t', 'subsector')) %>%
+            full_join(
+                lambda %>%
+                    semi_join(kap_data, 't'),
+
+                c('t', 'subsector')
+            ) %>%
+            assert(not_na, everything()) %>%
             mutate(value = value * lambda) %>%
             select(-lambda, -subsector),
 
         kap_data %>%
             filter(  'gdp_SSP2EU' != scenario
-                   | !grepl('^kap_(cement|chemcials|steel|otherInd)', pf))
-    ),
+                   | !grepl('^kap_(cement|chemicals|steel|otherInd)', pf))
+    ) %>%
+    group_by(t, regi, scenario, pf) %>%
+    mutate(count = n()) %>%
+    verify(1 == count) %>%
+    select(-count),
     file = kap_file, append = TRUE, col_names = FALSE)
 
 system(paste('tar --create --gzip --file',
