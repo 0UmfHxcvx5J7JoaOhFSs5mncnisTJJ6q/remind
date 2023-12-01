@@ -455,7 +455,7 @@ pm_tau_ces_tax(t,regi,"feh2_steel")     =  50 * sm_TWa_2_MWh * 1e-12;
 pm_tau_ces_tax(t,regi,"feh2_cement")    = 100 * sm_TWa_2_MWh * 1e-12;
 
 
-*' overwrite or extent CES markup cost if specified by switch
+*' overwrite or extend CES markup cost if specified by switch
 $ifthen.CESMkup "%cm_CESMkup_ind%" == "manual"
 loop (ppfen_industry_dyn37(in)$( p37_CESMkup_input(in) ),
   p37_CESMkup(ttot,regi,in)$( ppfen_MkupCost37(in) )
@@ -477,7 +477,7 @@ loop (fe2ppfen37(entyFE,in),
     - 1$( NOT sameas(entyFE,"feels") )
     );
 );
-$elseif.CESMkup "%cm_CESMkup_ind%" == "H2opt_ELopt%"
+$elseif.CESMkup "%cm_CESMkup_ind%" == "H2opt_ELopt"
 loop (fe2ppfen37(entyFE,in),
   pm_tau_ces_tax(ttot,regi,in)
   = %cm_CESMkup_ind_data%
