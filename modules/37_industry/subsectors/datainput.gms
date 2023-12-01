@@ -452,19 +452,19 @@ pm_tau_ces_tax(t,regi,"feh2_chemicals") = 0.43;
 pm_tau_ces_tax(t,regi,"feh2_steel")     = 0.10;
 pm_tau_ces_tax(t,regi,"feh2_otherInd")  = 0.01;
 $elseif.CESMkup "%cm_CESMkup_ind%" == "ELopt"
-loop (fe2ppfen37(fety,in),
+loop (fe2ppfen37(entyFE,in),
   pm_tau_ces_tax(ttot,regi,in)
   = %cm_CESMkup_ind_data%
-  * ( 1$(     sameas(fety,"feels") )
-    - 1$( NOT sameas(fety,"feels") )
+  * ( 1$(     sameas(entyFE,"feels") )
+    - 1$( NOT sameas(entyFE,"feels") )
     );
 );
 $elseif.CESMkup "%cm_CESMkup_ind%" == "H2opt_ELopt%"
-loop (fe2ppfen37(fety,in),
+loop (fe2ppfen37(entyFE,in),
   pm_tau_ces_tax(ttot,regi,in)
   = %cm_CESMkup_ind_data%
-  * ( 1$(     sameas(fety,"feels") )
-    - 1$( NOT sameas(fety,"feels") )
+  * ( 1$(     sameas(entyFE,"feels") )
+    - 1$( NOT sameas(entyFE,"feels") )
     );
 );
 pm_tau_ces_tax(t,regi,"feh2_cement")    = 0.43;
