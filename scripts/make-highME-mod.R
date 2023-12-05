@@ -1,7 +1,7 @@
 library(tidyverse)
 library(assertr)
 
-base_path <- '/p/projects/rd3mod/inputdata/output/rev6.60'
+base_path <- '/p/projects/rd3mod/inputdata/output/rev6.607'
 idr_tar <- list.files(dirname(base_path),
                       paste0(basename(base_path), '_62eff8f7_remind.tgz$'),
                       full.names = TRUE)
