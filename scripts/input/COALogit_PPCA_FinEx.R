@@ -24,7 +24,40 @@ COALogit_PPCA_FinEx <- function(refgdx, recovery, size, PPCA_pol, oecd, nonoecd,
   ###########################################
   pol_threshold <- 0.2      # REMIND regions only enforce the policy if its member nations comprise over a threshold share of regional energy and electricity demand
   leakage_allowance <- 1.5  # Freeriders in multi-national regions can increase coal consumption by 50% above reference
-  p <- c(0.95, 0.5, 0.05)   # Probability thresholds for coalition accession 
+
+    size <- ifelse(size=="1p", "95p",
+            ifelse(size=="2p", "50p",
+                    ifelse(size=="3p", "5p", size)))
+
+  if (size=="current") {
+    phase <- c("OECD","nonOECD")
+    timestep <- 2015
+  }else {
+    scen_prob <- as.numeric(gsub('p', '', size)) / 100
+    if (grepl("50CI",uncertainty))  p <- c(.25, scen_prob, 0.75)             # Probability thresholds for coalition accession
+    else if (grepl("33CI",uncertainty))  p <- c(.33, scen_prob, 0.67)
+    else if (grepl("60CI",uncertainty))  p <- c(0.2, scen_prob, 0.8)
+    else if (grepl("70CI",uncertainty))  p <- c(0.15, scen_prob, 0.85)
+    else if (grepl("90CI",uncertainty))  p <- c(0.05, scen_prob, 0.95)
+    else if (uncertainty=="10step")      p <- seq(10,90,10) / 100
+    else if (uncertainty=="5step")      p <- seq(10,90,20) / 100
+    else  p <- c(0.05, scen_prob, 0.95)
+    
+    print("probs")
+    print(p)
+
+    print("scen_prob")
+    print(scen_prob)
+    
+    if (nonoecd=="on") {
+        phase <- "nonOECD"
+        timestep <- 2050
+    }else if (oecd=="on") {
+        phase <- "OECD"
+        timestep <- 2025
+    }
+  }
+
   EJ_2_TWh <- 277777.77778
 
   ### Demand-exit analysis runs in three stages to control non-solid coal demand, solid coal demand, and metallurgical coal demand
@@ -36,21 +69,8 @@ COALogit_PPCA_FinEx <- function(refgdx, recovery, size, PPCA_pol, oecd, nonoecd,
     stop("Invalid policy type given for cm_PPCA_pol! Current options are demand and power.")
   }
 
-  if (size=="current") {
-    phase <- c("OECD","nonOECD")
-    timestep <- 2015
-  }else if (nonoecd=="on") {
-    phase <- "nonOECD"
-    timestep <- 2045
-  }else if (oecd=="on") {
-    phase <- "OECD"
-    timestep <- 2025
-  }
-
-#   if (grepl("_2030",mob))  mob <- gsub("_2030","",mob)
-
   ## Neutral Covid recovery is named BAU in previously written functions (e.g. mrremind:::readGCPT)
-  if (recovery=="Neutral")  recovery <- "BAU"
+  if (recovery=="BAU")  recovery <- "Neutral"
   
   if (is.null(run)) {
     mif <- strsplit(strsplit(refgdx,"output/",fixed=T)[[1]][2],"_202[0-9]",fixed=F)[[1]][1]
@@ -133,7 +153,7 @@ COALogit_PPCA_FinEx <- function(refgdx, recovery, size, PPCA_pol, oecd, nonoecd,
         
         if (is.null(recovery)) {
             recovery <- gsub(".mif","",strsplit(run,"-")[[1]][length(strsplit(run,"-")[[1]])])
-            if (!(recovery %in% c("BAU","Brown","Green"))) {
+            if (!(recovery %in% c("Neutral","Brown","Green"))) {
             recovery <- "none"
             }
         }
@@ -255,31 +275,18 @@ COALogit_PPCA_FinEx <- function(refgdx, recovery, size, PPCA_pol, oecd, nonoecd,
         }else {
             if (grepl("REdirect", fin_pol, ignore.case = T) | grepl("FinEx", fin_pol, ignore.case = T)) {
                 coalgen_2025_R <- rundata[, "y2025", "SE|Electricity|Coal (EJ/yr)"]
-                print("\ncoalgen_2025_R: ")
-                print(coalgen_2025_R)
                 
                 coalgen_2025_R <- magpiesort(
                     toolAggregate(coalgen_2025_R[-which(getItems(dim = 1,  x = coalgen_2025_R)=="GLO"),,], map, NULL)
                 )
-                print("\nDisaggregated coalgen_2025_R: ")
-                print(coalgen_2025_R)
-
-                finEx_cap_2025_c <- readGCPT_finEx(subtype = "G20_FinEx_2021")[,,recovery]
-                print("\nfinEx_cap_2025_R: ")
-                print(toolAggregate(finEx_cap_2025_c,map,NULL))    
+                finEx_cap_2025_c <- readGCPT_finEx(subtype = "G20_FinEx_2022")[,,recovery]
                            
                 finEx_cap_2025_R <- toolAggregate(toolAggregate(finEx_cap_2025_c,map,NULL),map,NULL)
-                print("\nDisaggregated finEx_cap_2025_R: ")
-                print(finEx_cap_2025_R)
 
                 finEx_coalgen_2025_c <- finEx_cap_2025_c * loadfactor_c[,2025,] * (365*24) / EJ_2_TWh 
                 finEx_coalgen_2025_R <- toolAggregate(toolAggregate(finEx_coalgen_2025_c,map,NULL),map,NULL)
-                print("\nfinEx_coalgen_2025_R")
-                print(finEx_coalgen_2025_R)
 
                 diff_REdir_coalgen_R <- finEx_coalgen_2025_R - coalgen_2025_R
-                print("\ndiff_REdir_coalgen_R")
-                print(diff_REdir_coalgen_R)
 
                 if (mob == "none" | mob == "OECD") {
                     mobil <- "oecd"
@@ -294,9 +301,7 @@ COALogit_PPCA_FinEx <- function(refgdx, recovery, size, PPCA_pol, oecd, nonoecd,
                 redir_R <- toolAggregate(toolAggregate(redir_c, map, NULL), map, NULL)
 
                 redir_share_c <- replace_non_finite(redir_c / redir_R, replace = 0)
-                print("\nredir_share_c")
-                print(redir_share_c)
-                        
+                       
                 coalgen_2025_c <- finEx_coalgen_2025_c - (redir_share_c * diff_REdir_coalgen_R)
                 print("\ncoalgen_2025_c after REdir:")
                 print(coalgen_2025_c)
@@ -307,7 +312,7 @@ COALogit_PPCA_FinEx <- function(refgdx, recovery, size, PPCA_pol, oecd, nonoecd,
 
             # Cases with fixed 2025 capacity due to Covid recovery or FinEx scenario
             # }else if (fin_pol=="FinEx") {
-            #     cap_2025_c <- readGCPT_finEx(subtype = "G20_FinEx_2021")[,,recovery]
+            #     cap_2025_c <- readGCPT_finEx(subtype = "G20_FinEx_2022")[,,recovery]
             }else {
             # if (fin_pol=="none" | fin_pol=="") {
                 print("fin_pol")
@@ -316,7 +321,7 @@ COALogit_PPCA_FinEx <- function(refgdx, recovery, size, PPCA_pol, oecd, nonoecd,
                 #Read coal capacity data from GCPT for the given COVID recovery scenario
                 # cap_2025_c <- readSource("GCPT",subtype="future2021",convert=F)[,,recovery]
                 # setConfig(cachefolder = "/p/projects/rd3mod/inputdata/cache/default/")
-                cap_2025_c <- readGCPT_finEx(subtype="future2021")[,,recovery]
+                cap_2025_c <- readGCPT_finEx(subtype="future")[,,recovery]
 
                 #Derive 2025 coal generation in exajoules from coal capacity and default REMIND country-level load factor assumptions
                 coalgen_2025_c <- cap_2025_c * loadfactor_c[,2025,] *365*24 / EJ_2_TWh
@@ -417,6 +422,15 @@ COALogit_PPCA_FinEx <- function(refgdx, recovery, size, PPCA_pol, oecd, nonoecd,
             # print(coalgen_2025_c)
             # print("totalgen_2025_c")
             # print(totalgen_2025_c)
+        
+
+        ########################################
+        ########## DEFINE FINEX HOSTS ##########
+        ########################################
+        finex_hosts <- c("AUS", "BGD", "BIH", "BWA", "BRA", "KHM", "EGY", "GEO", "IDN", 
+                            "CIV", "KEN", "LAO", "MWI", "MNG", "MOZ", "NGA", "OMN", "PAK", 
+                            "RUS", "SRB", "ZAF", "LKA", "TZA", "TUR", "UKR", "ARE", "VNM", 
+                            "ZWE", "MMR", "PHL")
 
         if (grepl("current",size)) {
 
@@ -465,9 +479,9 @@ COALogit_PPCA_FinEx <- function(refgdx, recovery, size, PPCA_pol, oecd, nonoecd,
                                     Region=map$RegionCode[order(map$CountryCode)])
 
             current_oecd <- current_status %>% filter(ppca == "Free")
-            current_oecd_top10 <- current_oecd %>% filter(oecd == "OECD") %>% filter(gen %in% tail(sort(gen), 10))
+            current_oecd_top10 <- current_oecd %>% filter(oecd == "OECD") %>% filter(gen %in% tail(sort(gen), 10) | country %in% finex_hosts)
 
-            current_nonoecd <- current_status %>% filter(accession_prob < 0.5 & oecd == "Non-OECD" & ppca == "Free")
+            current_nonoecd <- current_status %>% filter((accession_prob < scen_prob | country %in% finex_hosts) & oecd == "Non-OECD" & ppca == "Free")
             
             getNames(coalShare_2025_c) <- recovery
             getYears(coalShare_2025_c) <- "y2025"
@@ -486,11 +500,11 @@ COALogit_PPCA_FinEx <- function(refgdx, recovery, size, PPCA_pol, oecd, nonoecd,
             ##########################################
             ### Determine OECD coalition scenarios ###
             ##########################################
-            OECD <- OECD %>% mutate(coalition=ifelse(accession_prob >= p[2] & oecd=="OECD",
+            OECD <- OECD %>% mutate(coalition=ifelse(accession_prob >= scen_prob & oecd=="OECD",
                                                     "50p", "free"))
             # OECD <- OECD %>% mutate(coalition = ifelse(accession_prob >= p[3] & oecd=="OECD",
             #                                         "5p", "free"))
-            # OECD <- OECD %>% mutate(coalition=ifelse(accession_prob >= p[2] & oecd=="OECD",
+            # OECD <- OECD %>% mutate(coalition=ifelse(accession_prob >= scen_prob & oecd=="OECD",
             #                                         "50p", coalition))
             # OECD <- OECD %>% mutate(coalition=ifelse((accession_prob >= p[1] | ppca=="PPCA") & (oecd=="OECD" | Region=="EUR"),
             #                                         "95p", coalition))
@@ -514,6 +528,8 @@ COALogit_PPCA_FinEx <- function(refgdx, recovery, size, PPCA_pol, oecd, nonoecd,
             oecd_members <- as.character(oecd_95p[,1])
             }else if (grepl("5p",size) | grepl("3p",size)) {
             oecd_members <- as.character(oecd_5p[,1])
+            }else {
+            oecd_members <- as.character(oecd_50p[,1])
             }
         }
 
@@ -552,83 +568,126 @@ COALogit_PPCA_FinEx <- function(refgdx, recovery, size, PPCA_pol, oecd, nonoecd,
         coalgen_2050_R <- magpiesort(
             toolAggregate(coalgen_2050_R[-which(getItems(dim = 1,  x = coalgen_2050_R)=="GLO"),,],map,NULL)
         )        
+
+        ########################################################
+        ### For scenarios with two non-OECD accession stages ###
+        ########################################################
+        coalgen_2040_R <- rundata[,getYears(rundata)>="y2040","SE|Electricity|Coal (EJ/yr)"]
+        coalgen_2040_R <- magpiesort(
+            toolAggregate(coalgen_2040_R[-which(getItems(dim = 1,  x = coalgen_2040_R)=="GLO"),,],map,NULL))
+
+        totalgen_2040_R <- rundata[,getYears(rundata)>="y2040","SE|Electricity (EJ/yr)"]
+        totalgen_2040_c <- magpiesort(
+            toolAggregate(totalgen_2040_R[-which(getItems(dim = 1,  x = totalgen_2040_R)=="GLO"),,],map,weight[,getYears(totalgen_2040_R),])
+        )
+
+        # Apply downscale formula to derive 2040 coal generation by country
+        coalshare_2040_c <- downscale_coal(coalgen_2025_c,totalgen_2025_c,coalgen_2025_R,totalgen_2025_R,coalgen_2040_R,totalgen_2040_R)
+
+        coalgen_2040_c <- coalshare_2040_c * totalgen_2040_c
+
+        ######################################################
+        ################ NON-OECD 2040 LOGIT #################
+        ######################################################
+        if (grepl("nonoecd", refgdx)) {
+            logit2040 <- data.frame(country=sort(map$CountryCode),
+                                oecd=as.character(oecd_map),
+                                ppca=as.character(ppca_map),
+                                share_2040=as.numeric(coalshare_2040_c[,2040,]),
+                                gdp=as.numeric(gdppc[,2040,])) %>%
+                        ### Run logit model on 2045 data to get non-OECD nations' accession probabilities ###
+                        mutate(accession_prob = predict(object = logit_model, 
+                                                        newdata = data.frame(Coal.Share=share_2040,GDP.PC=gdp),
+                                                        type = "response"),
+                            Region=map$RegionCode[order(map$CountryCode)])
+
+        }
         ##################################################
         ### 2045 COAL SHARE IN ELECTRICITY CALCULATION ###
         ##################################################
-        logit_coalgen_2030_c <- coalgen_2030_c[,"y2030",]
+        logit_coalgen_2040_c <- coalgen_2040_c[,"y2040",]
         for (reg in unique(map$RegionCode)) {
+            if (grepl("nonoecd", refgdx)) {
+                reg_2040_members <- filter(logit2040, accession_prob >= 0.5)$country   #nonOECD members that joined the PPCA in the upstream 2040 scenario
+            }else {
+                reg_2040_members <- NULL
+            }
             reg_oecd_members <- map$CountryCode[which(map$CountryCode %in% oecd_members & map$RegionCode==reg)]
             reg_all <- map$CountryCode[which(map$RegionCode==reg)]
-            reg_freeriders <- setdiff(reg_all,reg_oecd_members)
-            reg_nonzero_freeriders <- getItems(dim = 1,  x = logit_coalgen_2030_c[reg_freeriders,,])[which(logit_coalgen_2030_c[reg_freeriders,,]>0)]
+            reg_freeriders <- setdiff(reg_all,c(reg_oecd_members, reg_2040_members))
+            reg_nonzero_freeriders <- getItems(dim = 1,  x = logit_coalgen_2040_c[reg_freeriders,,])[which(logit_coalgen_2040_c[reg_freeriders,,]>0)]
             
-            # Set OECD PPCA members' 2030 coal share to 0
-            logit_coalgen_2030_c[reg_oecd_members,,] <- 0 
+            # Set OECD PPCA members' 2040 coal share to 0
+            logit_coalgen_2040_c[reg_oecd_members,,] <- 0 
+
+            #Set nonOECD members that joined the PPCA in the upstream scenario to 0
+            logit_coalgen_2040_c[reg_2040_members,,] <- 0 
             
             ## If there are both OECD PPCA members and freeriders in the region, distribute the PPCA members' coal to the freeriders
-            if (length(reg_oecd_members) & length(reg_nonzero_freeriders)) {
+            if (length(c(reg_oecd_members, reg_2040_members)) & length(reg_nonzero_freeriders)) {
             # Each country's share of the region's total electricity generation
-            reg_normalized <- totalgen_2030_c[reg_all,"y2030",] / as.numeric(totalgen_2030_R[reg,2030,])
+            reg_normalized <- totalgen_2040_c[reg_all,"y2040",] / as.numeric(totalgen_2040_R[reg,2040,])
 
             # Each nonzero freerider's share of all nonzero freeriders' total electricity generation
-            reg_normalized_nzfree <- totalgen_2030_c[reg_nonzero_freeriders,"y2030",] / as.numeric(totalgen_2030_R[reg,2030,])
+            reg_normalized_nzfree <- totalgen_2040_c[reg_nonzero_freeriders,"y2040",] / as.numeric(totalgen_2040_R[reg,2040,])
 
-            logit_coalgen_2030_c[reg_nonzero_freeriders,,] <- logit_coalgen_2030_c[reg_nonzero_freeriders,,] + 
-                as.numeric(dimSums(coalgen_2030_c[reg_oecd_members,"y2030",]-logit_coalgen_2030_c[reg_oecd_members,,],dim=1)) * reg_normalized_nzfree
+            logit_coalgen_2040_c[reg_nonzero_freeriders,,] <- logit_coalgen_2040_c[reg_nonzero_freeriders,,] + 
+                as.numeric(dimSums(coalgen_2040_c[c(reg_oecd_members, reg_2040_members),"y2040",] -
+                            logit_coalgen_2040_c[c(reg_oecd_members, reg_2040_members),,],dim=1)) * reg_normalized_nzfree
             
-            logit_coalshare_2030_c <- logit_coalgen_2030_c / totalgen_2030_c[,"y2030",]
+            logit_coalshare_2040_c <- logit_coalgen_2040_c[,2040,] / totalgen_2040_c[,"y2040",]
             
-            reg_excess <- reg_nonzero_freeriders[which(logit_coalshare_2030_c[reg_nonzero_freeriders,,] > 1)]
+            reg_excess <- reg_nonzero_freeriders[which(logit_coalshare_2040_c[reg_nonzero_freeriders,,] > 1)]
 
 
             ## If the redistribution of coal results in other countries with >100% share in coal...
             while (length(reg_excess)) {
                 # Increase total electricity generation in >100% coal-share countries so that their coal-share equals the global max in 2019
-                totalgen_2030_c[reg_excess,,] <- logit_coalgen_2030_c[reg_excess,,] / max(coalgen_2019_c / totalgen_2019_c, na.rm = T)
+                totalgen_2040_c[reg_excess,,] <- logit_coalgen_2040_c[reg_excess,,] / max(coalgen_2019_c / totalgen_2019_c, na.rm = T)
 
                 # Resulting excess power generation in region 
-                excess <- as.numeric(dimSums(totalgen_2030_c[reg_all,,],dim=1) - as.numeric(totalgen_2030_R[reg,2030,]))
-                # as.numeric(dimSums(logit_coalgen_2030_c[reg_excess,,] - totalgen_2030_c[reg_excess,,], dim=1))
-                print("\nexcess 2030:")
+                excess <- as.numeric(dimSums(totalgen_2040_c[reg_all,,],dim=1) - as.numeric(totalgen_2040_R[reg,2040,]))
+                # as.numeric(dimSums(logit_coalgen_2040_c[reg_excess,,] - totalgen_2040_c[reg_excess,,], dim=1))
+                print("\nexcess 2040:")
                 print(excess)
 
                 # Decrease total electricity generation in all other countries in the region by the proportional amount 
-                totalgen_2030_c[setdiff(reg_all, reg_excess),,] <- totalgen_2030_c[setdiff(reg_all, reg_excess),,] - 
+                totalgen_2040_c[setdiff(reg_all, reg_excess),,] <- totalgen_2040_c[setdiff(reg_all, reg_excess),,] - 
                                                                     excess * (reg_normalized[setdiff(reg_all, reg_excess),,] / 
                                                                             as.numeric(dimSums(reg_normalized[setdiff(reg_all, reg_excess),,],dim=1)))
 
 
-                # excess <- as.numeric(dimSums(logit_coalgen_2030_c[reg_excess,,] - totalgen_2030_c[reg_excess,,], dim=1))
-                # print("\nexcess 2030:")
+                # excess <- as.numeric(dimSums(logit_coalgen_2040_c[reg_excess,,] - totalgen_2040_c[reg_excess,,], dim=1))
+                # print("\nexcess 2040:")
                 # print(excess)
 
                 # Decrease total electricity generation in all other nonzero countries by the proportional amount 
-                # totalgen_2030_c[setdiff(reg_nonzero_freeriders, reg_excess),,] <- totalgen_2030_c[setdiff(reg_nonzero_freeriders, reg_excess),,] - excess * reg_normalized_nzfree[setdiff(reg_nonzero_freeriders, reg_excess),,]
+                # totalgen_2040_c[setdiff(reg_nonzero_freeriders, reg_excess),,] <- totalgen_2040_c[setdiff(reg_nonzero_freeriders, reg_excess),,] - excess * reg_normalized_nzfree[setdiff(reg_nonzero_freeriders, reg_excess),,]
                 # / length(setdiff(reg_all, reg_excess)) 
                 # (1 - reg_normalized_nzfree[setdiff(reg_all, reg_excess),,])
 
                 # Transfer a proportional amount of the rest of the region's electricity generation to each excess country
-                # totalgen_2030_c[reg_excess,,] <- totalgen_2030_c[reg_excess,,] + excess * reg_normalized_nzfree[reg_excess,,]
+                # totalgen_2040_c[reg_excess,,] <- totalgen_2040_c[reg_excess,,] + excess * reg_normalized_nzfree[reg_excess,,]
                 # / length(reg_excess)
-                # totalgen_2030_c[reg_excess,,] <- totalgen_2030_c[reg_excess,,] + reg_normalized_nzfree[reg_excess,,] * as.numeric(dimSums(excess * (1 - reg_normalized_nzfree[setdiff(reg_all, reg_excess),,]), dim = 1))
+                # totalgen_2040_c[reg_excess,,] <- totalgen_2040_c[reg_excess,,] + reg_normalized_nzfree[reg_excess,,] * as.numeric(dimSums(excess * (1 - reg_normalized_nzfree[setdiff(reg_all, reg_excess),,]), dim = 1))
 
-                # logit_coalgen_2030_c[reg_excess,,] <- leakage_allowance * coalgen_2030_c[reg_excess,"y2030",]
-                logit_coalshare_2030_c[reg_all,,] <- logit_coalgen_2030_c[reg_all,,] / totalgen_2030_c[reg_all,"y2030",]
+                # logit_coalgen_2040_c[reg_excess,,] <- leakage_allowance * coalgen_2040_c[reg_excess,"y2040",]
+                logit_coalshare_2040_c[reg_all,,] <- logit_coalgen_2040_c[reg_all,,] / totalgen_2040_c[reg_all,"y2040",]
 
                 # Check if any are still over 100% 
-                reg_excess <- reg_excess[which(logit_coalshare_2030_c[reg_excess,,] > 1.001)]
+                reg_excess <- reg_excess[which(logit_coalshare_2040_c[reg_excess,,] > 1.001)]
 
-                print("\nreg_excess coal share 2030:")
-                print(logit_coalshare_2030_c[reg_excess,,])
+                print("\nreg_excess coal share 2040:")
+                print(logit_coalshare_2040_c[reg_excess,,])
 
-                reg_normalized_nzfree <- totalgen_2030_c[reg_all,"y2030",] / as.numeric(totalgen_2030_R[reg,2030,])
+                reg_normalized_nzfree <- totalgen_2040_c[reg_all,"y2040",] / as.numeric(totalgen_2040_R[reg,2040,])
 
             }
             }
         }
         
         # Derive 2045 coal share in electricity for use in logistic regression
-        logit_coalShare_2045_c <- downscale_coal(logit_coalgen_2030_c,totalgen_2030_c[,"y2030",],coalgen_2030_R[,"y2030",],totalgen_2030_R[,"y2030",],coalgen_2045_R[,"y2045",],totalgen_2045_R[,"y2045",])
+        logit_coalShare_2045_c <- downscale_coal(logit_coalgen_2040_c,totalgen_2040_c[,"y2040",],coalgen_2040_R[,"y2040",],totalgen_2040_R[,"y2040",],coalgen_2045_R[,"y2045",],totalgen_2045_R[,"y2045",])
         logit_coalgen_2045_c <- logit_coalShare_2045_c * totalgen_2045_c[,"y2045",]
         getNames(logit_coalShare_2045_c) <- recovery
         logit_coalcap_2045_c <- logit_coalgen_2045_c / (loadfactor_c[,2045,]*365*24 / EJ_2_TWh)
@@ -716,9 +775,9 @@ COALogit_PPCA_FinEx <- function(refgdx, recovery, size, PPCA_pol, oecd, nonoecd,
         getNames(coalShare_2045_c) <- recovery
         getYears(coalShare_2045_c) <- "y2045"
         
-        #################################################
-        ################ NON-OECD LOGIT #################
-        #################################################
+        ######################################################
+        ################ NON-OECD 2045 LOGIT #################
+        ######################################################
         if (!grepl("current",size)) {
             nonOECD <- data.frame(country=sort(getItems(dim = 1,  x = logit_coalShare_2045_c)),
                                 oecd=as.character(oecd_map),
@@ -736,11 +795,11 @@ COALogit_PPCA_FinEx <- function(refgdx, recovery, size, PPCA_pol, oecd, nonoecd,
             ##############################################
             ### Determine non-OECD coalition scenarios ###
             ##############################################
-            nonOECD <- nonOECD %>% mutate(nonOECDcoalition=ifelse(accession_prob >= p[2],
+            nonOECD <- nonOECD %>% mutate(nonOECDcoalition=ifelse(accession_prob >= scen_prob,
                                                     "50p", "free"))
             # nonOECD <- nonOECD %>% mutate(nonOECDcoalition = ifelse(accession_prob >= p[3],
             #                                         "5p", "free"))
-            # nonOECD <- nonOECD %>% mutate(nonOECDcoalition=ifelse(accession_prob >= p[2],
+            # nonOECD <- nonOECD %>% mutate(nonOECDcoalition=ifelse(accession_prob >= scen_prob,
             #                                         "50p", nonOECDcoalition))
             # nonOECD <- nonOECD %>% mutate(nonOECDcoalition=ifelse((accession_prob >= p[1] | ppca=="PPCA"),
             #                                         "95p", nonOECDcoalition))           
@@ -760,7 +819,7 @@ COALogit_PPCA_FinEx <- function(refgdx, recovery, size, PPCA_pol, oecd, nonoecd,
             nonoecd_members <- as.character(non_oecd_95p[,1])
             }else if (grepl("5p",size) | grepl("3p",size)) {
             nonoecd_members <- as.character(non_oecd_5p[,1])
-            }
+            }else nonoecd_members <- as.character(non_oecd_50p[,1])
 
             print("nonoecd_members")
             print(nonoecd_members)
@@ -915,14 +974,18 @@ COALogit_PPCA_FinEx <- function(refgdx, recovery, size, PPCA_pol, oecd, nonoecd,
             coalshare_2050[reg_all,,] <- 0
             }
         }
+
             
         if (grepl("non",phase[ii],ignore.case=TRUE)) {
+    
             out <- coalshare_2050
             getYears(out) <- NULL
             weight_out <- dimSums(weight[,getYears(weight)>="y2050",],dim=2)
 
             if (!grepl("current", size)) {
                 # Return status update of top 10 nonOECD coal countries
+                write.csv(current_nonoecd, file = paste0(outputfolder,"/current_nonoecd.csv"))
+
                 write.csv(current_nonoecd %>% 
                             left_join(OECD %>% 
                                     mutate(accession_prob_2025 = accession_prob, 
@@ -981,7 +1044,13 @@ COALogit_PPCA_FinEx <- function(refgdx, recovery, size, PPCA_pol, oecd, nonoecd,
 
         print(out_reg)
 
-        file <- paste0(paste("f47",phase[ii],recovery,PPCA_pol,size,sep="_"),".cs4r")
+        if (size %in% c("50p","40p"))  size <- "2p"
+        else if (size == "95p")  size <- "1p"
+        else if (size == "5p")  size = "3p"
+
+        if (recovery == "Neutral")  covidscen <- "BAU"
+
+        file <- paste0(paste("f47",phase[ii],covidscen,PPCA_pol,size,sep="_"),".cs4r")
         cat("Writing",file,"to ./modules/47_regipol/PPCAcoalExit/input/\n")
         write.magpie(out_reg,file_folder = "./modules/47_regipol/PPCAcoalExit/input/", file_name = file,append = ifelse(subpolicy[jj]=="none",FALSE,TRUE))
         cat("Writing",file,"to output folder:", outputfolder, "\n")
@@ -1009,11 +1078,11 @@ COALogit_PPCA_FinEx <- function(refgdx, recovery, size, PPCA_pol, oecd, nonoecd,
                 ##############################################
                 ### Determine non-OECD coalition scenarios ###
                 ##############################################
-                nonOECD <- nonOECD %>% mutate(nonOECDcoalition=ifelse(accession_prob >= p[2],
+                nonOECD <- nonOECD %>% mutate(nonOECDcoalition=ifelse(accession_prob >= scen_prob,
                                                         "50p", "free"))
                 # nonOECD <- nonOECD %>% mutate(nonOECDcoalition = ifelse(accession_prob >= p[3],
                 #                                         "5p", "free"))
-                # nonOECD <- nonOECD %>% mutate(nonOECDcoalition=ifelse(accession_prob >= p[2],
+                # nonOECD <- nonOECD %>% mutate(nonOECDcoalition=ifelse(accession_prob >= scen_prob,
                 #                                         "50p", nonOECDcoalition))
                 # nonOECD <- nonOECD %>% mutate(nonOECDcoalition=ifelse((accession_prob >= p[1] | ppca=="PPCA"),
                 #                                         "95p", nonOECDcoalition))    
@@ -1032,11 +1101,11 @@ COALogit_PPCA_FinEx <- function(refgdx, recovery, size, PPCA_pol, oecd, nonoecd,
             ##########################################
             ### Determine OECD coalition scenarios ###
             ##########################################
-            OECD <- OECD %>% mutate(coalition=ifelse(accession_prob >= p[2] & oecd=="OECD",
+            OECD <- OECD %>% mutate(coalition=ifelse(accession_prob >= scen_prob & oecd=="OECD",
                                                     "50p", "free"))
             # OECD <- OECD %>% mutate(coalition = ifelse(accession_prob >= p[3] & oecd=="OECD",
             #                                         "5p", "free"))
-            # OECD <- OECD %>% mutate(coalition=ifelse(accession_prob >= p[2] & oecd=="OECD",
+            # OECD <- OECD %>% mutate(coalition=ifelse(accession_prob >= scen_prob & oecd=="OECD",
             #                                         "50p", coalition))
             # OECD <- OECD %>% mutate(coalition=ifelse((accession_prob >= p[1] | ppca=="PPCA") & (oecd=="OECD" | Region=="EUR"),
             #                                         "95p", coalition))
@@ -1081,28 +1150,20 @@ COALogit_PPCA_FinEx <- function(refgdx, recovery, size, PPCA_pol, oecd, nonoecd,
     
     newest_mem_cop26 <- c('UKR','CHL','SGP','MUS','AZE','SVN','EST')
     
-    if (recovery=="Neutral")  recovery <- "BAU"
+    if (recovery=="Neutral")  recovery <- "Neutral"
     
     ##Probability levels and line types
-    # if (!is.null(file)) {
-      # if (grepl("50CI",file))  p <- c(.25, 0.5, 0.75)
-      # else if (grepl("33CI",file))  p <- c(.33, 0.5, 0.67)
-      # else if (grepl("60CI",file))  p <- c(0.2, 0.5, 0.8)
-      # else if (grepl("70CI",file))  p <- c(0.15, 0.5, 0.85)
-      # else if (grepl("90CI",file))  p <- c(0.05, 0.5, 0.95)
-      # else  p <- c(0.05, 0.5, 0.95)
-    # }
-    if (grepl("50CI",uncertainty))  p <- c(.25, 0.5, 0.75)
-    else if (grepl("33CI",uncertainty))  p <- c(.33, 0.5, 0.67)
-    else if (grepl("60CI",uncertainty))  p <- c(0.2, 0.5, 0.8)
-    else if (grepl("70CI",uncertainty))  p <- c(0.15, 0.5, 0.85)
-    else if (grepl("90CI",uncertainty))  p <- c(0.05, 0.5, 0.95)
+    if (grepl("50CI",uncertainty))  p <- c(.25, scen_prob, 0.75)
+    else if (grepl("33CI",uncertainty))  p <- c(.33, scen_prob, 0.67)
+    else if (grepl("60CI",uncertainty))  p <- c(0.2, scen_prob, 0.8)
+    else if (grepl("70CI",uncertainty))  p <- c(0.15, scen_prob, 0.85)
+    else if (grepl("90CI",uncertainty))  p <- c(0.05, scen_prob, 0.95)
     else if (uncertainty=="10step")      p <- seq(10,90,10) / 100
     else if (uncertainty=="5step")      p <- seq(10,90,20) / 100
-    else  p <- c(0.05, 0.5, 0.95)
+    else  p <- c(0.05, scen_prob, 0.95)
 
     lnCols <- setNames(c(rep("grey50", length(p)-1), "red"), 
-                            nm = c(p[-which(p==0.5)], 0.5)
+                            nm = c(p[-which(p==scen_prob)], scen_prob)
     )
 
     # lnAlpha <- setNames()
@@ -1145,7 +1206,7 @@ COALogit_PPCA_FinEx <- function(refgdx, recovery, size, PPCA_pol, oecd, nonoecd,
     ## Sanity check test data 
     testData$share[which(testData$share>1)] <- max(testData$share[which(testData$share<1)], na.rm = T)
     
-    if (phase=="OECD" & recovery=="BAU") 
+    if (phase=="OECD" & recovery=="Neutral") 
       testData <- testData %>% mutate(nudge = ifelse(country=="MAR",-0.02,ifelse(country=="CHN",0.065,0.025+Capacity/1.5e4)))
     # else if (grepl("non",phase,ignore.case=T))
     #   testData <- testData %>% mutate(nudge = ifelse(country=="CHN",0.065,0.025+Capacity/1.5e4))
@@ -1164,7 +1225,7 @@ COALogit_PPCA_FinEx <- function(refgdx, recovery, size, PPCA_pol, oecd, nonoecd,
     #   plotData <- filter(plotData,!(ppca=="PPCA" & oecd=="OECD"))
     # }  
     
-    if (recovery=="BAU")  recovery <- "Neutral"
+    if (recovery=="Neutral")  recovery <- "Neutral"
     
     clrs <- c("OECD"="#E41A1C", "Non-OECD"="#789FC6","PPCA" = "goldenrod3", "Free" = "#000000")
     # colnames(plotData)[which(grepl("cap_",colnames(plotData)))] <- paste0("GW Capacity (",gsub("cap_","",colnames(plotData)[which(grepl("cap_",colnames(plotData)))]),")")
@@ -1176,7 +1237,7 @@ COALogit_PPCA_FinEx <- function(refgdx, recovery, size, PPCA_pol, oecd, nonoecd,
                           ifelse(size=="3p", "5p", "")))
     
     print(plotData)
-    print(ln$Ic[which(ln$Prob==0.5)])
+    print(ln$Ic[which(ln$Prob==scen_prob)])
     print(ln$Ic)
 
     if (mob == "none")  mob <- ""
@@ -1188,13 +1249,13 @@ COALogit_PPCA_FinEx <- function(refgdx, recovery, size, PPCA_pol, oecd, nonoecd,
 
     ggplot(plotData) + 
       #Probability lines
-      geom_abline(intercept = seq(ln$Ic[which(ln$Prob==0.5)]+0.1,90,0.2),
+      geom_abline(intercept = seq(ln$Ic[which(ln$Prob==scen_prob)]+0.1,90,0.2),
                   slope = ln$Slope[1],
                   color="gold",
                   alpha=0.06
                 #   linetype = 2
                   ) +
-    #   geom_abline(intercept = ln$Ic[which(ln$Prob==0.5)],
+    #   geom_abline(intercept = ln$Ic[which(ln$Prob==scen_prob)],
     #               slope = ln$Slope[1],
     #               color="red",
     #               alpha=0.3,
@@ -1228,7 +1289,7 @@ COALogit_PPCA_FinEx <- function(refgdx, recovery, size, PPCA_pol, oecd, nonoecd,
     #   values=c("gold","#CC3333","blue"), 
                           name = "Coalition Scenario", 
                           labels = paste0(p*100,"% likely"),
-                        #   c(paste0("\u2265 ",p[3]*100,"% likely"),paste0("\u2265 ",p[2]*100,"% likely"),paste0("\u2265 ",p[3]*100,"% likely")),
+                        #   c(paste0("\u2265 ",p[3]*100,"% likely"),paste0("\u2265 ",scen_prob*100,"% likely"),paste0("\u2265 ",p[3]*100,"% likely")),
                         #   guide=guide_legend(override.aes = list(size=1),order=2)
                           ) +
       theme_bw() +
