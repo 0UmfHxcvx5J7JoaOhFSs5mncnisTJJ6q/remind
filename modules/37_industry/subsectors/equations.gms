@@ -106,7 +106,9 @@ q37_emiIndBase(ttot,regi,entyFE,secInd37)$( ttot.val ge cm_startyear ) ..
 *' Compute maximum possible CCS level in industry sub-sectors given the current
 *' CO2 price.
 ***------------------------------------------------------
-q37_emiIndCCSmax(ttot,regi,emiInd37)$( ttot.val ge cm_startyear AND NOT sum(secInd37Prc,secInd37_2_emiInd37(secInd37Prc,emiInd37)) ) ..
+q37_emiIndCCSmax(ttot,regi,emiInd37)$( 
+             ttot.val ge cm_startyear 
+         AND NOT sum(secInd37Prc,secInd37_2_emiInd37(secInd37Prc,emiInd37)) ) ..
   v37_emiIndCCSmax(ttot,regi,emiInd37)
   =e=
     !! map sub-sector emissions to sub-sector MACs
@@ -129,10 +131,23 @@ q37_emiIndCCSmax(ttot,regi,emiInd37)$( ttot.val ge cm_startyear AND NOT sum(secI
 ***------------------------------------------------------
 *' Limit industry CCS to maximum possible CCS level.
 ***------------------------------------------------------
-q37_IndCCS(ttot,regi,emiInd37)$( ttot.val ge cm_startyear AND NOT sum(secInd37Prc,secInd37_2_emiInd37(secInd37Prc,emiInd37)) ) ..
+q37_IndCCS(ttot,regi,emiInd37)$( 
+             ttot.val ge cm_startyear
+         AND NOT sum(secInd37Prc,secInd37_2_emiInd37(secInd37Prc,emiInd37)) ) ..
   vm_emiIndCCS(ttot,regi,emiInd37)
   =l=
   v37_emiIndCCSmax(ttot,regi,emiInd37)
+;
+
+q37_globalIndCCSlimit(ttot,secInd37)$( 
+                              ttot.val ge cm_startyear
+                          AND NOT secInd37Prc(secInd37)
+                          AND NOT p37_globalIndCCSlimit(ttot,secINd37) = NA ) ..
+  sum((regi,secInd37_2_emiInd37(secInd37,emiInd37)),
+    vm_emiIndCCS(ttot,regi,emiInd37)
+  )
+  =l=
+  p37_globalIndCCSlimit(ttot,secInd37)
 ;
 
 ***------------------------------------------------------
@@ -144,7 +159,7 @@ q37_limit_IndCCS_growth(ttot,regi,emiInd37) ..
     vm_emiIndCCS(ttot-1,regi,emiInd37)
   + sum(secInd37_2_emiInd37(secInd37,emiInd37),
       v37_emiIndCCSmax(ttot,regi,emiInd37)
-    * sm_macChange
+    * 0.20   !! was sm_macChange
     * pm_ts(ttot)
     )
 ;
@@ -420,14 +435,16 @@ q37_limitOutflowCCPrc(ttot,regi,tePrc)$(ttot.val ge cm_startyear ) ..
 ***------------------------------------------------------
 *' Emission captured from process based industry sector
 ***------------------------------------------------------
-q37_emiCCPrc(ttot,regi,emiInd37)$((ttot.val ge cm_startyear ) AND sum(secInd37Prc,secInd37_2_emiInd37(secInd37Prc,emiInd37)) ) ..
-    vm_emiIndCCS(ttot,regi,emiInd37)
+q37_emiCCPrc(ttot,regi,emiInd37)$( 
+                 ttot.val ge cm_startyear 
+             AND sum(secInd37Prc,secInd37_2_emiInd37(secInd37Prc,emiInd37)) ) ..
+  vm_emiIndCCS(ttot,regi,emiInd37)
   =e=
-    sum((secInd37_2_emiInd37(secInd37Prc,emiInd37),
-         secInd37_tePrc(secInd37Prc,tePrc),
-         tePrc2teCCPrc(tePrc,opmoPrc,teCCPrc,opmoCCPrc)),
-      vm_outflowPrc(ttot,regi,teCCPrc,opmoCCPrc)
-    )
+  sum((secInd37_2_emiInd37(secInd37Prc,emiInd37),
+       secInd37_tePrc(secInd37Prc,tePrc),
+       tePrc2teCCPrc(tePrc,opmoPrc,teCCPrc,opmoCCPrc)),
+    vm_outflowPrc(ttot,regi,teCCPrc,opmoCCPrc)
+  )
 ;
 
 *** EOF ./modules/37_industry/subsectors/equations.gms

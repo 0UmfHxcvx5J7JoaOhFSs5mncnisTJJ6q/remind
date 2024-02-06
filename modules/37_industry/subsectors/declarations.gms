@@ -23,6 +23,7 @@ Parameters
   p37_steel_secondary_max_share(tall,all_regi)                                 "maximum share of secondary steel production"
   p37_BAU_industry_ETS_solids(tall,all_regi)                                   "industry solids demand in baseline scenario"
   p37_cesIO_baseline(tall,all_regi,all_in)                                     "vm_cesIO from the baseline scenario"
+  p37_globalIndCCSlimit(tall,secInd37)                                         "global limit on industry subsector CCS"
   !! process-based implementation
   p37_specMatDem(mat,all_te,opmoPrc)                                           "Specific materials demand of a production technology and operation mode [t_input/t_output]"
   p37_specFeDem(tall,all_regi,all_enty,all_te,opmoPrc)                         "Actual specific final-energy demand of a tech; blends between IEA data and Target [TWa/Gt_output]"
@@ -89,6 +90,7 @@ $endif.no_calibration
   q37_emiIndBase(ttot,all_regi,all_enty,secInd37)         "gross industry emissions before CCS"
   q37_emiIndCCSmax(ttot,all_regi,emiInd37)                "maximum abatable industry emissions at current CO2 price"
   q37_IndCCS(ttot,all_regi,emiInd37)                      "limit industry emissions abatement"
+  q37_globalIndCCSlimit(ttot,secInd37)                    "limit global industry subsector CCS"
   q37_limit_IndCCS_growth(ttot,all_regi,emiInd37)         "limit industry CCS scale-up"
   q37_cementCCS(ttot,all_regi)                            "link cement fuel and process abatement"
   q37_IndCCSCost                                          "Calculate industry CCS costs"

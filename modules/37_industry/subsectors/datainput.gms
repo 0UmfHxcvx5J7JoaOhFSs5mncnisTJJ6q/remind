@@ -203,6 +203,13 @@ emiMacSector("co2otherInd") = NO;
 pm_macSwitch("co2otherInd") = NO;
 emiMac2mac("co2otherInd","co2otherInd") = NO;
 
+*** global limit on industry subsector CCS
+p37_globalIndCCSlimit(ttot,secInd37)$( ttot.val lt 2030 ) = 0;
+p37_globalIndCCSlimit("2030","cement")    = 0.0067 / sm_c_2_co2;
+p37_globalIndCCSlimit("2030","chemicals") = 0.014 / sm_c_2_co2;
+p37_globalIndCCSlimit("2030","steel")     = 0.0015 / sm_c_2_co2;
+p37_globalIndCCSlimit(ttot,secInd37)$( ttot.val gt 2030 ) = NA;   !! default to inactive value
+
 *** data on maximum secondary steel production
 *** The steel recycling rate limit is assumed to increase from 90 to 99 %.
   p37_cesIO_up_steel_secondary(tall,all_regi,all_GDPscen)
