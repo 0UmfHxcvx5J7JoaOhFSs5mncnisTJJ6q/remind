@@ -159,7 +159,9 @@ q37_limit_IndCCS_growth(ttot,regi,emiInd37) ..
     vm_emiIndCCS(ttot-1,regi,emiInd37)
   + sum(secInd37_2_emiInd37(secInd37,emiInd37),
       v37_emiIndCCSmax(ttot,regi,emiInd37)
-    * 0.20   !! was sm_macChange
+    * ( 0.20$(             sameas(emiInd37,"co2steel") )
+      + sm_macChange$( NOT sameas(emiInd37,"co2steel") )
+      )
     * pm_ts(ttot)
     )
 ;
