@@ -139,15 +139,14 @@ q37_IndCCS(ttot,regi,emiInd37)$(
   v37_emiIndCCSmax(ttot,regi,emiInd37)
 ;
 
-q37_globalIndCCSlimit(ttot,secInd37)$( 
-                              ttot.val ge cm_startyear
-                          AND NOT secInd37Prc(secInd37)
-                          AND NOT p37_globalIndCCSlimit(ttot,secINd37) = NA ) ..
-  sum((regi,secInd37_2_emiInd37(secInd37,emiInd37)),
-    vm_emiIndCCS(ttot,regi,emiInd37)
-  )
+*' Limit industry CCS to historic values
+q37_IndCCS_limit(ttot,regi,secInd37)$(
+                            ttot.val ge cm_startyear
+                        AND NOT secInd37Prc(secInd37) 
+                        AND NOT p37_IndCCS_limit(ttot,regi,secInd37) eq NA ) ..
+  sum(secInd37_2_emiInd37(secInd37,emiInd37), vm_emiIndCCS(ttot,regi,emiInd37))
   =l=
-  p37_globalIndCCSlimit(ttot,secInd37)
+  p37_IndCCS_limit(ttot,regi,secInd37)
 ;
 
 ***------------------------------------------------------
@@ -157,13 +156,7 @@ q37_limit_IndCCS_growth(ttot,regi,emiInd37) ..
   vm_emiIndCCS(ttot,regi,emiInd37)
   =l=
     vm_emiIndCCS(ttot-1,regi,emiInd37)
-  + sum(secInd37_2_emiInd37(secInd37,emiInd37),
-      v37_emiIndCCSmax(ttot,regi,emiInd37)
-    * ( 0.20$(             sameas(emiInd37,"co2steel") )
-      + sm_macChange$( NOT sameas(emiInd37,"co2steel") )
-      )
-    * pm_ts(ttot)
-    )
+  * ( 1.2 ** pm_ts(ttot) ) !! 20 % p.a. growth
 ;
 
 ***------------------------------------------------------
