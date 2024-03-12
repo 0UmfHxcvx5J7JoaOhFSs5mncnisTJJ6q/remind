@@ -10,9 +10,9 @@ loop ((ttot,steps)$( ttot.val ge 2005 ),
 
   sm_tmp = steps.val * sm_dmac / sm_c_2_co2;   !! CO2 price at MAC step [$/tCO2] 
 
-$ifthen NOT "%cm_Industry_CCS_markup%" == "off"
+  $$ifthen NOT "%cm_Industry_CCS_markup%" == "off"
   sm_tmp = sm_tmp / %cm_Industry_CCS_markup%;
-$endif
+  $$endif
 
   !! short-term (until 2030)
   if (ttot.val le 2030,
@@ -22,10 +22,10 @@ $endif
     pm_abatparam_Ind(ttot,regi,"co2chemicals",steps)$( sm_tmp ge  78 ) = 0.12;
     pm_abatparam_Ind(ttot,regi,"co2chemicals",steps)$( sm_tmp ge  80 ) = 0.57;
 
-$ifthen.cm_subsec_model_steel "%cm_subsec_model_steel%" == "ces"
+    $$ifthen.cm_subsec_model_steel "%cm_subsec_model_steel%" == "ces"
     pm_abatparam_Ind(ttot,regi,"co2steel",steps)$( sm_tmp ge  59 ) = 0.12;
     pm_abatparam_Ind(ttot,regi,"co2steel",steps)$( sm_tmp ge  82 ) = 0.23;
-$endif.cm_subsec_model_steel
+    $$endif.cm_subsec_model_steel
 
   !! intermediate
   elseif ttot.val eq 2035,
@@ -38,7 +38,7 @@ $endif.cm_subsec_model_steel
     pm_abatparam_Ind(ttot,regi,"co2chemicals",steps)$( sm_tmp ge  78 ) = 0.3;
     pm_abatparam_Ind(ttot,regi,"co2chemicals",steps)$( sm_tmp ge  80 ) = 0.57;
 
-$ifthen.cm_subsec_model_steel "%cm_subsec_model_steel%" == "ces"
+    $$ifthen.cm_subsec_model_steel "%cm_subsec_model_steel%" == "ces"
     pm_abatparam_Ind(ttot,regi,"co2steel",steps)$( sm_tmp ge  49 ) = 0.21;
     pm_abatparam_Ind(ttot,regi,"co2steel",steps)$( sm_tmp ge  51 ) = 0.30;
     pm_abatparam_Ind(ttot,regi,"co2steel",steps)$( sm_tmp ge  54 ) = 0.34;
@@ -46,7 +46,7 @@ $ifthen.cm_subsec_model_steel "%cm_subsec_model_steel%" == "ces"
     pm_abatparam_Ind(ttot,regi,"co2steel",steps)$( sm_tmp ge  59 ) = 0.37;
     pm_abatparam_Ind(ttot,regi,"co2steel",steps)$( sm_tmp ge  66 ) = 0.43;
     pm_abatparam_Ind(ttot,regi,"co2steel",steps)$( sm_tmp ge  82 ) = 0.48;
-$endif.cm_subsec_model_steel
+    $$endif.cm_subsec_model_steel
 
   !! long-term (from 2040 on)
   else
