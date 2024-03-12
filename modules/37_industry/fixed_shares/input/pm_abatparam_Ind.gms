@@ -39,12 +39,12 @@ $endif.cm_subsec_model_steel
     pm_abatparam_Ind(ttot,regi,"co2chemicals",steps)$( sm_tmp ge  80 ) = 0.57;
 
 $ifthen.cm_subsec_model_steel "%cm_subsec_model_steel%" == "ces"
-    pm_abatparam_Ind(ttot,regi,"co2steel",steps)$( sm_tmp ge  41 ) = 0.21;
-    pm_abatparam_Ind(ttot,regi,"co2steel",steps)$( sm_tmp ge  43 ) = 0.3;
-    pm_abatparam_Ind(ttot,regi,"co2steel",steps)$( sm_tmp ge  46 ) = 0.34;
-    pm_abatparam_Ind(ttot,regi,"co2steel",steps)$( sm_tmp ge  48 ) = 0.36;
-    pm_abatparam_Ind(ttot,regi,"co2steel",steps)$( sm_tmp ge  57 ) = 0.37;
-    pm_abatparam_Ind(ttot,regi,"co2steel",steps)$( sm_tmp ge  59 ) = 0.43;
+    pm_abatparam_Ind(ttot,regi,"co2steel",steps)$( sm_tmp ge  49 ) = 0.21;
+    pm_abatparam_Ind(ttot,regi,"co2steel",steps)$( sm_tmp ge  51 ) = 0.30;
+    pm_abatparam_Ind(ttot,regi,"co2steel",steps)$( sm_tmp ge  54 ) = 0.34;
+    pm_abatparam_Ind(ttot,regi,"co2steel",steps)$( sm_tmp ge  56 ) = 0.36;
+    pm_abatparam_Ind(ttot,regi,"co2steel",steps)$( sm_tmp ge  59 ) = 0.37;
+    pm_abatparam_Ind(ttot,regi,"co2steel",steps)$( sm_tmp ge  66 ) = 0.43;
     pm_abatparam_Ind(ttot,regi,"co2steel",steps)$( sm_tmp ge  82 ) = 0.48;
 $endif.cm_subsec_model_steel
 
@@ -60,8 +60,7 @@ $endif.cm_subsec_model_steel
                                                                               )
       = max(0, min(0.95, 0.2159 + 0.1365 * log(sm_tmp)));
     else
-      pm_abatparam_Ind(ttot,regi,"co2cement",steps)$( sm_tmp ge  54 ) = 0.7;
-      pm_abatparam_Ind(ttot,regi,"co2cement",steps)$( sm_tmp ge  95 ) = 0.7;
+      pm_abatparam_Ind(ttot,regi,"co2cement",steps)$( sm_tmp ge  54 ) = 0.70;
       pm_abatparam_Ind(ttot,regi,"co2cement",steps)$( sm_tmp ge 133 ) = 0.76;
 
       pm_abatparam_Ind(ttot,regi,"co2chemicals",steps)$( sm_tmp ge  46 ) = 0.36;
@@ -69,11 +68,11 @@ $endif.cm_subsec_model_steel
       pm_abatparam_Ind(ttot,regi,"co2chemicals",steps)$( sm_tmp ge  80 ) = 0.57;
 
       $$ifthen.cm_subsec_model_steel "%cm_subsec_model_steel%" == "ces"
-      pm_abatparam_Ind(ttot,regi,"co2steel",steps)$( sm_tmp ge  41 ) = 0.43;
-      pm_abatparam_Ind(ttot,regi,"co2steel",steps)$( sm_tmp ge  43 ) = 0.61;
-      pm_abatparam_Ind(ttot,regi,"co2steel",steps)$( sm_tmp ge  46 ) = 0.67;
-      pm_abatparam_Ind(ttot,regi,"co2steel",steps)$( sm_tmp ge  48 ) = 0.73;
-      pm_abatparam_Ind(ttot,regi,"co2steel",steps)$( sm_tmp ge  57 ) = 0.74;
+      pm_abatparam_Ind(ttot,regi,"co2steel",steps)$( sm_tmp ge  49 ) = 0.43;
+      pm_abatparam_Ind(ttot,regi,"co2steel",steps)$( sm_tmp ge  51 ) = 0.61;
+      pm_abatparam_Ind(ttot,regi,"co2steel",steps)$( sm_tmp ge  54 ) = 0.67;
+      pm_abatparam_Ind(ttot,regi,"co2steel",steps)$( sm_tmp ge  56 ) = 0.73;
+      pm_abatparam_Ind(ttot,regi,"co2steel",steps)$( sm_tmp ge  66 ) = 0.74;
       $$endif.cm_subsec_model_steel
     );
   );
