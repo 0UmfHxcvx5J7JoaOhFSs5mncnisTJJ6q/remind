@@ -40,8 +40,9 @@ if (smax((t,regi_dyn29(regi),ipf)$(    t.val gt 2005
 
 *' relax industry fixing over the calibration iterations
 sm_tmp = 5;  !! last iteration with bounds on industry
-loop (in$( pf_industry_relaxed_bounds_dyn37(in) OR ppfen_buildings_dyn36(in) ),
-  vm_cesIO.lo(t_29(t),regi_dyn29(regi),in)
+loop ((t_29(t),in)$(    pf_industry_relaxed_bounds_dyn37(in)
+                    OR (ppfen_buildings_dyn36(in) AND t.val gt 2015) ),
+  vm_cesIO.lo(t,regi_dyn29(regi),in)
   = max(
       ( pm_cesdata(t,regi,in,"quantity")
         !! goes from 0.95 to 1e-12 in -0.2 steps
