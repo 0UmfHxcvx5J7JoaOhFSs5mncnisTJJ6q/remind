@@ -23,6 +23,7 @@ $endif.inconv
 $IFTHEN.INCONV_bioSwitch "%cm_INCONV_PENALTY_FESwitch%" == "on"
 p02_inconvPen_Switch_Track(ttot,all_regi)                       "Parameter to track magnitude of inconvenience penalty for bio/synfuel share switching [share of consumption]"
 $ENDIF.INCONV_bioSwitch
+  p02_ies_wf(all_regi)    "intertemporal elasticity of substitution for the welfare function"
 ;
 
 ***-------------------------------------------------------------------------------

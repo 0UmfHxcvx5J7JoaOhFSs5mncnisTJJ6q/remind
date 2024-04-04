@@ -26,4 +26,5 @@ p02_inconvpen_lap(ttot,regi,te)$(ttot.val ge 2005) = p02_inconvpen_lap(ttot,regi
 display p02_inconvpen_lap;
 $ENDIF.INCONV
 
+p02_ies_wf(regi) = 0.999;
 *** EOF ./modules/02_welfare/utilitarian/datainput.gms

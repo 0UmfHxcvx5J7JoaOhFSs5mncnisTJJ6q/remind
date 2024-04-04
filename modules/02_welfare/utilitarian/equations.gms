@@ -33,12 +33,12 @@ q02_welfare(regi) ..
         * ( ( ( ( vm_cons(ttot,regi)
 	        / pm_pop(ttot,regi)
 		)
-	     ** (1 - 1 / pm_ies(regi))
+	     ** (1 - 1 / p02_ies_wf(regi))
 	      - 1
 	      )
-	    / (1 - 1 / pm_ies(regi))
-	    )$( pm_ies(regi) ne 1 )
-	  + log(vm_cons(ttot,regi) / pm_pop(ttot,regi))$( pm_ies(regi) eq 1 )
+	    / (1 - 1 / p02_ies_wf(regi))
+	    )$( p02_ies_wf(regi) ne 1 )
+	  + log(vm_cons(ttot,regi) / pm_pop(ttot,regi))$( p02_ies_wf(regi) eq 1 )
           )
         )
 $ifthen %cm_INCONV_PENALTY% == "on"
