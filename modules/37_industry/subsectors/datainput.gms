@@ -711,4 +711,20 @@ if (cm_startyear gt 2005,
 );
 $endif.cm_subsec_model_steel
 
+$ifthen "%cm_subsec_model_steel%" == "processes"   !! cm_subsec_model_steel
+execute_load "input.gdx", v37_demFeIndst;
+
+p37_demFeIndst_shares(t,regi,entySe,entyFe,out,emiMkt)$(
+                          sefe(entySe,entyFE)
+                      AND entyFe_out_emiMkt(entyFe,out,emiMkt)
+                      AND sameas(out,"ue_steel_primary")
+                      AND sum(se2fe(entySe2,entyFe,te),
+                            v37_demFeIndst.l(t,regi,entySe2,entyFe,out,emiMkt)
+                          )                                                    )
+  = v37_demFeIndst.l(t,regi,entySe,entyFe,out,emiMkt)
+  / sum(se2fe(entySe2,entyFe,te),
+      v37_demFeIndst.l(t,regi,entySe2,entyFe,out,emiMkt)
+    );
+$endif
+
 *** EOF ./modules/37_industry/subsectors/datainput.gms

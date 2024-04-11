@@ -70,6 +70,10 @@ $ifthen.cm_wasteIncinerationCCSshare not "%cm_wasteIncinerationCCSshare%" == "of
   p37_wasteIncinerationCCSshare(ttot,ext_regi)            "switch values for proportion of waste incineration that is captured [%]"   
   / %cm_wasteIncinerationCCSshare% /
 $endIf.cm_wasteIncinerationCCSshare
+
+$ifthen "%cm_subsec_model_steel%" == "processes"   !! cm_subsec_model_steel
+  p37_demFeIndst_shares(tall,all_regi,all_enty,all_enty,all_in,all_emiMkt)    "DEBUG SE shares in FE for PBS"
+$endif
 ;
 
 Positive Variables
@@ -122,6 +126,10 @@ $endif.no_calibration
   q37_emiCCPrc(tall,all_regi,emiInd37)                                              "Captured emissions from CCS"
   q37_limitOutflowCCPrc(tall,all_regi,all_te)                                       "Carbon capture processes can only capture as much co2 as the base process emits"
   q37_costMat(tall,all_regi)                                                        "External material cost (non-energy)"
+
+$ifthen "%cm_subsec_model_steel%" == "processes"   !! cm_subsec_model_steel
+  q37_demFeIndst_shares(tall,all_regi,all_enty,all_enty,all_in,all_emiMkt)                   "DEBUG: fix SE shares in FE for PBS"
+$endif
 ;
 
 *** EOF ./modules/37_industry/subsectors/declarations.gms

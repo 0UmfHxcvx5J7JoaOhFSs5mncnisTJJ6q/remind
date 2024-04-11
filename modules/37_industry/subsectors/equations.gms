@@ -37,6 +37,24 @@ q37_demFeIndst_intermediate(t,regi,entyFe,out,secInd37,emiMkt)$(
     )
 ;
 
+$ifthen.cm_subsec_model_steel "%cm_subsec_model_steel%" == "processes"
+q37_demFeIndst_shares(t,regi,entySe,entyFe,out,emiMkt)$(
+                                      sefe(entySe,entyFe)
+                                  AND entyFe_out_emiMkt(entyFe,out,emiMkt)
+                                  AND sameas(out,"ue_steel_primary")       
+$ifthen.cm_fix_pbs_se_shares NOT "%cm_fix_pbs_se_shares%" == "1"
+                                  AND NO
+$endif.cm_fix_pbs_se_shares
+                                                                           ) ..
+  v37_demFeIndst(t,regi,entySe,entyFe,out,emiMkt)
+  =e=
+    sum(se2fe(entySe2,entyFe,te),
+      v37_demFeIndst(t,regi,entySe2,entyFe,out,emiMkt)
+    )
+  * p37_demFeIndst_shares(t,regi,entySe,entyFe,out,emiMkt)
+;
+$endif.cm_subsec_model_steel
+
 q37_demFeIndst(t,regi,entySe,entyFe,emiMkt)$(
                                              sefe(entySe,entyFe)
                                          AND entyFe2Sector(entyFe,"indst")
