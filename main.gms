@@ -671,7 +671,7 @@ parameter
 parameter
   cm_prtpScen               "pure rate of time preference standard values"
 ;
-  cm_prtpScen         = 1;         !! def = 1  !! regexp = 1|3
+  cm_prtpScen         = 3;         !! def = 1  !! regexp = 1|3
 *' *  (1): 1 %
 *' *  (3): 3 %
 *'
