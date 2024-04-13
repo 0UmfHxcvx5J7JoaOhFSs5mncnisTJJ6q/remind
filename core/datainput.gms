@@ -55,7 +55,7 @@ pm_ttot_2_tall(ttot,tall)$((ttot.val = tall.val) ) = Yes;
 *** define pm_prtp according to cm_prtpScen:
 if(cm_prtpScen eq 1, pm_prtp(regi) = 0.01);
 if(cm_prtpScen eq 3, pm_prtp(regi) = 0.03);
-pm_ies(regi) = 0.5;
+pm_ies(regi) = 1;
 
 *------------------------------------------------------------------------------------
 *------------------------------------------------------------------------------------
