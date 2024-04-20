@@ -75,6 +75,18 @@ if (cm_IndCCSscen eq 1,
      );
    );
 
+Parameter
+  f37_indCCSlimit(ttot,all_regi,secInd37)   "upper limit on industry CCS capacity [GtC/a]"
+  /
+    $$ondelim
+    $$ifthen.cm_rcp_scen "%cm_rcp_scen%" == "rcp20"
+    $$include "./modules/37_industry/subsectors/input/f37_indCCSlimit_high.cs4r";
+    $$else.cm_rcp_scen
+    $$include "./modules/37_industry/subsectors/input/f37_indCCSlimit_default.cs4r";
+    $$endif.cm_rcp_scen
+  /
+;
+
 *** assume 50 year lifetime for industry energy efficiency capital
 pm_delta_kap(regi,ppfKap_industry_dyn37) = -log(1 / 4) / 50;
 

@@ -136,10 +136,20 @@ q37_IndCCS(t,regi,emiInd37)$(
   v37_emiIndCCSmax(t,regi,emiInd37)
 ;
 
+*** Limit industry CCS capacity based on existing CCS projects
+q37_IndCCS_cap_limit(t,regi,secInd37)$( NOT secInd37Prc(secInd37) ) ..
+  sum(secInd37_2_emiInd37(secInd37,emiInd37),
+    vm_emiIndCCS(t,regi,emiInd37)
+  )
+  =l=
+  f37_indCCSlimit(t,regi,secInd37)
+;
+
 ***------------------------------------------------------
 *' Limit industry CCS scale-up to sm_macChange (default: 5 % p.a.)
 ***------------------------------------------------------
-q37_limit_IndCCS_growth(ttot,regi,emiInd37)$( ttot.val ge cm_startyear ) ..
+q37_limit_IndCCS_growth(ttot,regi,emiInd37)$(
+                                        ttot.val ge max(2050, cm_startyear) ) ..
   vm_emiIndCCS(ttot,regi,emiInd37)
   =l=
     vm_emiIndCCS(ttot-1,regi,emiInd37)
