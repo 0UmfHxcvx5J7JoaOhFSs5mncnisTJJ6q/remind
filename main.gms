@@ -1327,6 +1327,10 @@ $setGlobal cm_VREminShare    off !! def = off
 ***     amount of Carbon Capture and Storage (including DACCS and BECCS) is limited to a maximum of 2GtCO2 per yr globally, and 250 Mt CO2 per yr in EU28.
 ***   This switch only works for model native regions. If you want to apply it to a group region use cm_implicitQttyTarget instead.
 $setGlobal cm_CCSmaxBound    off  !! def = off
+*** cm_indCCSlimit assumptions on the limits on industry CCS imposed by the
+***   existing CCS project pipeline.  Corresponds to the files
+***   ./modules/37_industry/subsectors/input/f37_indCCSlimit_%cm_indCCSlimit%.cs4r
+$setglobal cm_indCCSlimit   default !! def = default !! regexp = default|high
 *** c_CES_calibration_new_structure      <-   0        switch to 1 if you want to calibrate a CES structure different from input gdx
 $setglobal c_CES_calibration_new_structure  0     !!  def  =  0  !! regexp = 0|1
 *** c_CES_calibration_write_prices       <-   0       switch to 1 if you want to generate price file, you can use this as new p29_cesdata_price.cs4r price input file
