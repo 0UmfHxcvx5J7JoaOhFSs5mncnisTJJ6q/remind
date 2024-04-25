@@ -110,14 +110,14 @@ write_csv(
     file = kap_file, append = TRUE, col_names = FALSE)
 
 system(paste('tar --create --gzip --file',
-             sub('^(.*rev[0-9\\.]+)_(.*)$',
+             sub('^(.*rev[0-9\\.]+[^_]*)_(.*)$',
                  'calibration_results/\\1-highME-mod_\\2',
                  basename(idr_tar)),
              '-C', tar_dir,
              paste(list.files(tar_dir), collapse = ' ')))
 
 file.copy(sub('_remind.tgz$', '_validationremind.tgz', idr_tar),
-          sub('^.*(rev[0-9\\.]+)_([0-9a-f]{8})_remind.tgz',
+          sub('^.*(rev[0-9\\.]+[^_]*)_([0-9a-f]{8})_remind.tgz',
               'calibration_results/\\1-highME-mod_\\2_validationremind.tgz',
               idr_tar),
           overwrite = TRUE)
