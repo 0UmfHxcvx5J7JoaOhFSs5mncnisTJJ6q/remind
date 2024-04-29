@@ -85,8 +85,13 @@ Parameter
 ;
 
 p37_indCCSlimit(t,regi,secInd37) = -1;
-p37_indCCSlimit(t,regi,secInd37)$( f37_indCCSlimit(t,regi,secInd37) ne NA )
+loop ((regi,secInd37),
+  sm_tmp = 0;
+  loop (t, sm_tmp = max(sm_tmp, t.val$( f37_indCCSlimit(t,regi,secInd37) )));
+
+  p37_indCCSlimit(t,regi,secInd37)$( t.val le sm_tmp )
   = f37_indCCSlimit(t,regi,secInd37);
+);
 
 *** assume 50 year lifetime for industry energy efficiency capital
 pm_delta_kap(regi,ppfKap_industry_dyn37) = -log(1 / 4) / 50;
