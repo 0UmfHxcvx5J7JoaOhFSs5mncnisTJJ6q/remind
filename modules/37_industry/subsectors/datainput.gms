@@ -87,7 +87,9 @@ Parameter
 p37_indCCSlimit(t,regi,secInd37) = -1;
 loop ((regi,secInd37),
   sm_tmp = 0;
-  loop (t, sm_tmp = max(sm_tmp, t.val$( f37_indCCSlimit(t,regi,secInd37) )));
+  loop (t,
+    sm_tmp = max(sm_tmp, t.val$( f37_indCCSlimit(t,regi,secInd37) ge 0 ))
+  );
 
   p37_indCCSlimit(t,regi,secInd37)$( t.val le sm_tmp )
   = f37_indCCSlimit(t,regi,secInd37);
