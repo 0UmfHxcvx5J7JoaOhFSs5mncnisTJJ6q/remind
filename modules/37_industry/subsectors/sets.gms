@@ -333,7 +333,7 @@ $ifthen.cm_subsec_model_steel "%cm_subsec_model_steel%" == "ces"
 $endif.cm_subsec_model_steel
   /
 
-  entyFECC37(all_enty)   "FE carriers in industry which can be used for CO2 capture"
+  entyFeCC37(all_enty)   "FE carriers in industry which can be used for CO2 capture"
   /
     fesos
     fehos
