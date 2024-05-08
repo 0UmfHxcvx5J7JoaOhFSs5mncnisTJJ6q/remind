@@ -139,7 +139,7 @@ q37_IndCCS(t,regi,emiInd37)$(
 *** Limit industry CCS capacity based on existing CCS projects
 q37_IndCCS_cap_limit(t,regi,secInd37)$(
                                       NOT secInd37Prc(secInd37) 
-                                  AND 0 <= p37_indCCSlimit(t,regi,secInd37) ) ..
+                                  AND p37_indCCSlimit(t,regi,secInd37) ge 0 ) ..
   sum(secInd37_2_emiInd37(secInd37,emiInd37),
     vm_emiIndCCS(t,regi,emiInd37)
   )
