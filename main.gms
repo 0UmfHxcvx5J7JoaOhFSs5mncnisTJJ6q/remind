@@ -1126,6 +1126,9 @@ parameter
   cm_LearningSpillover      "Activate Learningspillover from foreign capacity in learning technogolies"
 ;
   cm_LearningSpillover = 1; !! def 1 = Learningspillover activated (set to 0 to deactivate)
+
+Parameter cm_co2cement_process_by_equation "set cement process emissions according to cement production level";
+cm_co2cement_process_by_equation = 0;
 *'
 *' * if Learningspillover is deactivated, foreign capacity is set to the level of 2020 in technology learning.
 *' * This means that in the model, each region's learning depends on its OWN additional capacity investment after 2020 in comparison to the GLOBAL cumulative capacity until 2020,

@@ -162,6 +162,18 @@ q37_cementCCS(t,regi)$(    pm_macSwitch("co2cement")
   * v37_emiIndCCSmax(t,regi,"co2cement")
 ;
 
+*' Set cement process emissions according to cement production level
+q37_cement_process_emissions(ttot,regi)$(
+                                      ttot.val ge 2005 
+                                  AND cm_co2cement_process_by_equation ne 0 ) ..
+  vm_emiIndBase(ttot,regi,"co2cement_process","cement")
+  =e=
+    s37_clinker_process_CO2
+  * p37_clinker_cement_ratio(ttot,regi)
+  * vm_cesIO(ttot,regi,"ue_cement")
+  / sm_c_2_co2
+;
+
 ***------------------------------------------------------
 *' Calculate industry CCS costs.
 ***------------------------------------------------------

@@ -12,13 +12,15 @@
 *' function.
 *' Last iteration's cement production value is used, since the MAC mechanism is
 *' outside of the optimisation loop.
-vm_emiIndBase.fx(ttot,regi,"co2cement_process","cement")$( ttot.val ge 2005 )
-  = s37_clinker_process_CO2
-  * p37_clinker_cement_ratio(ttot,regi)
-  * vm_cesIO.l(ttot,regi,"ue_cement")
-  / sm_c_2_co2;
-
-
-***p37_emiFac(ttot,regi,entyFe) = sum((entySe,te)$(se2fe(entySe,entyFe,te) and entySeFos(entySe)), pm_emifac(ttot,regi,entySe,entyFe,te,"co2"));
+if (cm_co2cement_process_by_equation eq 0,
+  vm_emiIndBase.fx(ttot,regi,"co2cement_process","cement")$( ttot.val ge 2005 )
+    = s37_clinker_process_CO2
+    * p37_clinker_cement_ratio(ttot,regi)
+    * vm_cesIO.l(ttot,regi,"ue_cement")
+    / sm_c_2_co2;
+else
+  vm_emiIndBase.lo(ttot,regi,"co2cement_process","cement") = 0;
+  vm_emiIndBase.up(ttot,regi,"co2cement_process","cement") = Inf;
+);
 
 *** EOF ./modules/37_industry/subsectors/presolve.gms
