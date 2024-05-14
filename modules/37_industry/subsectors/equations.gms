@@ -284,13 +284,17 @@ q37_plasticWaste(ttot,regi,sefe(entySe,entyFe),emiMkt)$(
                      AND ttot.val ge max(2015, cm_startyear)               ) ..
   v37_plasticWaste(ttot,regi,entySe,entyFe,emiMkt)
   =e=
-    v37_plasticsCarbon(ttot-2,regi,entySe,entyFe,emiMkt)$( ttot.val lt 2070 )
-  + ( ( v37_plasticsCarbon(ttot-2,regi,entySe,entyFe,emiMkt)
-      + v37_plasticsCarbon(ttot-1,regi,entySe,entyFe,emiMkt)
-      )
-    / 2
-    )$( ttot.val eq 2070 )
-  + v37_plasticsCarbon(ttot-1,regi,entySe,entyFe,emiMkt)$( ttot.val gt 2070 )
+    ( v37_plasticsCarbon(ttot-2,regi,entySe,entyFe,emiMkt)$( ttot.val lt 2070 )
+    + ( ( v37_plasticsCarbon(ttot-2,regi,entySe,entyFe,emiMkt)
+        + v37_plasticsCarbon(ttot-1,regi,entySe,entyFe,emiMkt)
+        )
+      / 2
+      )$( ttot.val eq 2070 )
+    + v37_plasticsCarbon(ttot-1,regi,entySe,entyFe,emiMkt)$( ttot.val gt 2070 )
+    )$( cm_plasticWaste_lag eq 1 )
+  + ( v37_plasticsCarbon(ttot,regi,entySe,entyFe,emiMkt)
+    )$( cm_plasticWaste_lag eq 0 )
+  + (1 / 0)$( NOT (cm_plasticWaste_lag eq 0 OR cm_plasticWaste_lag eq 1) )
   ;
 
 *' emissions from plastics incineration as a share of total plastic waste, discounted by captured amount

@@ -1132,9 +1132,10 @@ parameter
 *' * so for small regions learning is very slow. This is a very pessimistic interpretation of 'no learning spillovers',
 *' * as every region has to climb up the global learning curve all by itself.
 *' * In combination with endogenous carbon pricing (e.g., in NDC), the deactivated Learningspillover will lead to higher overall carbon prices. Can be solved by setting carbonprice to exogenous (config).
-*'
-*'
-*'
+
+Parameter cm_plasticWaste_lag "use lag formulation for plastic waste";
+cm_plasticWaste_lag = 1;
+
 ***-----------------------------------------------------------------------------
 *' ####                     FLAGS
 ***-----------------------------------------------------------------------------
