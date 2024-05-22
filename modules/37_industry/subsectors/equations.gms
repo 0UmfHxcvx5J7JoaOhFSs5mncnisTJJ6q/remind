@@ -22,19 +22,9 @@ q37_demFeIndst(t,regi,entyFe,emiMkt)$( entyFe2Sector(entyFe,"indst") ) ..
   =e=
   sum(fe2ppfEn(entyFe,ppfen_industry_dyn37(in)),
     sum((secInd37_emiMkt(secInd37,emiMkt),secInd37_2_pf(secInd37,in)),
-      (
-          vm_cesIO(t,regi,in)
-        + pm_cesdata(t,regi,in,"offset_quantity")
-      )$(NOT secInd37Prc(secInd37))
+      vm_cesIO(t,regi,in)
+    + pm_cesdata(t,regi,in,"offset_quantity")
     )
-  )
-  +
-  sum((secInd37_emiMkt(secInd37Prc,emiMkt),
-       secInd37_tePrc(secInd37Prc,tePrc),
-       tePrc2opmoPrc(tePrc,opmoPrc)),
-    pm_specFeDem(t,regi,entyFe,tePrc,opmoPrc)
-    *
-    vm_outflowPrc(t,regi,tePrc,opmoPrc)
   )
 ;
 
@@ -44,7 +34,6 @@ q37_demFeIndst(t,regi,entyFe,emiMkt)$( entyFe2Sector(entyFe,"indst") ) ..
 $ifthen.no_calibration "%CES_parameters%" == "load"   !! CES_parameters
 q37_energy_limits(t,regi,industry_ue_calibration_target_dyn37(out))$(
                                         t.val gt 2020
-                                    AND NOT ppfUePrc(out)
                                     AND p37_energy_limit_slope(t,regi,out) ) ..
   sum(ces_eff_target_dyn37(out,in), vm_cesIO(t,regi,in))
   =g=
@@ -81,7 +70,7 @@ $endif.exogDem_scen
 *' energy mix, as that is what can be captured); vm_emiIndBase itself is not used for emission
 *' accounting, just as a CCS baseline.
 ***------------------------------------------------------
-q37_emiIndBase(t,regi,enty,secInd37)$( entyFeCC37(enty) OR sameas(enty,"co2cement_process") ) ..
+q37_emiIndBase(t,regi,enty,secInd37) ..
   vm_emiIndBase(t,regi,enty,secInd37)
   =e=
     sum((secInd37_2_pf(secInd37,ppfen_industry_dyn37(in)),fe2ppfEn(entyFeCC37(enty),in)),
@@ -90,121 +79,70 @@ q37_emiIndBase(t,regi,enty,secInd37)$( entyFeCC37(enty) OR sameas(enty,"co2cemen
         * vm_cesIO(t,regi,in)
         )$( in_chemicals_feedstock_37(in) )
       )
-    * sum(se2fe(entySeFos,enty,te),
-        pm_emifac(t,regi,entySeFos,enty,te,"co2")
-      )
-    )$( NOT secInd37Prc(secInd37) )
-  + ( s37_clinker_process_CO2
+        *
+        sum(se2fe(entySeFos,enty,te),
+            pm_emifac(t,regi,entySeFos,enty,te,"co2")
+        )
+    ) !!$(entyFe(enty)) condition should be fulfilled by summation over entyFeCC37 above
+    +
+    (s37_clinker_process_CO2
     * p37_clinker_cement_ratio(t,regi)
     * vm_cesIO(t,regi,"ue_cement")
-    / sm_c_2_co2
-    )$( sameas(enty,"co2cement_process") AND sameas(secInd37,"cement") )
-  + sum((secInd37_tePrc(secInd37,tePrc),tePrc2opmoPrc(tePrc,opmoPrc)),
-      v37_emiPrc(t,regi,enty,tePrc,opmoPrc)
-    )$( secInd37Prc(secInd37) )
+    / sm_c_2_co2)$(sameas(enty,"co2cement_process") AND sameas(secInd37,"cement"))
 ;
 
-***------------------------------------------------------
-*' Compute maximum possible CCS level in industry sub-sectors given the current
-*' CO2 price.
-***------------------------------------------------------
-q37_emiIndCCSmax(t,regi,emiInd37)$(
-            NOT sum(secInd37Prc,secInd37_2_emiInd37(secInd37Prc,emiInd37)) ) ..
-  v37_emiIndCCSmax(t,regi,emiInd37)
-  =e=
-    !! map sub-sector emissions to sub-sector MACs
-    !! otherInd has no CCS, therefore no MAC, cement has both fuel and process
-    !! emissions under the same MAC
-    sum(emiMac2mac(emiInd37,macInd37),
-      !! add cement process emissions, which are calculated in core/preloop
-      !! from a econometric fit and might not correspond to energy use (FIXME)
-      ( sum((secInd37_2_emiInd37(secInd37,emiInd37),entyFe),
-          vm_emiIndBase(t,regi,entyFe,secInd37)
-        )$( NOT sameas(emiInd37,"co2cement_process") )
-      + ( vm_emiIndBase(t,regi,"co2cement_process","cement")
-        )$( sameas(emiInd37,"co2cement_process") )
-      )
-    * pm_macSwitch(macInd37)              !! sub-sector CCS available or not
-    * pm_macAbatLev(t,regi,macInd37)   !! abatement level at current price
-  )
-;
-
-***------------------------------------------------------
-*' Limit industry CCS to maximum possible CCS level.
-***------------------------------------------------------
-q37_IndCCS(t,regi,emiInd37)$(
-            NOT sum(secInd37Prc,secInd37_2_emiInd37(secInd37Prc,emiInd37)) ) ..
-  vm_emiIndCCS(t,regi,emiInd37)
-  =l=
-  v37_emiIndCCSmax(t,regi,emiInd37)
-;
-
-*** Limit industry CCS capacity based on existing CCS projects
-q37_IndCCS_cap_limit(t,regi,secInd37)$(
-                                      NOT secInd37Prc(secInd37) 
-                                  AND p37_indCCSlimit(t,regi,secInd37) ge 0 ) ..
-  sum(secInd37_2_emiInd37(secInd37,emiInd37),
-    vm_emiIndCCS(t,regi,emiInd37)
-  )
-  =l=
-  p37_indCCSlimit(t,regi,secInd37)
-;
-
-***------------------------------------------------------
-*' Limit industry CCS scale-up to sm_macChange (default: 5 % p.a.)
-***------------------------------------------------------
-q37_limit_IndCCS_growth(ttot,regi,emiInd37)$(
-                                        ttot.val ge max(2050, cm_startyear) ) ..
-  vm_emiIndCCS(ttot,regi,emiInd37)
-  =l=
-    vm_emiIndCCS(ttot-1,regi,emiInd37)
-  + sum(secInd37_2_emiInd37(secInd37,emiInd37),
-      v37_emiIndCCSmax(ttot,regi,emiInd37)
-    * sm_macChange
-    * pm_ts(ttot)
-    )
-;
 
 ***------------------------------------------------------
 *' Fix cement fuel and cement process emissions to the same abatement level.
 ***------------------------------------------------------
-q37_cementCCS(t,regi)$(    pm_macSwitch("co2cement")
-                       AND pm_macAbatLev(t,regi,"co2cement") ) ..
+q37_cementCCS(t,regi)$(cm_CCS_cement eq 1 AND cm_IndCCSscen eq 1) ..
     vm_emiIndCCS(t,regi,"co2cement")
-  * v37_emiIndCCSmax(t,regi,"co2cement_process")
+  * vm_emiIndBase(t,regi,"co2cement_process","cement")
   =e=
     vm_emiIndCCS(t,regi,"co2cement_process")
-  * v37_emiIndCCSmax(t,regi,"co2cement")
+  * sum(entyFeCC37(entyFe),
+      vm_emiIndBase(t,regi,entyFe,"cement")
+    )
 ;
 
 ***------------------------------------------------------
-*' Calculate industry CCS costs.
+*' Definition of capacity constraints
 ***------------------------------------------------------
-q37_IndCCSCost(t,regi,emiInd37)$(
-            NOT sum(secInd37Prc,secInd37_2_emiInd37(secInd37Prc,emiInd37)) ) ..
-  vm_IndCCSCost(t,regi,emiInd37)
+q37_limitCapCC(t,regi,teCCInd) ..
+      vm_captureVol(t,regi,teCCInd)
+    =l=
+    sum(teCCInd2rlf(teCCInd,rlf),
+      vm_capFac(t,regi,teCCInd)
+    * vm_cap(t,regi,teCCInd,rlf)
+    )
+;
+
+***------------------------------------------------------
+*' Carbon capture processes can only capture as much co2 as the base process emits
+***------------------------------------------------------
+q37_limitOutflowCC(t,regi,secInd37) ..
+    sum(emiInd37_fe2sec(enty,secInd37),
+      vm_emiIndBase(t,regi,enty,secInd37)
+      )
+  =g=
+    sum(secInd37_teCCInd(secInd37,teCCInd),
+      1. / p37_captureRate(teCCInd)
+      *
+      vm_captureVol(t,regi,teCCInd)
+    )
+;
+
+***------------------------------------------------------
+*' Emission captured from process based industry sector
+***------------------------------------------------------
+q37_emiIndCC(t,regi,secInd37) ..
+    sum(secInd37_2_emiInd37(secInd37,emiInd37),
+      vm_emiIndCCS(t,regi,emiInd37))
   =e=
-    1e-3
-  * pm_macSwitch(emiInd37)
-  * ( sum((enty,secInd37_2_emiInd37(secInd37,emiInd37)),
-        vm_emiIndBase(t,regi,enty,secInd37)
-      )$( NOT sameas(emiInd37,"co2cement_process") )
-    + ( vm_emiIndBase(t,regi,"co2cement_process","cement")
-      )$( sameas(emiInd37,"co2cement_process") )
-    )
-  * sm_dmac
-  * sum(emiMac2mac(emiInd37,enty),
-      ( pm_macStep(t,regi,enty)
-      * sum(steps$( ord(steps) eq pm_macStep(t,regi,enty) ),
-          pm_macAbat(t,regi,enty,steps)
-        )
-      )
-    - sum(steps$( ord(steps) le pm_macStep(t,regi,enty) ),
-        pm_macAbat(t,regi,enty,steps)
-      )
+    sum(secInd37_teCCInd(secInd37,teCCInd),
+      vm_captureVol(t,regi,teCCInd)
     )
 ;
-
 
 ***------------------------------------------------------
 *'  CES markup cost that are accounted in the budget (GDP) to represent sector-specific demand-side transformation cost in industry
@@ -358,125 +296,6 @@ q37_FossilFeedstock_Base(t,regi,entyFe,emiMkt)$(
   )
 ;
 
-*** ---------------------------------------------------------------------------
-***        2. Process-Based
-*** ---------------------------------------------------------------------------
-
-***------------------------------------------------------
-*' Material input to production
-***------------------------------------------------------
-q37_demMatPrc(t,regi,mat)$( matIn(mat) ) ..
-    v37_matFlow(t,regi,mat)
-  =e=
-    sum(tePrc2matIn(tePrc,opmoPrc,mat),
-      p37_specMatDem(mat,tePrc,opmoPrc)
-      *
-      vm_outflowPrc(t,regi,tePrc,opmoPrc)
-    )
-;
-
-***------------------------------------------------------
-*' Material cost
-***------------------------------------------------------
-q37_costMat(t,regi) ..
-    vm_costMatPrc(t,regi)
-  =e=
-    sum(mat,
-      p37_priceMat(mat)
-      *
-      v37_matFlow(t,regi,mat))
-;
-
-***------------------------------------------------------
-*' Output material production
-***------------------------------------------------------
-q37_prodMat(t,regi,mat)$( matOut(mat) ) ..
-    v37_matFlow(t,regi,mat)
-  =e=
-    sum(tePrc2matOut(tePrc,opmoPrc,mat),
-      vm_outflowPrc(t,regi,tePrc,opmoPrc)
-    )
-;
-
-***------------------------------------------------------
-*' Hand-over to CES
-***------------------------------------------------------
-q37_mat2ue(t,regi,in)$( ppfUePrc(in) ) ..
-    vm_cesIO(t,regi,in)
-    + pm_cesdata(t,regi,in,"offset_quantity")
-  =e=
-    sum(mat2ue(mat,in),
-      p37_mat2ue(mat,in)
-      *
-      v37_matFlow(t,regi,mat)
-    )
-;
-
-***------------------------------------------------------
-*' Definition of capacity constraints
-***------------------------------------------------------
-q37_limitCapMat(t,regi,tePrc) ..
-    sum(tePrc2opmoPrc(tePrc,opmoPrc),
-      vm_outflowPrc(t,regi,tePrc,opmoPrc)
-    )
-    =l=
-    sum(teMat2rlf(tePrc,rlf),
-      vm_capFac(t,regi,tePrc)
-    * vm_cap(t,regi,tePrc,rlf)
-    )
-;
-
-***------------------------------------------------------
-*' Emission from process based industry sector (pre CC)
-***------------------------------------------------------
-q37_emiPrc(t,regi,entyFe,tePrc,opmoPrc) ..
-    v37_emiPrc(t,regi,entyFe,tePrc,opmoPrc)
-  =e=
-    pm_specFeDem(t,regi,entyFe,tePrc,opmoPrc)
-    *
-    sum(se2fe(entySeFos,entyFe,te),
-      pm_emifac(t,regi,entySeFos,entyFe,te,"co2"))
-    *
-    vm_outflowPrc(t,regi,tePrc,opmoPrc)
-;
-
-
-***------------------------------------------------------
-*' Carbon capture processes can only capture as much co2 as the base process and the CCS process combined emit
-***------------------------------------------------------
-q37_limitOutflowCCPrc(t,regi,teCCPrc)$(
-                sum((tePrc,opmoPrc,opmoCCPrc),tePrc2teCCPrc(tePrc,opmoPrc,teCCPrc,opmoCCPrc)) ) ..
-    sum(tePrc2opmoPrc(teCCPrc,opmoCCPrc),
-      vm_outflowPrc(t,regi,teCCPrc,opmoCCPrc)
-    )
-  =e=
-    p37_captureRate(teCCPrc)
-    *
-    sum((entyFe,tePrc2teCCPrc(tePrc,opmoPrc,teCCPrc,opmoCCPrc)),
-      v37_shareWithCC(t,regi,tePrc,opmoPrc)
-      *
-      v37_emiPrc(t,regi,entyFe,tePrc,opmoPrc)
-    )
-    +
-    p37_selfCaptureRate(teCCPrc)
-    *
-    sum((entyFe,tePrc2opmoPrc(teCCPrc,opmoCCPrc)),
-      v37_emiPrc(t,regi,entyFe,teCCPrc,opmoCCPrc))
-;
-
-***------------------------------------------------------
-*' Emission captured from process based industry sector
-***------------------------------------------------------
-q37_emiCCPrc(t,regi,emiInd37)$(
-                sum(secInd37Prc,secInd37_2_emiInd37(secInd37Prc,emiInd37)) ) ..
-    vm_emiIndCCS(t,regi,emiInd37)
-  =e=
-    sum((secInd37_2_emiInd37(secInd37Prc,emiInd37),
-         secInd37_tePrc(secInd37Prc,tePrc),
-         tePrc2teCCPrc(tePrc,opmoPrc,teCCPrc,opmoCCPrc)),
-      vm_outflowPrc(t,regi,teCCPrc,opmoCCPrc)
-    )
-;
 
 *' @stop
 *** EOF ./modules/37_industry/subsectors/equations.gms

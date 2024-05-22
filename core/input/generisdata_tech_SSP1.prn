@@ -165,19 +165,4 @@ incolearn                      14000
 ccap0                         0.0008
 learn                           0.15
 
-$ifthen.cm_subsec_model_steel "%cm_subsec_model_steel%" == "processes"
-+                     bf         bof         idr         eaf
-!! Copied from generisdata_tech.prn; Documentation & sources: see generisdata_tech.prn
-tech_stat
-inco0              400.0       200.0       350.0       350.0
-omf                 0.06        0.06        0.06        0.06
-lifetime              20          20          20          20
-
-+                   bfcc       idrcc
-!! Copied from generisdata_tech.prn; Documentation & sources: see generisdata_tech.prn
-inco0               1100         900
-omf                 0.06        0.06
-lifetime              20          20
-$endif.cm_subsec_model_steel
-
 *** EOF ./core/input/generisdata_tech.prn

@@ -1327,10 +1327,6 @@ $setGlobal cm_VREminShare    off !! def = off
 ***     amount of Carbon Capture and Storage (including DACCS and BECCS) is limited to a maximum of 2GtCO2 per yr globally, and 250 Mt CO2 per yr in EU28.
 ***   This switch only works for model native regions. If you want to apply it to a group region use cm_implicitQttyTarget instead.
 $setGlobal cm_CCSmaxBound    off  !! def = off
-*** cm_indCCSlimit assumptions on the limits on industry CCS imposed by the
-***   existing CCS project pipeline.  Corresponds to the files
-***   ./modules/37_industry/subsectors/input/f37_indCCSlimit_%cm_indCCSlimit%.cs4r
-$setglobal cm_indCCSlimit   default !! def = default !! regexp = default|high
 *** c_CES_calibration_new_structure      <-   0        switch to 1 if you want to calibrate a CES structure different from input gdx
 $setglobal c_CES_calibration_new_structure  0     !!  def  =  0  !! regexp = 0|1
 *** c_CES_calibration_write_prices       <-   0       switch to 1 if you want to generate price file, you can use this as new p29_cesdata_price.cs4r price input file
@@ -1683,7 +1679,7 @@ $setGlobal c_regi_nucscen  all  !! def = all
 ***  c_regi_capturescen              "regions to apply cm_ccapturescen to (availability of carbon capture technologies), e.g. c_regi_nucscen <- "JPN,USA"
 $setGlobal c_regi_capturescen  all  !! def = all
 *** cm_subsec_model_steel      "switch between ces-based and process-based steel implementation in subsectors realisation of industry module"
-$setglobal cm_subsec_model_steel  processes  !! def = processes  !! regexp = processes|ces
+$setglobal cm_subsec_model_steel  ces  !! def = processes  !! regexp = processes|ces
 *** set conopt version. Warning: conopt4 is in beta
 $setGlobal cm_conoptv  conopt3    !! def = conopt3
 *' c_empty_model  "Short-circuit the model, just use the input as solution"
@@ -1710,6 +1706,10 @@ $setglobal cm_taxrc_RE  none   !! def = none   !! regexp = none|REdirect
 *' *  (off): no, only infeasable regions are repeated, standard setting
 *' *  (on):  also non-optimal regions are solved again, up to cm_solver_try_max
 $setglobal cm_repeatNonOpt off      !! def = off  !! regexp = off|on
+*** industry ccs
+*** cm_industry_ccs_limit
+*** cm_industry_ccs_limit  0, means wind energy is only represented by "wind", which is a mixture of both wind onshore and wind offshore
+$setglobal cm_industry_ccs_limit  default      !! def = default !! regexp = default|high
 
 *' @stop
 

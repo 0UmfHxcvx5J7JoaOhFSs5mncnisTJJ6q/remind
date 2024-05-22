@@ -133,8 +133,6 @@ $IFTHEN.emiMkt not "%cm_emiMktTarget%" == "off"
       loop(enty2$emiMac2mac(enty,enty2), !! make sure that both mac sectors and mac curves have prices asigned as both sets are used in calculations below
         pm_priceCO2forMAC(t,regi,enty) = pm_taxemiMkt(t,regi,emiMkt)* 1000;
         pm_priceCO2forMAC(t,regi,enty2) = pm_taxemiMkt(t,regi,emiMkt)* 1000;
-        pm_priceCO2forMAC(t,regi,"co2chemicals") = pm_taxemiMkt(t,regi,"ETS")* 1000;
-        pm_priceCO2forMAC(t,regi,"co2steel") = pm_taxemiMkt(t,regi,"ETS")* 1000;
       );
     );
   );
@@ -169,29 +167,26 @@ vm_macBase.fx(ttot,regi,"ch4wsts")$(ttot.val ge 2005) = p_emineg_econometric(reg
 vm_macBase.fx(ttot,regi,"ch4wstl")$(ttot.val ge 2005) = p_emineg_econometric(regi,"ch4wstl","p1") * pm_pop(ttot,regi) * (1000*pm_gdp(ttot,regi) / (pm_pop(ttot,regi)*pm_shPPPMER(regi)))**p_emineg_econometric(regi,"ch4wstl","p2");
 vm_macBase.fx(ttot,regi,"n2owaste")$(ttot.val ge 2005) = p_emineg_econometric(regi,"n2owaste","p1") * pm_pop(ttot,regi) * (1000*pm_gdp(ttot,regi) / (pm_pop(ttot,regi)*pm_shPPPMER(regi)))**p_emineg_econometric(regi,"n2owaste","p2");
 
-
-$ifthen.fixed_shares "%industry%" == "fixed_shares"
-vm_macBase.fx(ttot,regi,"co2cement_process")$( ttot.val ge 2005 )
-  = ( pm_pop(ttot,regi)
-    * ( (1 - p_switch_cement(ttot,regi))
-      * p_emineg_econometric(regi,"co2cement_process","p1")
-      * ( (1000
-          * p_inv_gdx(ttot,regi)
-          / ( pm_pop(ttot,regi)
-            * pm_shPPPMER(regi)
-            )
-          ) ** p_emineg_econometric(regi,"co2cement_process","p2")
-         )
-      + ( p_switch_cement(ttot,regi)
-        * p_emineg_econometric(regi,"co2cement_process","p3")
-        )
-       )
-    )$(p_inv_gdx(ttot,regi) ne 0)
-;
-
-vm_emiIndBase.fx(ttot,regi,"co2cement_process","cement")$( ttot.val ge 2005 )
-= vm_macBase.lo(ttot,regi,"co2cement_process");
-$endif.fixed_shares
+!! vm_macBase.fx(ttot,regi,"co2cement_process")$( ttot.val ge 2005 )
+!!   = ( pm_pop(ttot,regi)
+!!     * ( (1 - p_switch_cement(ttot,regi))
+!!       * p_emineg_econometric(regi,"co2cement_process","p1")
+!!       * ( (1000
+!!           * p_inv_gdx(ttot,regi)
+!!           / ( pm_pop(ttot,regi)
+!!             * pm_shPPPMER(regi)
+!!             )
+!!           ) ** p_emineg_econometric(regi,"co2cement_process","p2")
+!!          )
+!!       + ( p_switch_cement(ttot,regi)
+!!         * p_emineg_econometric(regi,"co2cement_process","p3")
+!!         )
+!!        )
+!!     )$(p_inv_gdx(ttot,regi) ne 0)
+!! ;
+!!
+!! vm_emiIndBase.fx(ttot,regi,"co2cement_process","cement")$( ttot.val ge 2005 )
+!! = vm_macBase.lo(ttot,regi,"co2cement_process");
 
 * *** Reduction of cement demand due to CO2 price markups *** *
 if ( NOT (cm_IndCCSscen eq 1 AND cm_CCS_cement eq 1),
@@ -281,7 +276,6 @@ pm_macAbat(ttot,regi,enty,steps)
   =  p_abatparam_N2O(ttot,regi,enty,steps)
   +  p_abatparam_CH4(ttot,regi,enty,steps)
   +  p_abatparam_CO2(ttot,enty,steps)
-  + pm_abatparam_Ind(ttot,regi,enty,steps)
 ;
 pm_macAbat(ttot,regi,enty,steps)$(ttot.val gt 2100) = pm_macAbat("2100",regi,enty,steps);
 

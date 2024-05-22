@@ -134,33 +134,35 @@ $endif.policy_scenario
 $drop cm_indstExogScen_set
 
 
-$ifthen.cm_subsec_model_steel "%cm_subsec_model_steel%" == "processes"
-!! fix processes procudction in historic years
+!! fix industry CCS in historic years
 if (cm_startyear eq 2005,
   loop(regi,
-    loop(tePrc2opmoPrc(tePrc,opmoPrc),
-      vm_outflowPrc.fx('2005',regi,tePrc,opmoPrc) = pm_outflowPrcIni(regi,tePrc,opmoPrc);
-    );
-  );
-
-  loop(regi,
     loop(ttot$(ttot.val ge 2005 AND ttot.val le 2020),
-      vm_outflowPrc.fx(ttot,regi,'eaf','pri') = 0.;
-      vm_outflowPrc.fx(ttot,regi,'idr','ng') = 0.;
-      vm_outflowPrc.fx(ttot,regi,'idr','h2') = 0.;
-      vm_outflowPrc.fx(ttot,regi,'bfcc','standard') = 0.;
-      vm_outflowPrc.fx(ttot,regi,'idrcc','ng') = 0.;
+      vm_captureVol.fx(ttot,regi,'steelcc') = 0.;
+      vm_captureVol.fx(ttot,regi,'chemicalscc') = 0.;
+      vm_captureVol.fx(ttot,regi,'cementcc') = 0.;
     );
   );
 );
 
-!! Switch to turn off steel CCS
+!! Switch to turn off CCS
 if (cm_CCS_steel ne 1 OR cm_IndCCSscen ne 1,
-  vm_cap.fx(t,regi,teCCPrc,rlf) = 0.;
+  vm_cap.fx(t,regi,"steelcc",rlf) = 0.;
+);
+if (cm_CCS_chemicals ne 1 OR cm_IndCCSscen ne 1,
+  vm_cap.fx(t,regi,"chemicalscc",rlf) = 0.;
+);
+if (cm_CCS_cement ne 1 OR cm_IndCCSscen ne 1,
+  vm_cap.fx(t,regi,"cementcc",rlf) = 0.;
 );
 
-v37_shareWithCC.lo(t,regi,tePrc,opmoPrc) = 0.;
-v37_shareWithCC.up(t,regi,tePrc,opmoPrc) = 1.;
-$endif.cm_subsec_model_steel
+
+vm_cap.up("2025",regi,"steelcc","1")     = f37_industry_CCS_limits("2025",regi,"steel");
+vm_cap.up("2025",regi,"chemicalscc","1") = f37_industry_CCS_limits("2025",regi,"chemicals");
+vm_cap.up("2025",regi,"cementcc","1")    = f37_industry_CCS_limits("2025",regi,"cement");
+vm_cap.up("2030",regi,"steelcc","1")     = f37_industry_CCS_limits("2030",regi,"steel");
+vm_cap.up("2030",regi,"chemicalscc","1") = f37_industry_CCS_limits("2030",regi,"chemicals");
+vm_cap.up("2030",regi,"cementcc","1")    = f37_industry_CCS_limits("2030",regi,"cement");
+
 
 *** EOF ./modules/37_industry/subsectors/bounds.gms
