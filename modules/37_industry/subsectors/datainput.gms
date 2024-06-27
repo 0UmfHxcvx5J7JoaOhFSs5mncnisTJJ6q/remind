@@ -95,9 +95,13 @@ pm_energy_limit(out)$(NOT sum(in, ces_eff_target_dyn37(out,in))) = 0.;
 * year (e.g. 2050).
 $ifthen.no_calibration "%CES_parameters%" == "load"   !! CES_parameters
 if (cm_startyear eq 2005,
-  execute_loadpoint "input.gdx"     p37_cesIO_baseline = vm_cesIO.l;
+  execute_loadpoint "input.gdx"
+    p37_cesIO_baseline = vm_cesIO.l,
+    p37_plasticsCarbon_baseline = v37_plasticsCarbon.l;
 else
-  execute_loadpoint "input_ref.gdx" p37_cesIO_baseline = vm_cesIO.l;
+  execute_loadpoint "input_ref.gdx"
+    p37_cesIO_baseline = vm_cesIO.l,
+    p37_plasticsCarbon_baseline = v37_plasticsCarbon.l;
 );
 
 Parameter

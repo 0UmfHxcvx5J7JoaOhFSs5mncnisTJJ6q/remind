@@ -229,6 +229,18 @@ q37_plasticsCarbon(t,regi,sefe(entySe,entyFe),emiMkt)$(
   * s37_plasticsShare
 ;
 
+q37_plasticsCarbon_limit(t,regi)$( t.val eq 2025 ) ..
+  sum((sefe(entySe,entyFe),emiMkt)$( 
+                            entyFE2sector2emiMkt_NonEn(entyFe,"indst",emiMkt) ),
+    v37_plasticsCarbon(t,regi,entySe,entyFe,emiMkt)
+  )
+  =l=
+  sum((sefe(entySe,entyFe),emiMkt)$( 
+                            entyFE2sector2emiMkt_NonEn(entyFe,"indst",emiMkt) ),
+    p37_plasticsCarbon_baseline(t,regi,entySe,entyFe,emiMkt)
+  )
+;
+
 *' calculate plastic waste generation, shifted by mean lifetime of plastic products
 *' shift by 2 time steps when we have 5-year steps and 1 when we have 10-year steps
 *' allocate averge of 2055 and 2060 to 2070

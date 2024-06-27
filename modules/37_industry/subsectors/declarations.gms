@@ -25,15 +25,16 @@ Parameters
 
   p37_captureRate(all_te)                                                      "Capture rate of CCS technology"
 
-  p37_chemicals_feedstock_share(ttot,all_regi)               "minimum share of feso/feli/fega in total chemicals FE input [0-1]"
-  p37_FeedstockCarbonContent(ttot,all_regi,all_enty)         "carbon content of feedstocks [GtC/TWa]"
-  p37_FE_noNonEn(ttot,all_regi,all_enty,all_enty2,emiMkt)    "testing parameter for FE without non-energy use"
-  p37_Emi_ChemProcess(ttot,all_regi,all_enty,emiMkt)         "testing parameter for process emissions from chemical feedstocks"
-  p37_CarbonFeed_CDR(ttot,all_regi,all_emiMkt)               "testing parameter for carbon in feedstocks from biogenic and synthetic sources"
-  p37_IndFeBal_FeedStock_LH(ttot,all_regi,all_enty,emiMkt)   "testing parameter Ind FE Balance left-hand side feedstock term"
-  p37_IndFeBal_FeedStock_RH(ttot,all_regi,all_enty,emiMkt)   "testing parameter Ind FE Balance right-hand side feedstock term"
-  p37_EmiEnDemand_NonEnCorr(ttot,all_regi)                   "energy demand co2 emissions with non-energy correction"
-  p37_EmiEnDemand(ttot,all_regi)                             "energy demand co2 emissions without non-energy correction"
+  p37_chemicals_feedstock_share(ttot,all_regi)                              "minimum share of feso/feli/fega in total chemicals FE input [0-1]"
+  p37_FeedstockCarbonContent(ttot,all_regi,all_enty)                        "carbon content of feedstocks [GtC/TWa]"
+  p37_FE_noNonEn(ttot,all_regi,all_enty,all_enty2,emiMkt)                   "testing parameter for FE without non-energy use"
+  p37_Emi_ChemProcess(ttot,all_regi,all_enty,emiMkt)                        "testing parameter for process emissions from chemical feedstocks"
+  p37_CarbonFeed_CDR(ttot,all_regi,all_emiMkt)                              "testing parameter for carbon in feedstocks from biogenic and synthetic sources"
+  p37_IndFeBal_FeedStock_LH(ttot,all_regi,all_enty,emiMkt)                  "testing parameter Ind FE Balance left-hand side feedstock term"
+  p37_IndFeBal_FeedStock_RH(ttot,all_regi,all_enty,emiMkt)                  "testing parameter Ind FE Balance right-hand side feedstock term"
+  p37_EmiEnDemand_NonEnCorr(ttot,all_regi)                                  "energy demand co2 emissions with non-energy correction"
+  p37_EmiEnDemand(ttot,all_regi)                                            "energy demand co2 emissions without non-energy correction"
+  p37_plasticsCarbon_baseline(ttot,all_regi,all_enty,all_enty,all_emiMkt)   "Carbon flow: carbon contained in plastics; baseline run [GtC]"
 
 *** output parameters only for reporting
   o37_cementProcessEmissions(ttot,all_regi,all_enty)                     "cement process emissions [GtC/a]"
@@ -85,6 +86,7 @@ $endif.no_calibration
   q37_FossilFeedstock_Base(ttot,all_regi,all_enty,all_emiMkt)                       "in baseline runs feedstocks only come from fossil energy carriers"
   q37_FeedstocksCarbon(ttot,all_regi,all_enty,all_enty,all_emiMkt)                  "calculate carbon contained in feedstocks [GtC]"
   q37_plasticsCarbon(ttot,all_regi,all_enty,all_enty,all_emiMkt)                    "calculate carbon contained in plastics [GtC]"
+  q37_plasticsCarbon_limit(ttot,all_regi)                                           "limit plastics production to baseline scenario"
   q37_plasticWaste(ttot,all_regi,all_enty,all_enty,all_emiMkt)                      "calculate carbon contained in plastic waste [GtC]"
   q37_incinerationEmi(ttot,all_regi,all_enty,all_enty,all_emiMkt)                   "calculate carbon contained in plastics that are incinerated [GtC]"
   q37_incinerationCCS(ttot,all_regi,all_enty,all_enty,all_emiMkt)                   "calculate carbon captured from plastics that are incinerated [GtC]"
