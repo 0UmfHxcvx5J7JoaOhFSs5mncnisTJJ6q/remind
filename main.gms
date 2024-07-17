@@ -596,6 +596,10 @@ parameter
   cm_CCS_steel              "CCS for steel sub-sector"
 ;
   cm_CCS_steel           = 1;        !! def = 1
+
+parameter c_CHA_EAF_sed_shift "shift CHA EAF specific energy demand";
+c_CHA_EAF_sed_shift = 0; 
+
 *'
 parameter
   cm_bioenergy_SustTax      "level of the bioenergy sustainability tax in fraction of bioenergy price"
