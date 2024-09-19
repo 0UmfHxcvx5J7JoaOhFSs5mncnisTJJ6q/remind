@@ -70,7 +70,9 @@ $endif.exogDem_scen
 *' energy mix, as that is what can be captured); vm_emiIndBase itself is not used for emission
 *' accounting, just as a CCS baseline.
 ***------------------------------------------------------
-q37_emiIndBase(t,regi,enty,secInd37) ..
+q37_emiIndBase(t,regi,enty,secInd37)$(
+                               NOT (    sameas(enty,"co2cement_process")
+                                    AND cm_CCS_cement ne 0               ) ) ..
   vm_emiIndBase(t,regi,enty,secInd37)
   =e=
     sum((secInd37_2_pf(secInd37,ppfen_industry_dyn37(in)),fe2ppfEn(entyFeCC37(enty),in)),
