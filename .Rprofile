@@ -3,6 +3,31 @@ local({
 # for some reason this also has implications for symlinking into the global cache
 Sys.setenv(RENV_PATHS_LIBRARY = "renv/library")
 
+# write-protect installed packages to prevent tampering and accidental deletion
+options(renv.cache.callback = function(path) {
+    files <- path |>
+        dirname() |>   # two levels up to the hash-directory
+	dirname() |>
+        list.files(all.files = TRUE, full.names = TRUE, recursive = TRUE,
+                   include.dirs = TRUE)
+
+    RENV_CACHE_USER <- Sys.getenv('RENV_CACHE_USER', unset = NA)
+    if (is.na(RENV_CACHE_USER)) {
+        warning('RENV_CACHE_USER is not set.  Cannot write-protect installed ',
+                'package `', basename(path), '`')
+    }
+    else if (any(file.info(files)[,'uname'] != RENV_CACHE_USER)) {
+        warning('Not all files under `', path, '` are owned by RENV_CACHE_USER',
+                ' (', RENV_CACHE_USER, ').  Cannot write-protect installed ',
+                'package `', basename(path), '`')
+    }
+    else {
+        umask <- Sys.umask('0222')
+        Sys.chmod(files)
+        Sys.umask(umask)
+    }
+})
+
 # do not check if library and renv.lock are in sync, because normally renv.lock does not exist
 options(renv.config.synchronized.check = FALSE)
 
