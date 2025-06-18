@@ -422,7 +422,7 @@ pm_tau_ces_tax(t,regi,"feh2_cement")    = pm_tau_ces_tax(t,regi,"feh2_cement")  
 pm_tau_ces_tax(t,regi,"feh2_chemicals") = pm_tau_ces_tax(t,regi,"feh2_chemicals") *  2;
 pm_tau_ces_tax(t,regi,"feh2_steel")     = pm_tau_ces_tax(t,regi,"feh2_steel")     *  4;
 pm_tau_ces_tax(t,regi,"feh2_otherInd")  = pm_tau_ces_tax(t,regi,"feh2_otherInd")  * 10;
-$endif
+$endif.CESMkup
 
 $ifthen.CESMkup "%cm_CESMkup_ind%" == "manual"
 loop (ppfen_industry_dyn37(in)$( p37_CESMkup_input(in) ),

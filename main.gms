@@ -598,6 +598,15 @@ parameter
   cm_CCS_steel              "CCS for steel sub-sector"
 ;
   cm_CCS_steel           = 1;        !! def = 1
+
+parameters
+  cm_Industry_CCS_cap_mod     "industry CCS capacity ceiling modifyer"
+  cm_Industry_CCS_inco0_mod   "industry CCS investment cost modifyer"
+;
+
+cm_Industry_CCS_cap_mod   = 1;
+cm_Industry_CCS_inco0_mod = 1;
+
 *'
 parameter
   cm_bioenergy_SustTax      "level of the bioenergy sustainability tax in fraction of bioenergy price"

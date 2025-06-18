@@ -145,6 +145,14 @@ if (cm_startyear eq 2005,
   );
 );
 
+!! limit industry CCS capacity
+loop ((t,secInd37_teCCind(secInd37,teCCind))$( 
+                                             2025 le t.val AND t.val le 2030 ),
+  vm_cap.up(t,regi,teCCind,"1")
+  = f37_industry_CCS_limits(t,regi,secInd37)
+  * cm_Industry_CCS_cap_mod;
+);
+
 !! Switch to turn off CCS
 if (cm_CCS_steel ne 1 OR cm_IndCCSscen ne 1,
   vm_cap.fx(t,regi,"steelcc",rlf) = 0.;
@@ -155,14 +163,6 @@ if (cm_CCS_chemicals ne 1 OR cm_IndCCSscen ne 1,
 if (cm_CCS_cement ne 1 OR cm_IndCCSscen ne 1,
   vm_cap.fx(t,regi,"cementcc",rlf) = 0.;
 );
-
-
-vm_cap.up("2025",regi,"steelcc","1")     = f37_industry_CCS_limits("2025",regi,"steel");
-vm_cap.up("2025",regi,"chemicalscc","1") = f37_industry_CCS_limits("2025",regi,"chemicals");
-vm_cap.up("2025",regi,"cementcc","1")    = f37_industry_CCS_limits("2025",regi,"cement");
-vm_cap.up("2030",regi,"steelcc","1")     = f37_industry_CCS_limits("2030",regi,"steel");
-vm_cap.up("2030",regi,"chemicalscc","1") = f37_industry_CCS_limits("2030",regi,"chemicals");
-vm_cap.up("2030",regi,"cementcc","1")    = f37_industry_CCS_limits("2030",regi,"cement");
 
 
 *** EOF ./modules/37_industry/subsectors/bounds.gms
