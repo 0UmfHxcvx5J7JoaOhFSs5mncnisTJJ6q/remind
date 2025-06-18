@@ -412,6 +412,18 @@ pm_tau_ces_tax(t,regi,"feh2_cement")    = 100 * sm_TWa_2_MWh * 1e-12;
 
 
 *' overwrite or extend CES markup cost if specified by switch
+$ifthen.CESMkup "%cm_CESMkup_ind_H2%" == "opt"
+pm_tau_ces_tax(t,regi,"feh2_cement")    = pm_tau_ces_tax(t,regi,"feh2_cement")    /  2;
+pm_tau_ces_tax(t,regi,"feh2_chemicals") = pm_tau_ces_tax(t,regi,"feh2_chemicals") /  2;
+pm_tau_ces_tax(t,regi,"feh2_steel")     = pm_tau_ces_tax(t,regi,"feh2_steel")     /  4;
+pm_tau_ces_tax(t,regi,"feh2_otherInd")  = pm_tau_ces_tax(t,regi,"feh2_otherInd")  / 40;
+$elseif.CESMkup "%cm_CESMkup_ind_H2%" == "pes"
+pm_tau_ces_tax(t,regi,"feh2_cement")    = pm_tau_ces_tax(t,regi,"feh2_cement")    *  2;
+pm_tau_ces_tax(t,regi,"feh2_chemicals") = pm_tau_ces_tax(t,regi,"feh2_chemicals") *  2;
+pm_tau_ces_tax(t,regi,"feh2_steel")     = pm_tau_ces_tax(t,regi,"feh2_steel")     *  4;
+pm_tau_ces_tax(t,regi,"feh2_otherInd")  = pm_tau_ces_tax(t,regi,"feh2_otherInd")  * 10;
+$endif
+
 $ifthen.CESMkup "%cm_CESMkup_ind%" == "manual"
 loop (ppfen_industry_dyn37(in)$( p37_CESMkup_input(in) ),
   p37_CESMkup(ttot,regi,in)$( ppfen_MkupCost37(in) )

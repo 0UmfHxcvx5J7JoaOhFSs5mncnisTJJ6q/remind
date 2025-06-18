@@ -1581,6 +1581,11 @@ $setGlobal cm_CESMkup_build  standard  !! def = standard
 $setGlobal cm_CESMkup_ind        standard  !! def = standard
 $setGlobal cm_CESMkup_ind_data   ""        !! def = ""
 
+*** Modify industry H2 CES markups
+*** - "opt" decreases markups by a factor of 2-40
+*** - "pes" increases markups by a factor of 2-10
+$setGlobal cm_CESMkup_ind_H2 off  !! off
+
 *** cm_ind_energy_limit Switch for setting upper limits on industry energy
 *** efficiency improvements.  See ./modules/37_subsectors/datainput.gms for
 *** implementation.
