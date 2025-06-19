@@ -36,6 +36,8 @@ Parameters
   p37_EmiEnDemand(ttot,all_regi)                                            "energy demand co2 emissions without non-energy correction"
   p37_plasticsCarbon_baseline(ttot,all_regi,all_enty,all_enty,all_emiMkt)   "Carbon flow: carbon contained in plastics; baseline run [GtC]"
 
+  p37_demFeSector_afterTax_baseline(ttot,all_regi,all_enty,all_enty,emi_sectors,all_emiMkt)
+
 *** output parameters only for reporting
   o37_cementProcessEmissions(ttot,all_regi,all_enty)                     "cement process emissions [GtC/a]"
   o37_demFeIndTotEn(ttot,all_regi,all_enty,all_emiMkt)                   "total FE per energy carrier and emissions market in industry (sum over subsectors)"
@@ -70,6 +72,8 @@ Positive Variables
 
   !! process-based implementation
   vm_captureVol(tall,all_regi,all_te)                               "Production volume of processes in process-based model [Gt/a]"
+
+  v37_demFeIndst_biomass_share(ttot,all_regi,all_enty,all_emiMkt)   "biomass share in industry FE demand"
 ;
 
 Equations
@@ -101,6 +105,8 @@ $endif.CES_parameters
   q37_limitCapCC(tall,all_regi,all_te)                                              "carbon capture volume is limited by capacities"
   q37_emiIndCC(tall,all_regi,secInd37)                                              "Captured emissions from CCS"
   q37_limitOutflowCC(tall,all_regi,secInd37)                                        "Carbon capture processes can only capture as much co2 as the base process emits"
+
+  q37_demFeIndst_biomass_share(ttot,all_regi,all_enty,all_emiMkt)   "biomass share in industry FE demand"
 ;
 
 *** EOF ./modules/37_industry/subsectors/declarations.gms

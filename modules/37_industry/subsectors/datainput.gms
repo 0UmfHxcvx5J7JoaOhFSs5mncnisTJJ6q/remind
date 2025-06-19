@@ -97,12 +97,15 @@ $ifthen.no_calibration "%CES_parameters%" == "load"   !! CES_parameters
 if (cm_startyear eq 2005,
   execute_loadpoint "input.gdx"
     p37_cesIO_baseline = vm_cesIO.l,
-    p37_plasticsCarbon_baseline = v37_plasticsCarbon.l;
+    p37_plasticsCarbon_baseline = v37_plasticsCarbon.l,
+    p37_demFeSector_afterTax_baseline = vm_demFeSector_afterTax.l;
 else
   execute_loadpoint "input_ref.gdx"
     p37_cesIO_baseline = vm_cesIO.l,
-    p37_plasticsCarbon_baseline = v37_plasticsCarbon.l;
+    p37_plasticsCarbon_baseline = v37_plasticsCarbon.l,
+    p37_demFeSector_afterTax_baseline = vm_demFeSector_afterTax.l;
 );
+
 
 Parameter
   p37_energy_limit_def(ttot,ext_regi,all_in)   "input data for calculating p37_energy_limit_slope"

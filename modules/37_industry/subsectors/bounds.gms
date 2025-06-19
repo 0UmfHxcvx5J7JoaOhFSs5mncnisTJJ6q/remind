@@ -120,8 +120,8 @@ vm_cesIO.lo(t,regi_dyn29(regi),in_industry_dyn37(in))$(
 *' carbon prices due to missing adjustment costs.
 if (cm_startyear gt 2005,   !! not a baeline or NPi scenario
   vm_demFeSector_afterTax.up(t,regi,"sesobio","fesos","indst","ETS")
-  = max(0.25 , smax(t2, pm_secBioShare(t2,regi,"fesos","indst") ) )
-    * p37_BAU_industry_ETS_solids(t,regi);
+  = max(0.25, smax(t2, pm_secBioShare(t2,regi,"fesos","indst")))
+  * p37_BAU_industry_ETS_solids(t,regi);
 );
 
 !! Fix industry output for Bal and EnSec scenario
@@ -164,5 +164,33 @@ if (cm_CCS_cement ne 1 OR cm_IndCCSscen ne 1,
   vm_cap.fx(t,regi,"cementcc",rlf) = 0.;
 );
 
+*** industry biomass shares
+v37_demFeIndst_biomass_share.l(t,regi,entyFE,emiMkt)$(
+                                       sum(entySeBio, sefe(entySeBio,entyFE)) 
+                                   AND sector2emiMkt("indst",emiMkt)          )
+  = sum(sefe(entySeBio,entyFe),
+      p37_demFeSector_afterTax_baseline(t,regi,entySeBio,entyFe,"indst",emiMkt)
+    )
+  / ( sum(sefe(entySe,entyFe),
+        p37_demFeSector_afterTax_baseline(t,regi,entySe,entyFe,"indst",emiMkt)
+      )
+    + sm_eps
+    );
+
+$ifthen NOT "%cm_Indst_biomass_share_limit%" == "off"
+v37_demFeIndst_biomass_share.up(t,regi,entyFE,emiMkt)$(
+                                       t.val ge 2030
+                                   AND sum(entySeBio, sefe(entySeBio,entyFE)) 
+                                   AND sector2emiMkt("indst",emiMkt)          )
+  = sum(sefe(entySeBio,entyFe),
+      p37_demFeSector_afterTax_baseline(t,regi,entySeBio,entyFe,"indst",emiMkt)
+    )
+  / ( sum(sefe(entySe,entyFe),
+        p37_demFeSector_afterTax_baseline(t,regi,entySe,entyFe,"indst",emiMkt)
+      )
+    + sm_eps
+    )
+  * %cm_Indst_biomass_share_limit%;
+$endif
 
 *** EOF ./modules/37_industry/subsectors/bounds.gms

@@ -28,6 +28,19 @@ q37_demFeIndst(t,regi,entyFe,emiMkt)$( entyFe2Sector(entyFe,"indst") ) ..
   )
 ;
 
+q37_demFeIndst_biomass_share(t,regi,entyFe,emiMkt)$( 
+                                    sum(entySeBio, sefe(entySeBio,entyFe))
+                                AND          sector2emiMkt("indst",emiMkt) ) ..
+    v37_demFeIndst_biomass_share(t,regi,entyFe,emiMkt)
+  * sum(sefe(entySe,entyFe),
+      vm_demFeSector_afterTax(t,regi,entySe,entyFe,"indst",emiMkt)
+    )
+  =e=
+  sum(sefe(entySeBio,entyFe),
+    vm_demFeSector_afterTax(t,regi,entySeBio,entyFe,"indst",emiMkt)
+  )
+;
+
 ***------------------------------------------------------
 *' Thermodynamic limits on subsector energy demand
 ***------------------------------------------------------
