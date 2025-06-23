@@ -124,12 +124,12 @@ q37_cementCCS(t,regi)$(cm_CCS_cement eq 1 AND cm_IndCCSscen eq 1) ..
 *' Definition of capacity constraints
 ***------------------------------------------------------
 q37_limitCapCC(t,regi,teCCInd) ..
-      vm_captureVol(t,regi,teCCInd)
-    =l=
-    sum(teCCInd2rlf(teCCInd,rlf),
-      vm_capFac(t,regi,teCCInd)
-    * vm_cap(t,regi,teCCInd,rlf)
-    )
+  vm_captureVol(t,regi,teCCInd)
+  =l=
+  sum(teCCInd2rlf(teCCInd,rlf),
+    vm_capFac(t,regi,teCCInd)
+  * vm_cap(t,regi,teCCInd,rlf)
+  )
 ;
 
 ***------------------------------------------------------

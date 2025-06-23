@@ -146,8 +146,7 @@ if (cm_startyear eq 2005,
 );
 
 !! limit industry CCS capacity
-loop ((t,secInd37_teCCind(secInd37,teCCind))$( 
-                                             2025 le t.val AND t.val le 2030 ),
+loop ((t,secInd37_teCCind(secInd37,teCCind))$( 2025 lt t.val ),
   vm_cap.up(t,regi,teCCind,"1")
   = f37_industry_CCS_limits(t,regi,secInd37)
   * cm_Industry_CCS_cap_mod;
