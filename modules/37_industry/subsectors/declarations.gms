@@ -74,6 +74,7 @@ Positive Variables
   vm_captureVol(tall,all_regi,all_te)                               "Production volume of processes in process-based model [Gt/a]"
 
   v37_demFeIndst_biomass_share(ttot,all_regi,all_enty,all_emiMkt)   "biomass share in industry FE demand"
+  v37_demFeIndst_hydrogen_share(ttot,all_regi,all_emiMkt)           "hydrogen share in industry FE demand"
 ;
 
 Equations
@@ -107,6 +108,7 @@ $endif.CES_parameters
   q37_limitOutflowCC(tall,all_regi,secInd37)                                        "Carbon capture processes can only capture as much co2 as the base process emits"
 
   q37_demFeIndst_biomass_share(ttot,all_regi,all_enty,all_emiMkt)   "biomass share in industry FE demand"
+  q37_demFeIndst_hydrogen_share(ttot,all_regi,all_emiMkt)           "hydrogen share in industry FE demand"
 ;
 
 *** EOF ./modules/37_industry/subsectors/declarations.gms
