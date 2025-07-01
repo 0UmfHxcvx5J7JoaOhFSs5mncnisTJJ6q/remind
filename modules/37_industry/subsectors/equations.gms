@@ -48,8 +48,7 @@ q37_demFeIndst_hydrogen_share(t,regi,emiMkt)$(
       vm_demFeSector_afterTax(t,regi,entySe,entyFe,"indst",emiMkt)
     )
   =e=
-  sum((sefe(entySe,entyFe),entyFe2Sector(entyFe,"indst"))$(
-                                  sameas(entySe,"seh2") OR entySeSyn(entySe) ),
+  sum((sefe(entySeAllH2(entySe),entyFe),entyFe2Sector(entyFe,"indst")),
     vm_demFeSector_afterTax(t,regi,entySe,entyFe,"indst",emiMkt)
   )
 ;

@@ -1745,6 +1745,13 @@ entySeSyn(all_enty)   "synfuel secondary energy types"
   segasyn    "secondary energy gas from H2"
 /
 
+entySeAllH2(all_enty)
+/
+  seliqsyn
+  segasyn
+  seh2
+/
+
 entyFe(all_enty)      "final energy types."
 /
         fegas        "FE gas stationary"

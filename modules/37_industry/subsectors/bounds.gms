@@ -190,36 +190,30 @@ v37_demFeIndst_biomass_share.up(t,regi,entyFE,emiMkt)$(
       )
     + sm_eps
     )
-  * %cm_Indst_biomass_share_limit%;
+  * %cm_Indst_biomass_share_limit%;  !! cm_Indst_biomass_share_limit
 $endif
 
 *** industry hydrogen shares
 v37_demFeIndst_hydrogen_share.l(t,regi,emiMkt)$(
                                                 sector2emiMkt("indst",emiMkt) )
-  = sum(sefe(entySe,entyFe)$( entyFe2Sector(entyFe,"indst") ),
+  = sum(sefe(entySeAllH2(entySe),entyFe)$( entyFe2Sector(entyFe,"indst") ),
       vm_demFeSector_afterTax.l(t,regi,entySe,entyFe,"indst",emiMkt)
     )
-  / (  sum(sefe(entySe,entyFe)$(    entyFe2Sector(entyFe,"indst")
-                               AND entySe("seh2") OR entySeSyn(entySe) ),
-        vm_demFeSector_afterTax.l(t,regi,entySe,entyFe,"indst",emiMkt)
-      )
-    + sm_tmp
+  / sum(sefe(entySe,entyFe)$( entyFe2Sector(entyFe,"indst") ),
+      vm_demFeSector_afterTax.l(t,regi,entySe,entyFe,"indst",emiMkt)
     );
 
 $ifthen NOT "%cm_Indst_hydrogen_share_limit%" == "off"
 v37_demFeIndst_hydrogen_share.up(t,regi,emiMkt)$(
                                                 t.val ge 2030
                                             AND sector2emiMkt("indst",emiMkt) )
-  = sum(sefe(entySe,entyFe)$( entyFe2Sector(entyFe,"indst") ),
+  = sum(sefe(entySeAllH2(entySe),entyFe)$( entyFe2Sector(entyFe,"indst") ),
       vm_demFeSector_afterTax.l(t,regi,entySe,entyFe,"indst",emiMkt)
     )
-  / (  sum(sefe(entySe,entyFe)$(    entyFe2Sector(entyFe,"indst")
-                               AND entySe("seh2") OR entySeSyn(entySe) ),
-        vm_demFeSector_afterTax.l(t,regi,entySe,entyFe,"indst",emiMkt)
-      )
-    + sm_tmp
+  / sum(sefe(entySe,entyFe)$( entyFe2Sector(entyFe,"indst") ),
+      vm_demFeSector_afterTax.l(t,regi,entySe,entyFe,"indst",emiMkt)
     )
-  * %cm_Indst_hydrogen_share_limit%;
+  * %cm_Indst_hydrogen_share_limit%;  !! cm_Indst_hydrogen_share_limit
 $endif
 
 *** EOF ./modules/37_industry/subsectors/bounds.gms
