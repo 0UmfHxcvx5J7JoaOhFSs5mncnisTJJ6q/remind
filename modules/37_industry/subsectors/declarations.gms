@@ -61,6 +61,8 @@ $ifthen.cm_wasteIncinerationCCSshare not "%cm_wasteIncinerationCCSshare%" == "of
   p37_wasteIncinerationCCSshare(ttot,ext_regi)            "switch values for proportion of waste incineration that is captured [%]"
   / %cm_wasteIncinerationCCSshare% /
 $endIf.cm_wasteIncinerationCCSshare
+
+  p37_ind_CCS_cap(tall, all_regi,all_te,rlf)
 ;
 
 Positive Variables

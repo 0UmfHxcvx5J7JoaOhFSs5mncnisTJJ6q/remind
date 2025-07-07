@@ -599,14 +599,6 @@ parameter
 ;
   cm_CCS_steel           = 1;        !! def = 1
 
-parameters
-  cm_Industry_CCS_cap_mod     "industry CCS capacity ceiling modifyer"
-  cm_Industry_CCS_inco0_mod   "industry CCS investment cost modifyer"
-;
-
-cm_Industry_CCS_cap_mod   = 1;
-cm_Industry_CCS_inco0_mod = 1;
-
 *'
 parameter
   cm_bioenergy_SustTax      "level of the bioenergy sustainability tax in fraction of bioenergy price"
@@ -1534,10 +1526,13 @@ $setglobal cm_CCS_markup  off  !! def = off
 ***   or number (ex. 0.66), multiply by 0.66 Industry CSS cost markup
 $setglobal cm_Industry_CCS_markup  off !! def = off
 
-*** limit on biomass share in industry relative to baseline [1 - 0]
+*** limit on CCS capacity in industry relative to reference [1 - 0]
+$setglobal cm_Indst_CCS_cap_limit    off !! def = off
+
+*** limit on biomass share in industry relative to reference [1 - 0]
 $setglobal cm_Indst_biomass_share_limit off  !! def = off
 
-*** limit on hydrogen share in industry relative to baseline [1 - 0]
+*** limit on hydrogen share in industry relative to reference [1 - 0]
 $setglobal cm_Indst_hydrogen_share_limit off  !! def = off
 
 *** cm_renewables_floor_cost "additional floor cost for renewables"

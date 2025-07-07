@@ -145,15 +145,6 @@ $include "./core/input/generisdata_tech.prn"
 $include "./core/input/generisdata_trade.prn"
 ;
 
-!! modify industry CCS capacity costs
-fm_dataglob("inco0","cementcc")    = fm_dataglob("inco0","cementcc")    * cm_Industry_CCS_inco0_mod;
-fm_dataglob("inco0","chemicalscc") = fm_dataglob("inco0","chemicalscc") * cm_Industry_CCS_inco0_mod;
-fm_dataglob("inco0","steelcc")     = fm_dataglob("inco0","steelcc")     * cm_Industry_CCS_inco0_mod;
-
-fm_dataglob("inco0",teCCind)
-  = fm_dataglob("inco0",teCCind)
-  * cm_Industry_CCS_inco0_mod;
-
 *** CG warning: some of the SSP1 and SSP5 costs are not consistent with the story line (e.g. under SSP1 blue H2 and some fossil fuel CCS technologies have lower costs than in SSP2). This is to be fixed in the future when new SSP storylines are implemented, unclear when (29-1-2024). In the future, SSP1 and SSP5 data should be implemented as switches to avoid errors
 *JH* SSP energy technology scenario
 table f_dataglob_SSP1(char,all_te)        "Techno-economic assumptions consistent with SSP1"

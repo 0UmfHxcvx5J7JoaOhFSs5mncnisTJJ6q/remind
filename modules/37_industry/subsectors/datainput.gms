@@ -98,12 +98,14 @@ if (cm_startyear eq 2005,
   execute_loadpoint "input.gdx"
     p37_cesIO_baseline = vm_cesIO.l,
     p37_plasticsCarbon_baseline = v37_plasticsCarbon.l,
-    p37_demFeSector_afterTax_baseline = vm_demFeSector_afterTax.l;
+    p37_demFeSector_afterTax_baseline = vm_demFeSector_afterTax.l,
+    p37_ind_CCS_cap = vm_cap.l;
 else
   execute_loadpoint "input_ref.gdx"
     p37_cesIO_baseline = vm_cesIO.l,
     p37_plasticsCarbon_baseline = v37_plasticsCarbon.l,
-    p37_demFeSector_afterTax_baseline = vm_demFeSector_afterTax.l;
+    p37_demFeSector_afterTax_baseline = vm_demFeSector_afterTax.l,
+    p37_ind_CCS_cap = vm_cap.l;
 );
 
 
