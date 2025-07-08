@@ -28,28 +28,75 @@ q37_demFeIndst(t,regi,entyFe,emiMkt)$( entyFe2Sector(entyFe,"indst") ) ..
   )
 ;
 
-q37_demFeIndst_biomass_share(t,regi,entyFe,emiMkt)$( 
-                                    sum(entySeBio, sefe(entySeBio,entyFe))
-                                AND          sector2emiMkt("indst",emiMkt) ) ..
-    v37_demFeIndst_biomass_share(t,regi,entyFe,emiMkt)
-  * sum(sefe(entySe,entyFe),
-      vm_demFeSector_afterTax(t,regi,entySe,entyFe,"indst",emiMkt)
-    )
+
+q37_demFeIndst_total_byFE(t,regi,entyFe,emiMkt)$(
+                                            sector2emiMkt("indst",emiMkt)
+                                        AND entyFe2sector(entyFe,"indst") ) ..
+  v37_demFeIndst_total_byFE(t,regi,entyFe,emiMkt)
+  =e=
+  sum(sefe(entySe,entyFe),
+    vm_demFeSector_afterTax(t,regi,entySe,entyFe,"indst",emiMkt)
+  )
+;
+
+!! limit share of biomass SE in FE
+q37_demFeIndst_biomass(t,regi,entyFe,emiMkt)$( 
+                                            sector2emiMkt("indst",emiMkt)
+                                        AND entyFe2Sector(entyFe,"indst") ) ..
+  v37_demFeIndst_biomass(t,regi,entyFe,emiMkt)
   =e=
   sum(sefe(entySeBio,entyFe),
     vm_demFeSector_afterTax(t,regi,entySeBio,entyFe,"indst",emiMkt)
   )
 ;
 
-q37_demFeIndst_hydrogen_share(t,regi,emiMkt)$(
-                                             sector2emiMkt("indst",emiMkt) ) ..
-    v37_demFeIndst_hydrogen_share(t,regi,emiMkt)
-  * sum((sefe(entySe,entyFe),entyFe2Sector(entyFe,"indst")),
+q37_demFeIndst_biomass_share(t,regi,entyFe,emiMkt)$(
+                                    sector2emiMkt("indst",emiMkt)
+                                AND entyFe2Sector(entyFe,"indst")
+                                AND sum(entySeBio, sefe(entySeBio,entyFe)) ) ..
+    v37_demFeIndst_biomass_share(t,regi,entyFe,emiMkt)
+  * v37_demFeIndst_total_byFE(t,regi,entyFe,emiMkt)
+  =e=
+  v37_demFeIndst_biomass(t,regi,entyFe,emiMkt)
+;
+
+!! limit share of synthetic SE in FE
+q37_demFeIndst_hydrogen(t,regi,entyFe,emiMkt)$( 
+                                    sector2emiMkt("indst",emiMkt)
+                                AND entyFe2Sector(entyFe,"indst")
+                                AND sum(entySeSyn, sefe(entySeSyn,entyFe)) ) ..
+  v37_demFeIndst_hydrogen(t,regi,entyFe,emiMkt)
+  =e=
+  sum(sefe(entySeSyn,entyFe),
+    vm_demFeSector_afterTax(t,regi,entySeSyn,entyFe,"indst",emiMkt)
+  )
+;
+
+q37_demFeIndst_hydrogen_share(t,regi,entyFe,emiMkt)$(
+                                    sector2emiMkt("indst",emiMkt)
+                                AND entyFe2Sector(entyFe,"indst")
+                                AND sum(entySeSyn, sefe(entySeSyn,entyFe)) ) ..
+    v37_demFeIndst_hydrogen_share(t,regi,entyFe,emiMkt)
+  * v37_demFeIndst_total_byFE(t,regi,entyFe,emiMkt)
+  =e=
+  v37_demFeIndst_hydrogen(t,regi,entyFe,emiMkt)
+;
+
+!! limit share of H2 in all FE
+q37_demFeIndst_total(t,regi,emiMkt)$( sector2emiMkt("indst",emiMkt) ) ..
+  v37_demFeIndst_total(t,regi,emiMkt)
+  =e=
+    sum((sefe(entySe,entyFe),entyFe2Sector(entyFe,"indst")),
       vm_demFeSector_afterTax(t,regi,entySe,entyFe,"indst",emiMkt)
     )
+;
+
+q37_demFeIndst_feh2_share(t,regi,emiMkt)$( sector2emiMkt("indst",emiMkt) ) .. 
+    v37_demFeIndst_feh2_share(t,regi,emiMkt)
+  * v37_demFeIndst_total(t,regi,emiMkt)
   =e=
-  sum((sefe(entySeAllH2(entySe),entyFe),entyFe2Sector(entyFe,"indst")),
-    vm_demFeSector_afterTax(t,regi,entySe,entyFe,"indst",emiMkt)
+  sum(sefe(entySe,"feh2s"),
+    vm_demFeSector_afterTax(t,regi,entySe,"feh2s","indst",emiMkt)
   )
 ;
 

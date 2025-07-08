@@ -62,7 +62,10 @@ $ifthen.cm_wasteIncinerationCCSshare not "%cm_wasteIncinerationCCSshare%" == "of
   / %cm_wasteIncinerationCCSshare% /
 $endIf.cm_wasteIncinerationCCSshare
 
-  p37_ind_CCS_cap(tall, all_regi,all_te,rlf)
+  p37_deltaCap(tall, all_regi,all_te,rlf)
+  p37_demFeIndst_biomass_share(ttot,all_regi,all_enty,all_emiMkt)   "biomass share in industry FE demand"
+  p37_demFeIndst_hydrogen_share(ttot,all_regi,all_enty,all_emiMkt)           "hydrogen share in industry FE demand"
+  p37_demFeIndst_feh2_share(ttot,all_regi,all_emiMkt)
 ;
 
 Positive Variables
@@ -75,8 +78,13 @@ Positive Variables
   !! process-based implementation
   vm_captureVol(tall,all_regi,all_te)                               "Production volume of processes in process-based model [Gt/a]"
 
+  v37_demFeIndst_total_byFE(ttot,all_regi,all_enty,all_emiMkt)
+  v37_demFeIndst_biomass(ttot,all_regi,all_enty,all_emiMkt)
+  v37_demFeIndst_hydrogen(ttot,all_regi,all_enty,all_emiMkt)
+  v37_demFeIndst_total(ttot,all_regi,all_emiMkt)
   v37_demFeIndst_biomass_share(ttot,all_regi,all_enty,all_emiMkt)   "biomass share in industry FE demand"
-  v37_demFeIndst_hydrogen_share(ttot,all_regi,all_emiMkt)           "hydrogen share in industry FE demand"
+  v37_demFeIndst_hydrogen_share(ttot,all_regi,all_enty,all_emiMkt)           "hydrogen share in industry FE demand"
+  v37_demFeIndst_feh2_share(ttot,all_regi,all_emiMkt)
 ;
 
 Equations
@@ -109,8 +117,14 @@ $endif.CES_parameters
   q37_emiIndCC(tall,all_regi,secInd37)                                              "Captured emissions from CCS"
   q37_limitOutflowCC(tall,all_regi,secInd37)                                        "Carbon capture processes can only capture as much co2 as the base process emits"
 
+  q37_demFeIndst_total(ttot,all_regi,all_emiMkt)
+  q37_demFeIndst_total_byFE(ttot,all_regi,all_enty,all_emiMkt)
+  q37_demFeIndst_biomass(ttot,all_regi,all_enty,all_emiMkt)
+  q37_demFeIndst_hydrogen(ttot,all_regi,all_enty,all_emiMkt)
+
   q37_demFeIndst_biomass_share(ttot,all_regi,all_enty,all_emiMkt)   "biomass share in industry FE demand"
-  q37_demFeIndst_hydrogen_share(ttot,all_regi,all_emiMkt)           "hydrogen share in industry FE demand"
+  q37_demFeIndst_hydrogen_share(ttot,all_regi,all_enty,all_emiMkt)           "hydrogen share in industry FE demand"
+  q37_demFeIndst_feh2_share(ttot,all_regi,all_emiMkt)
 ;
 
 *** EOF ./modules/37_industry/subsectors/declarations.gms

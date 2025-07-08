@@ -96,16 +96,23 @@ pm_energy_limit(out)$(NOT sum(in, ces_eff_target_dyn37(out,in))) = 0.;
 $ifthen.no_calibration "%CES_parameters%" == "load"   !! CES_parameters
 if (cm_startyear eq 2005,
   execute_loadpoint "input.gdx"
-    p37_cesIO_baseline = vm_cesIO.l,
-    p37_plasticsCarbon_baseline = v37_plasticsCarbon.l,
+    p37_cesIO_baseline                = vm_cesIO.l,
+    p37_plasticsCarbon_baseline       = v37_plasticsCarbon.l,
     p37_demFeSector_afterTax_baseline = vm_demFeSector_afterTax.l,
-    p37_ind_CCS_cap = vm_cap.l;
+    p37_deltaCap                      = vm_deltaCap.l;
+!!    p37_demFeIndst_biomass_share      = v37_demFeIndst_biomass_share.l,
+!!    p37_demFeIndst_hydrogen_share     = v37_demFeIndst_hydrogen_share.l,
+!!    p37_demFeIndst_feh2_share         = v37_demFeIndst_feh2_share.l
 else
   execute_loadpoint "input_ref.gdx"
-    p37_cesIO_baseline = vm_cesIO.l,
-    p37_plasticsCarbon_baseline = v37_plasticsCarbon.l,
+    p37_cesIO_baseline                = vm_cesIO.l,
+    p37_plasticsCarbon_baseline       = v37_plasticsCarbon.l,
     p37_demFeSector_afterTax_baseline = vm_demFeSector_afterTax.l,
-    p37_ind_CCS_cap = vm_cap.l;
+    p37_deltaCap                      = vm_deltaCap.l,
+    p37_demFeIndst_biomass_share      = v37_demFeIndst_biomass_share.l,
+    p37_demFeIndst_hydrogen_share     = v37_demFeIndst_hydrogen_share.l,
+    p37_demFeIndst_feh2_share         = v37_demFeIndst_feh2_share.l
+  ;
 );
 
 

@@ -193,26 +193,40 @@ v37_demFeIndst_biomass_share.up(t,regi,entyFE,emiMkt)$(
 $endif
 
 *** industry hydrogen shares
-v37_demFeIndst_hydrogen_share.l(t,regi,emiMkt)$(
-                                                sector2emiMkt("indst",emiMkt) )
-  = sum(sefe(entySeAllH2(entySe),entyFe)$( entyFe2Sector(entyFe,"indst") ),
+v37_demFeIndst_hydrogen_share.l(t,regi,entyFe,emiMkt)$(
+                                      sector2emiMkt("indst",emiMkt) 
+                                  AND entyFe2Sector(entyFe,"indst")
+                                  AND sum(entySeSyn, sefe(entySeSyn,entyFe)) )
+  = sum(sefe(entySeAllH2(entySe),entyFe),
       vm_demFeSector_afterTax.l(t,regi,entySe,entyFe,"indst",emiMkt)
     )
-  / sum(sefe(entySe,entyFe)$( entyFe2Sector(entyFe,"indst") ),
+  / sum(sefe(entySe,entyFe),
       vm_demFeSector_afterTax.l(t,regi,entySe,entyFe,"indst",emiMkt)
     );
 
-$ifthen NOT "%cm_Indst_hydrogen_share_limit%" == "off"
-v37_demFeIndst_hydrogen_share.up(t,regi,emiMkt)$(
-                                                t.val ge 2030
-                                            AND sector2emiMkt("indst",emiMkt) )
-  = sum(sefe(entySeAllH2(entySe),entyFe)$( entyFe2Sector(entyFe,"indst") ),
-      vm_demFeSector_afterTax.l(t,regi,entySe,entyFe,"indst",emiMkt)
+v37_demFeIndst_feh2_share.l(t,regi,emiMkt)$( sector2emiMkt("indst",emiMkt) )
+  = sum(sefe(entySe,"feh2s"),
+      vm_demFeSector_afterTax.l(t,regi,entySe,"feh2s","indst",emiMkt)
     )
-  / sum(sefe(entySe,entyFe)$( entyFe2Sector(entyFe,"indst") ),
+  / sum((sefe(entySe,entyFe),entyFe2Sector(entyFe,"indst")),
       vm_demFeSector_afterTax.l(t,regi,entySe,entyFe,"indst",emiMkt)
-    )
+    );
+
+
+$ifthen NOT "%cm_Indst_hydrogen_share_limit%" == "off"   !! cm_Indst_hydrogen_share_limit
+v37_demFeIndst_hydrogen_share.up(t,regi,entyFe,emiMkt)$(
+                                      2030 le t.val
+                                  AND sector2emiMkt("indst",emiMkt)
+                                  AND entyFe2Sector(entyFe,"indst")
+                                  AND sum(entySeSyn, sefe(entySeSyn,entyFe)) )
+  = p37_demFeIndst_hydrogen_share(t,regi,entyFe,emiMkt)
   * %cm_Indst_hydrogen_share_limit%;  !! cm_Indst_hydrogen_share_limit
+
+v37_demFeIndst_feh2_share.up(t,regi,emiMkt)$(
+                                                2025 le t.val
+                                            AND sector2emiMkt("indst",emiMkt) )
+  = p37_demFeIndst_feh2_share(t,regi,emiMkt)
+  * %cm_Indst_hydrogen_share_limit%;   !! cm_Indst_hydrogen_share_limit
 $endif
 
 *** EOF ./modules/37_industry/subsectors/bounds.gms
