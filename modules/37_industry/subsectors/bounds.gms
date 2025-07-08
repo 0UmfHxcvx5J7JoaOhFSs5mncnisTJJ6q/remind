@@ -152,12 +152,6 @@ loop ((t,secInd37_teCCind(secInd37,teCCind))$(
   = f37_industry_CCS_limits(t,regi,secInd37)
 );
 
-$ifthen NOT "%cm_Indst_CCS_cap_limit%" == "off"
-vm_cap.up(t,regi,teCCind,"1")$( 2030 le t.val )
-  = p37_ind_CCS_cap(t,regi,teCCind,"1")
-  * %cm_Indst_CCS_cap_limit%;  !! cm_Indst_CCS_cap_limit
-$endif
-
 !! Switch to turn off CCS
 if (cm_CCS_steel ne 1 OR cm_IndCCSscen ne 1,
   vm_cap.fx(t,regi,"steelcc",rlf) = 0.;
