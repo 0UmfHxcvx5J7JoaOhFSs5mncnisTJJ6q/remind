@@ -147,22 +147,20 @@ q37_emiIndBase(t,regi,enty,secInd37)$(
                                     AND cm_CCS_cement ne 0               ) ) ..
   vm_emiIndBase(t,regi,enty,secInd37)
   =e=
-    sum((secInd37_2_pf(secInd37,ppfen_industry_dyn37(in)),fe2ppfEn(entyFeCC37(enty),in)),
+    sum((secInd37_2_pf(secInd37,ppfen_industry_dyn37(in)),
+         fe2ppfEn(entyFeCC37(enty),in)),
       ( vm_cesIO(t,regi,in)
       - ( p37_chemicals_feedstock_share(t,regi)
         * vm_cesIO(t,regi,in)
         )$( in_chemicals_feedstock_37(in) )
       )
-        *
-        sum(se2fe(entySeFos,enty,te),
-            pm_emifac(t,regi,entySeFos,enty,te,"co2")
-        )
-    ) !!$(entyFe(enty)) condition should be fulfilled by summation over entyFeCC37 above
-    +
-    (s37_clinker_process_CO2
+    * sum(se2fe(entySeFos,enty,te), pm_emifac(t,regi,entySeFos,enty,te,"co2"))
+    )
+  +  (s37_clinker_process_CO2
     * p37_clinker_cement_ratio(t,regi)
     * vm_cesIO(t,regi,"ue_cement")
-    / sm_c_2_co2)$(sameas(enty,"co2cement_process") AND sameas(secInd37,"cement"))
+    / sm_c_2_co2
+    )$( sameas(enty,"co2cement_process") AND sameas(secInd37,"cement") )
 ;
 
 
