@@ -143,8 +143,8 @@ $endif.exogDem_scen
 *' accounting, just as a CCS baseline.
 ***------------------------------------------------------
 q37_emiIndBase(t,regi,enty,secInd37)$(
-                               NOT (    sameas(enty,"co2cement_process")
-                                    AND cm_CCS_cement ne 0               ) ) ..
+            emiInd37_fe2sec(enty,secInd37)
+        AND NOT (sameas(enty,"co2cement_process") AND cm_CCS_cement ne 1) ) ..
   vm_emiIndBase(t,regi,enty,secInd37)
   =e=
     sum((secInd37_2_pf(secInd37,ppfen_industry_dyn37(in)),
