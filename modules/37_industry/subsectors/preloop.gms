@@ -18,4 +18,40 @@ p37_FeedstockCarbonContent(ttot,regi,entyFe)
     - pm_emifacNonEnergy(ttot,regi,entySeFos,entyFe,"indst","co2")
     );
 
+*** initialise indstry biomass, synfuels, and H2 shares
+v37_demFeIndst_biomass_share.l(t,regi,entyFE,emiMkt)$(
+                                       sum(entySeBio, sefe(entySeBio,entyFE)) 
+                                   AND sector2emiMkt("indst",emiMkt)          )
+  = sum(sefe(entySeBio,entyFe),
+      p37_demFeSector_afterTax_baseline(t,regi,entySeBio,entyFe,"indst",emiMkt)
+    )
+  / ( sum(sefe(entySe,entyFe),
+        p37_demFeSector_afterTax_baseline(t,regi,entySe,entyFe,"indst",emiMkt)
+      )
+    + sm_eps
+    );
+
+v37_demFeIndst_hydrogen_share.l(t,regi,entyFe,emiMkt)$(
+                                      sector2emiMkt("indst",emiMkt) 
+                                  AND entyFe2Sector(entyFe,"indst")
+                                  AND sum(entySeSyn, sefe(entySeSyn,entyFe)) )
+  = sum(sefe(entySeAllH2(entySe),entyFe),
+      vm_demFeSector_afterTax.l(t,regi,entySe,entyFe,"indst",emiMkt)
+    )
+  / ( sum(sefe(entySe,entyFe),
+        vm_demFeSector_afterTax.l(t,regi,entySe,entyFe,"indst",emiMkt)
+      )
+    + sm_eps
+    );
+
+v37_demFeIndst_feh2_share.l(t,regi,emiMkt)$( sector2emiMkt("indst",emiMkt) )
+  = sum(sefe(entySe,"feh2s"),
+      vm_demFeSector_afterTax.l(t,regi,entySe,"feh2s","indst",emiMkt)
+    )
+  / ( sum((sefe(entySe,entyFe),entyFe2Sector(entyFe,"indst")),
+        vm_demFeSector_afterTax.l(t,regi,entySe,entyFe,"indst",emiMkt)
+      )
+    + sm_eps
+    );
+
 *** EOF ./modules/37_industry/subsectors/preloop.gms

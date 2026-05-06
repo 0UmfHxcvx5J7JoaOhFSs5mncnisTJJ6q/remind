@@ -96,13 +96,25 @@ pm_energy_limit(out)$(NOT sum(in, ces_eff_target_dyn37(out,in))) = 0.;
 $ifthen.no_calibration "%CES_parameters%" == "load"   !! CES_parameters
 if (cm_startyear eq 2005,
   execute_loadpoint "input.gdx"
-    p37_cesIO_baseline = vm_cesIO.l,
-    p37_plasticsCarbon_baseline = v37_plasticsCarbon.l;
+    p37_cesIO_baseline                = vm_cesIO.l,
+    p37_plasticsCarbon_baseline       = v37_plasticsCarbon.l,
+    p37_demFeSector_afterTax_baseline = vm_demFeSector_afterTax.l,
+    p37_deltaCap                      = vm_deltaCap.l;
+!!    p37_demFeIndst_biomass_share      = v37_demFeIndst_biomass_share.l,
+!!    p37_demFeIndst_hydrogen_share     = v37_demFeIndst_hydrogen_share.l,
+!!    p37_demFeIndst_feh2_share         = v37_demFeIndst_feh2_share.l
 else
   execute_loadpoint "input_ref.gdx"
-    p37_cesIO_baseline = vm_cesIO.l,
-    p37_plasticsCarbon_baseline = v37_plasticsCarbon.l;
+    p37_cesIO_baseline                = vm_cesIO.l,
+    p37_plasticsCarbon_baseline       = v37_plasticsCarbon.l,
+    p37_demFeSector_afterTax_baseline = vm_demFeSector_afterTax.l,
+    p37_deltaCap                      = vm_deltaCap.l,
+    p37_demFeIndst_biomass_share      = v37_demFeIndst_biomass_share.l,
+    p37_demFeIndst_hydrogen_share     = v37_demFeIndst_hydrogen_share.l,
+    p37_demFeIndst_feh2_share         = v37_demFeIndst_feh2_share.l
+  ;
 );
+
 
 Parameter
   p37_energy_limit_def(ttot,ext_regi,all_in)   "input data for calculating p37_energy_limit_slope"
@@ -412,6 +424,18 @@ pm_tau_ces_tax(t,regi,"feh2_cement")    = 100 * sm_TWa_2_MWh * 1e-12;
 
 
 *' overwrite or extend CES markup cost if specified by switch
+$ifthen.CESMkup "%cm_CESMkup_ind_H2%" == "opt"
+pm_tau_ces_tax(t,regi,"feh2_cement")    = pm_tau_ces_tax(t,regi,"feh2_cement")    /  2;
+pm_tau_ces_tax(t,regi,"feh2_chemicals") = pm_tau_ces_tax(t,regi,"feh2_chemicals") /  2;
+pm_tau_ces_tax(t,regi,"feh2_steel")     = pm_tau_ces_tax(t,regi,"feh2_steel")     /  4;
+pm_tau_ces_tax(t,regi,"feh2_otherInd")  = pm_tau_ces_tax(t,regi,"feh2_otherInd")  / 40;
+$elseif.CESMkup "%cm_CESMkup_ind_H2%" == "pes"
+pm_tau_ces_tax(t,regi,"feh2_cement")    = pm_tau_ces_tax(t,regi,"feh2_cement")    *  2;
+pm_tau_ces_tax(t,regi,"feh2_chemicals") = pm_tau_ces_tax(t,regi,"feh2_chemicals") *  2;
+pm_tau_ces_tax(t,regi,"feh2_steel")     = pm_tau_ces_tax(t,regi,"feh2_steel")     *  4;
+pm_tau_ces_tax(t,regi,"feh2_otherInd")  = pm_tau_ces_tax(t,regi,"feh2_otherInd")  * 10;
+$endif.CESMkup
+
 $ifthen.CESMkup "%cm_CESMkup_ind%" == "manual"
 loop (ppfen_industry_dyn37(in)$( p37_CESMkup_input(in) ),
   p37_CESMkup(ttot,regi,in)$( ppfen_MkupCost37(in) )

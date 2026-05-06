@@ -598,6 +598,7 @@ parameter
   cm_CCS_steel              "CCS for steel sub-sector"
 ;
   cm_CCS_steel           = 1;        !! def = 1
+
 *'
 parameter
   cm_bioenergy_SustTax      "level of the bioenergy sustainability tax in fraction of bioenergy price"
@@ -1524,6 +1525,16 @@ $setglobal cm_CCS_markup  off  !! def = off
 ***   def <- "off"
 ***   or number (ex. 0.66), multiply by 0.66 Industry CSS cost markup
 $setglobal cm_Industry_CCS_markup  off !! def = off
+
+*** limit on CCS capacity in industry relative to reference [1 - 0]
+$setglobal cm_Indst_CCS_cap_limit    off !! def = off
+
+*** limit on biomass share in industry relative to reference [1 - 0]
+$setglobal cm_Indst_biomass_share_limit off  !! def = off
+
+*** limit on hydrogen share in industry relative to reference [1 - 0]
+$setglobal cm_Indst_hydrogen_share_limit off  !! def = off
+
 *** cm_renewables_floor_cost "additional floor cost for renewables"
 ***   def <- "off" = use default floor cost for renewables.
 ***   or list of techs with respective value to be added to the renewables floor cost in Europe
@@ -1580,6 +1591,11 @@ $setGlobal cm_CESMkup_build  standard  !! def = standard
 *** addressed in cm_CESMkup_ind_data.
 $setGlobal cm_CESMkup_ind        standard  !! def = standard
 $setGlobal cm_CESMkup_ind_data   ""        !! def = ""
+
+*** Modify industry H2 CES markups
+*** - "opt" decreases markups by a factor of 2-40
+*** - "pes" increases markups by a factor of 2-10
+$setGlobal cm_CESMkup_ind_H2 off  !! off
 
 *** cm_ind_energy_limit Switch for setting upper limits on industry energy
 *** efficiency improvements.  See ./modules/37_subsectors/datainput.gms for

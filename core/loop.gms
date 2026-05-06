@@ -61,6 +61,12 @@ $batinclude "./modules/include.gms" presolve
 *cb 20140305 submit.R looks for the unique string in the following line and replaces it with the offlisting include into the full.gms at this position
 ***cb20140305readinpositionforfinxingfiles
 
+$ifthen NOT "%cm_Indst_CCS_cap_limit%" == "off"   !! cm_Indst_CCS_cap_limit
+vm_deltaCap.up(t,regi,teCCind,"1")$( 2020 le t.val )
+  = p37_deltaCap(t,regi,teCCind,"1")
+  * %cm_Indst_CCS_cap_limit%;   !! cm_Indst_CCS_cap_limit
+$endif
+
 *** In case of fixing, fix to prices from input_ref.gdx (t < cm_startyear). 
 *** Parameters are not automatically treated by the fixing mechanism above.
 if( (cm_startyear gt 2005),

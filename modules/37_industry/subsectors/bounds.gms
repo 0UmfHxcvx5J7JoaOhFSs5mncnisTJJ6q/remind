@@ -120,8 +120,8 @@ vm_cesIO.lo(t,regi_dyn29(regi),in_industry_dyn37(in))$(
 *' carbon prices due to missing adjustment costs.
 if (cm_startyear gt 2005,   !! not a baeline or NPi scenario
   vm_demFeSector_afterTax.up(t,regi,"sesobio","fesos","indst","ETS")
-  = max(0.25 , smax(t2, pm_secBioShare(t2,regi,"fesos","indst") ) )
-    * p37_BAU_industry_ETS_solids(t,regi);
+  = max(0.25, smax(t2, pm_secBioShare(t2,regi,"fesos","indst")))
+  * p37_BAU_industry_ETS_solids(t,regi);
 );
 
 !! Fix industry output for Bal and EnSec scenario
@@ -145,6 +145,13 @@ if (cm_startyear eq 2005,
   );
 );
 
+!! limit industry CCS capacity for 2025–30
+loop ((t,secInd37_teCCind(secInd37,teCCind))$(
+                                             2025 le t.val AND t.val le 2030 ),
+  vm_cap.up(t,regi,teCCind,"1")
+  = f37_industry_CCS_limits(t,regi,secInd37)
+);
+
 !! Switch to turn off CCS
 if (cm_CCS_steel ne 1 OR cm_IndCCSscen ne 1,
   vm_cap.fx(t,regi,"steelcc",rlf) = 0.;
@@ -156,13 +163,38 @@ if (cm_CCS_cement ne 1 OR cm_IndCCSscen ne 1,
   vm_cap.fx(t,regi,"cementcc",rlf) = 0.;
 );
 
+*** industry biomass shares
+$ifthen NOT "%cm_Indst_biomass_share_limit%" == "off"
+v37_demFeIndst_biomass_share.up(t,regi,entyFE,emiMkt)$(
+                                       t.val ge 2030
+                                   AND sum(entySeBio, sefe(entySeBio,entyFE)) 
+                                   AND sector2emiMkt("indst",emiMkt)          )
+  = sum(sefe(entySeBio,entyFe),
+      p37_demFeSector_afterTax_baseline(t,regi,entySeBio,entyFe,"indst",emiMkt)
+    )
+  / ( sum(sefe(entySe,entyFe),
+        p37_demFeSector_afterTax_baseline(t,regi,entySe,entyFe,"indst",emiMkt)
+      )
+    + sm_eps
+    )
+  * %cm_Indst_biomass_share_limit%;  !! cm_Indst_biomass_share_limit
+$endif
 
-vm_cap.up("2025",regi,"steelcc","1")     = f37_industry_CCS_limits("2025",regi,"steel");
-vm_cap.up("2025",regi,"chemicalscc","1") = f37_industry_CCS_limits("2025",regi,"chemicals");
-vm_cap.up("2025",regi,"cementcc","1")    = f37_industry_CCS_limits("2025",regi,"cement");
-vm_cap.up("2030",regi,"steelcc","1")     = f37_industry_CCS_limits("2030",regi,"steel");
-vm_cap.up("2030",regi,"chemicalscc","1") = f37_industry_CCS_limits("2030",regi,"chemicals");
-vm_cap.up("2030",regi,"cementcc","1")    = f37_industry_CCS_limits("2030",regi,"cement");
+*** industry hydrogen shares
+$ifthen NOT "%cm_Indst_hydrogen_share_limit%" == "off"   !! cm_Indst_hydrogen_share_limit
+v37_demFeIndst_hydrogen_share.up(t,regi,entyFe,emiMkt)$(
+                                      2030 le t.val
+                                  AND sector2emiMkt("indst",emiMkt)
+                                  AND entyFe2Sector(entyFe,"indst")
+                                  AND sum(entySeSyn, sefe(entySeSyn,entyFe)) )
+  = p37_demFeIndst_hydrogen_share(t,regi,entyFe,emiMkt)
+  * %cm_Indst_hydrogen_share_limit%;  !! cm_Indst_hydrogen_share_limit
 
+v37_demFeIndst_feh2_share.up(t,regi,emiMkt)$(
+                                                2025 le t.val
+                                            AND sector2emiMkt("indst",emiMkt) )
+  = p37_demFeIndst_feh2_share(t,regi,emiMkt)
+  * %cm_Indst_hydrogen_share_limit%;   !! cm_Indst_hydrogen_share_limit
+$endif
 
 *** EOF ./modules/37_industry/subsectors/bounds.gms

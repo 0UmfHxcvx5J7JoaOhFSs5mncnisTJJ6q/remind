@@ -28,6 +28,78 @@ q37_demFeIndst(t,regi,entyFe,emiMkt)$( entyFe2Sector(entyFe,"indst") ) ..
   )
 ;
 
+
+q37_demFeIndst_total_byFE(t,regi,entyFe,emiMkt)$(
+                                            sector2emiMkt("indst",emiMkt)
+                                        AND entyFe2sector(entyFe,"indst") ) ..
+  v37_demFeIndst_total_byFE(t,regi,entyFe,emiMkt)
+  =e=
+  sum(sefe(entySe,entyFe),
+    vm_demFeSector_afterTax(t,regi,entySe,entyFe,"indst",emiMkt)
+  )
+;
+
+!! limit share of biomass SE in FE
+q37_demFeIndst_biomass(t,regi,entyFe,emiMkt)$( 
+                                            sector2emiMkt("indst",emiMkt)
+                                        AND entyFe2Sector(entyFe,"indst") ) ..
+  v37_demFeIndst_biomass(t,regi,entyFe,emiMkt)
+  =e=
+  sum(sefe(entySeBio,entyFe),
+    vm_demFeSector_afterTax(t,regi,entySeBio,entyFe,"indst",emiMkt)
+  )
+;
+
+q37_demFeIndst_biomass_share(t,regi,entyFe,emiMkt)$(
+                                    sector2emiMkt("indst",emiMkt)
+                                AND entyFe2Sector(entyFe,"indst")
+                                AND sum(entySeBio, sefe(entySeBio,entyFe)) ) ..
+    v37_demFeIndst_biomass_share(t,regi,entyFe,emiMkt)
+  * v37_demFeIndst_total_byFE(t,regi,entyFe,emiMkt)
+  =e=
+  v37_demFeIndst_biomass(t,regi,entyFe,emiMkt)
+;
+
+!! limit share of synthetic SE in FE
+q37_demFeIndst_hydrogen(t,regi,entyFe,emiMkt)$( 
+                                    sector2emiMkt("indst",emiMkt)
+                                AND entyFe2Sector(entyFe,"indst")
+                                AND sum(entySeSyn, sefe(entySeSyn,entyFe)) ) ..
+  v37_demFeIndst_hydrogen(t,regi,entyFe,emiMkt)
+  =e=
+  sum(sefe(entySeSyn,entyFe),
+    vm_demFeSector_afterTax(t,regi,entySeSyn,entyFe,"indst",emiMkt)
+  )
+;
+
+q37_demFeIndst_hydrogen_share(t,regi,entyFe,emiMkt)$(
+                                    sector2emiMkt("indst",emiMkt)
+                                AND entyFe2Sector(entyFe,"indst")
+                                AND sum(entySeSyn, sefe(entySeSyn,entyFe)) ) ..
+    v37_demFeIndst_hydrogen_share(t,regi,entyFe,emiMkt)
+  * v37_demFeIndst_total_byFE(t,regi,entyFe,emiMkt)
+  =e=
+  v37_demFeIndst_hydrogen(t,regi,entyFe,emiMkt)
+;
+
+!! limit share of H2 in all FE
+q37_demFeIndst_total(t,regi,emiMkt)$( sector2emiMkt("indst",emiMkt) ) ..
+  v37_demFeIndst_total(t,regi,emiMkt)
+  =e=
+    sum((sefe(entySe,entyFe),entyFe2Sector(entyFe,"indst")),
+      vm_demFeSector_afterTax(t,regi,entySe,entyFe,"indst",emiMkt)
+    )
+;
+
+q37_demFeIndst_feh2_share(t,regi,emiMkt)$( sector2emiMkt("indst",emiMkt) ) .. 
+    v37_demFeIndst_feh2_share(t,regi,emiMkt)
+  * v37_demFeIndst_total(t,regi,emiMkt)
+  =e=
+  sum(sefe(entySe,"feh2s"),
+    vm_demFeSector_afterTax(t,regi,entySe,"feh2s","indst",emiMkt)
+  )
+;
+
 ***------------------------------------------------------
 *' Thermodynamic limits on subsector energy demand
 ***------------------------------------------------------
@@ -71,26 +143,24 @@ $endif.exogDem_scen
 *' accounting, just as a CCS baseline.
 ***------------------------------------------------------
 q37_emiIndBase(t,regi,enty,secInd37)$(
-                               NOT (    sameas(enty,"co2cement_process")
-                                    AND cm_CCS_cement ne 0               ) ) ..
+            emiInd37_fe2sec(enty,secInd37)
+        AND NOT (sameas(enty,"co2cement_process") AND cm_CCS_cement ne 1) ) ..
   vm_emiIndBase(t,regi,enty,secInd37)
   =e=
-    sum((secInd37_2_pf(secInd37,ppfen_industry_dyn37(in)),fe2ppfEn(entyFeCC37(enty),in)),
+    sum((secInd37_2_pf(secInd37,ppfen_industry_dyn37(in)),
+         fe2ppfEn(entyFeCC37(enty),in)),
       ( vm_cesIO(t,regi,in)
       - ( p37_chemicals_feedstock_share(t,regi)
         * vm_cesIO(t,regi,in)
         )$( in_chemicals_feedstock_37(in) )
       )
-        *
-        sum(se2fe(entySeFos,enty,te),
-            pm_emifac(t,regi,entySeFos,enty,te,"co2")
-        )
-    ) !!$(entyFe(enty)) condition should be fulfilled by summation over entyFeCC37 above
-    +
-    (s37_clinker_process_CO2
+    * sum(se2fe(entySeFos,enty,te), pm_emifac(t,regi,entySeFos,enty,te,"co2"))
+    )
+  +  (s37_clinker_process_CO2
     * p37_clinker_cement_ratio(t,regi)
     * vm_cesIO(t,regi,"ue_cement")
-    / sm_c_2_co2)$(sameas(enty,"co2cement_process") AND sameas(secInd37,"cement"))
+    / sm_c_2_co2
+    )$( sameas(enty,"co2cement_process") AND sameas(secInd37,"cement") )
 ;
 
 
@@ -111,12 +181,12 @@ q37_cementCCS(t,regi)$(cm_CCS_cement eq 1 AND cm_IndCCSscen eq 1) ..
 *' Definition of capacity constraints
 ***------------------------------------------------------
 q37_limitCapCC(t,regi,teCCInd) ..
-      vm_captureVol(t,regi,teCCInd)
-    =l=
-    sum(teCCInd2rlf(teCCInd,rlf),
-      vm_capFac(t,regi,teCCInd)
-    * vm_cap(t,regi,teCCInd,rlf)
-    )
+  vm_captureVol(t,regi,teCCInd)
+  =l=
+  sum(teCCInd2rlf(teCCInd,rlf),
+    vm_capFac(t,regi,teCCInd)
+  * vm_cap(t,regi,teCCInd,rlf)
+  )
 ;
 
 ***------------------------------------------------------
